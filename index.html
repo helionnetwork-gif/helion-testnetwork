@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helion Staking</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
+    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
+    --danger: #E5484D; --success: #3DD68C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
+    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .display{ font-family:'Chakra Petch', sans-serif; }
+  .wrap{ max-width: 760px; margin: 0 auto; }
+
+  header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
+  .brand{ display:flex; align-items:center; gap: 12px; }
+  .brand h1{ font-size: 22px; letter-spacing: 0.5px; }
+  .brand .tag{ font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;}
+  .brand-logo{ height: 40px; width: 40px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 16px rgba(242,169,59,0.35); }
+
+  .wallet-pill{
+    background: var(--panel); border: 1px solid var(--line); padding: 10px 16px; border-radius: 999px;
+    font-size: 13px; display:flex; align-items:center; gap:8px; cursor:pointer; transition: border-color .15s ease;
+  }
+  .wallet-pill:hover{ border-color: var(--gold-dim); }
+  .wallet-pill .dot{ width:8px; height:8px; border-radius:50%; background: var(--muted); }
+  .wallet-pill.connected .dot{ background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+  .nav-link-row{ display:flex; justify-content:flex-end; margin-bottom: 20px; }
+  .nav-link-row a{
+    font-size:12.5px; color: var(--gold); text-decoration:none; font-family:'Chakra Petch',sans-serif; font-weight:600;
+  }
+
+  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
+  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; transition: all .15s ease; min-width:70px; }
+  .site-nav .nav-item:hover{ color: var(--text); }
+  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
+
+  .connect-screen{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 60px 20px; text-align:center; }
+  .connect-screen p{ color: var(--muted); max-width: 380px; margin: 12px 0 28px; line-height:1.6; font-size: 14px;}
+  .connect-logo{ width: 110px; height:110px; border-radius:50%; object-fit:cover; border:3px solid var(--gold); box-shadow:0 0 32px rgba(242,169,59,0.45); }
+
+  .btn-primary{
+    background: linear-gradient(180deg, var(--gold), #d68f26); color: #1a1305; border: none; font-weight: 700;
+    padding: 16px 32px; border-radius: 14px; font-size: 15px; cursor: pointer; font-family:'Chakra Petch', sans-serif;
+    box-shadow: 0 8px 24px rgba(242,169,59,0.25); transition: transform .12s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-1px); }
+
+  .hidden{ display:none !important; }
+
+  .account-strip{
+    display:flex; align-items:center; justify-content:space-between; font-size: 12px; color: var(--muted);
+    margin-bottom: 20px; padding: 10px 16px; background: var(--panel); border:1px solid var(--line); border-radius: 12px;
+  }
+  .account-strip .addr{ color: var(--text); font-family:'JetBrains Mono', monospace; }
+  .network-badge{ font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(124,92,252,0.15); color: var(--violet); text-transform: uppercase; }
+
+  .balance-card{
+    background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 20px 22px;
+    display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;
+  }
+  .balance-card .label{ font-size: 11.5px; color: var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
+  .balance-card .value{ font-size: 24px; font-family:'JetBrains Mono',monospace; font-weight:700; }
+  .balance-card .pool-info{ text-align:right; font-size:11.5px; color:var(--muted); }
+  .balance-card .pool-info .val{ color: var(--gold); font-family:'JetBrains Mono',monospace; font-weight:600; }
+
+  h2.section-title{ font-size:14px; margin-bottom:14px; letter-spacing:0.3px; }
+
+  .tiers-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 640px){ .tiers-grid{ grid-template-columns: 1fr; } }
+  .tier-card{
+    background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 18px 16px;
+    cursor: pointer; transition: all .15s ease; text-align:center;
+  }
+  .tier-card:hover{ border-color: var(--gold-dim, #7A5C22); }
+  .tier-card.selected{ border-color: var(--gold); background: rgba(242,169,59,0.06); }
+  .tier-card .name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:15px; margin-bottom:8px; }
+  .tier-card .duration{ font-size: 22px; font-family:'JetBrains Mono',monospace; font-weight:700; color: var(--gold); margin-bottom: 4px;}
+  .tier-card .reward{ font-size: 12.5px; color: var(--success); font-weight:600; margin-bottom: 8px; }
+  .tier-card .min{ font-size: 11px; color: var(--muted); }
+  .tier-card.inactive{ opacity: 0.4; cursor:not-allowed; }
+
+  .stake-box{
+    background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 20px; margin-bottom: 24px;
+  }
+  .input-row{
+    display:flex; align-items:center; background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 4px 4px 4px 14px; margin-bottom: 12px;
+  }
+  .input-row input{ background: transparent; border:none; outline:none; color: var(--text); font-family:'JetBrains Mono', monospace; font-size: 15px; width: 100%; padding: 12px 0; }
+  .input-row .unit{ color: var(--muted); font-size: 12px; padding: 0 10px; white-space:nowrap; }
+  .btn-block{
+    width:100%; border:none; padding: 16px; border-radius:14px; font-family:'Chakra Petch',sans-serif;
+    font-weight:700; font-size:14px; cursor:pointer; transition: transform .12s ease, opacity .12s ease;
+    background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305;
+  }
+  .btn-block:hover{ transform: translateY(-1px); }
+  .btn-block:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
+  .btn-block.secondary{ background: linear-gradient(180deg, var(--violet), #5b3fd6); color:#f4f1ff; }
+  .btn-block.danger-outline{ background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+
+  .positions-list{ display:flex; flex-direction:column; gap: 12px; }
+  .position-card{ background: var(--panel); border:1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
+  .position-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; flex-wrap:wrap; gap:8px;}
+  .position-amount{ font-size: 18px; font-family:'JetBrains Mono',monospace; font-weight:700; }
+  .position-tag{ font-size: 10.5px; padding: 4px 10px; border-radius: 999px; background: var(--panel-2); color: var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
+  .position-tag.locked{ color: var(--gold); }
+  .position-tag.ready{ background: rgba(61,214,140,0.15); color: var(--success); }
+  .position-tag.done{ background: var(--panel-2); color: var(--muted); }
+
+  .progress-track{ height: 6px; background: var(--panel-2); border-radius: 999px; overflow:hidden; margin-bottom: 10px; }
+  .progress-fill{ height:100%; background: linear-gradient(90deg, var(--gold), #ffd68a); transition: width 1s linear; }
+
+  .position-meta{ display:flex; justify-content:space-between; font-size: 11.5px; color: var(--muted); margin-bottom: 14px; }
+  .position-meta span:last-child{ color: var(--text); font-family:'JetBrains Mono',monospace; }
+
+  .position-actions{ display:flex; gap: 10px; }
+  .position-actions button{ flex:1; padding: 11px; border-radius: 10px; font-size:12.5px; font-family:'Chakra Petch',sans-serif; font-weight:700; cursor:pointer; border:none; }
+  .btn-withdraw{ background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
+  .btn-early{ background: transparent; border:1px solid var(--danger) !important; color: var(--danger); }
+  .btn-withdraw:disabled, .btn-early:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  .empty-note{ text-align:center; color: var(--muted); font-size: 13px; padding: 30px 0; }
+
+  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
+  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; display:flex; align-items:flex-start; gap:10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); animation: slideUp .2s ease; }
+  @keyframes slideUp{ from{ opacity:0; transform: translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  .toast.success{ border-color: rgba(61,214,140,0.4); }
+  .toast.error{ border-color: rgba(229,72,77,0.4); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="logo.jpg" alt="Helion" class="brand-logo">
+      <div>
+        <h1 class="display">Helion Staking</h1>
+        <div class="tag">BSC Testnet · Monitasoinen staking</div>
+      </div>
+    </div>
+    <div id="walletPill" class="wallet-pill" onclick="connectWallet()">
+      <div class="dot"></div>
+      <span id="walletPillText">Ei yhdistetty</span>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <a href="index.html" class="nav-item active">🔒 Staking</a>
+    <a href="helion-trading.html" class="nav-item">🔄 Trading</a>
+    <a href="guide.html" class="nav-item">📖 Ohjeet</a>
+  </nav>
+
+  <div id="connectScreen" class="connect-screen">
+    <img src="logo.jpg" alt="Helion" class="connect-logo">
+    <h2 class="display" style="font-size:24px; margin-top:20px;">Yhdistä lompakkosi</h2>
+    <p>Yhdistä MetaMask nähdäksesi stakingtasot, oman saldosi ja aktiiviset stake-positiosi BSC-testiverkossa.</p>
+    <button class="btn-primary" onclick="connectWallet()" id="connectBtn">Yhdistä MetaMask</button>
+  </div>
+
+  <div id="mainUI" class="hidden">
+    <div class="account-strip">
+      <span>Lompakko: <span class="addr" id="accountDisplay">–</span></span>
+      <span class="network-badge">BSC Testnet</span>
+    </div>
+
+    <div class="balance-card">
+      <div>
+        <div class="label">Lompakkosaldo</div>
+        <div class="value" id="walletBalance">– HEL</div>
+      </div>
+      <div class="pool-info">
+        <div>Reward-pool jäljellä</div>
+        <div class="val" id="rewardPoolInfo">– HEL</div>
+      </div>
+    </div>
+
+    <h2 class="section-title display">Valitse taso</h2>
+    <div class="tiers-grid" id="tiersGrid">
+      <!-- Tasot renderöidään JS:llä -->
+    </div>
+
+    <div class="stake-box">
+      <div class="input-row">
+        <input type="number" id="stakeAmount" placeholder="0.0" min="0" step="0.01">
+        <span class="unit">HEL</span>
+      </div>
+      <div style="font-size:11.5px; color:var(--muted); margin-bottom:12px;" id="selectedTierInfo">
+        Valitse taso yllä ennen staketusta.
+      </div>
+      <button class="btn-block" id="stakeBtn" onclick="doStake()" disabled>Valitse taso ensin</button>
+    </div>
+
+    <h2 class="section-title display">Omat stake-positiot</h2>
+    <div class="positions-list" id="positionsList">
+      <div class="empty-note">Ladataan…</div>
+    </div>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<script>
+  // Deployattu HelionStaking.sol BSC Testnetissä:
+  const STAKING_ADDRESS = "0x44eD13BD90dCAf748F80e8faC8bbcd4dc498f5dd";
+  const HEL_ADDRESS = "0xE4BCF45d177Cea1DFB6Fb8fCD2F32Bc9Dc79814B";
+
+  const STAKING_ABI = [
+    "function tiersCount() view returns (uint256)",
+    "function tiers(uint256) view returns (uint256 lockDuration, uint256 minStake, uint256 rewardBps, bool active)",
+    "function rewardPool() view returns (uint256)",
+    "function stake(uint256 tierId, uint256 amount)",
+    "function withdraw(uint256 stakeIndex)",
+    "function earlyWithdraw(uint256 stakeIndex)",
+    "function pendingReward(address user, uint256 stakeIndex) view returns (uint256)",
+    "function getUserStakes(address user) view returns (tuple(uint256 amount, uint256 startTime, uint256 lockDuration, uint256 rewardBps, bool withdrawn)[])"
+  ];
+  const TOKEN_ABI = [
+    "function balanceOf(address) view returns (uint256)",
+    "function approve(address,uint256) returns (bool)",
+    "function allowance(address,address) view returns (uint256)"
+  ];
+
+  let signer = null, account = null, provider = null;
+  let selectedTierId = null;
+  let tiersCache = [];
+  let positionTimerInterval = null;
+
+  function toast(message, type = 'default') {
+    const host = document.getElementById('toastHost');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : '•';
+    el.innerHTML = `<span class="icon">${icon}</span><span>${message}</span>`;
+    host.appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(()=>el.remove(), 300); }, 4500);
+  }
+
+  function fmtDuration(seconds) {
+    const days = Math.floor(seconds / 86400);
+    if (days >= 1) return `${days} vrk`;
+    const hours = Math.floor(seconds / 3600);
+    return `${hours} h`;
+  }
+
+  function fmtCountdown(ms) {
+    if (ms <= 0) return "Valmis";
+    const totalSec = Math.floor(ms / 1000);
+    const d = Math.floor(totalSec / 86400);
+    const h = Math.floor((totalSec % 86400) / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    if (d > 0) return `${d}pv ${h}h jäljellä`;
+    if (h > 0) return `${h}h ${m}min jäljellä`;
+    return `${m}min jäljellä`;
+  }
+
+  function getReadProvider() {
+    if (provider) return provider;
+    if (window.ethereum) return new ethers.BrowserProvider(window.ethereum);
+    return new ethers.JsonRpcProvider("https://data-seed-prebsc-1-s1.bnbchain.org:8545");
+  }
+
+  async function loadTiers() {
+    try {
+      const readProvider = getReadProvider();
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, readProvider);
+      const count = await staking.tiersCount();
+      tiersCache = [];
+      for (let i = 0; i < count; i++) {
+        const t = await staking.tiers(i);
+        tiersCache.push({
+          id: i,
+          lockDuration: Number(t.lockDuration),
+          minStake: t.minStake,
+          rewardBps: Number(t.rewardBps),
+          active: t.active
+        });
+      }
+      renderTiers();
+    } catch (e) {
+      console.warn("Tasojen haku epäonnistui:", e.message);
+      document.getElementById('tiersGrid').innerHTML = '<div class="empty-note">Tasojen haku epäonnistui — tarkista että STAKING_ADDRESS on asetettu oikein.</div>';
+    }
+  }
+
+  function renderTiers() {
+    const grid = document.getElementById('tiersGrid');
+    grid.innerHTML = '';
+    const names = ['Pika', 'Perus', 'Pitkä', 'Extra'];
+    tiersCache.forEach(t => {
+      const card = document.createElement('div');
+      card.className = 'tier-card' + (t.active ? '' : ' inactive') + (selectedTierId === t.id ? ' selected' : '');
+      card.onclick = () => { if (t.active) selectTier(t.id); };
+      card.innerHTML = `
+        <div class="name">${names[t.id] || 'Taso ' + t.id}</div>
+        <div class="duration">${fmtDuration(t.lockDuration)}</div>
+        <div class="reward">+${(t.rewardBps / 100).toFixed(2)}% tuotto</div>
+        <div class="min">Min. ${parseFloat(ethers.formatUnits(t.minStake, 18)).toLocaleString('fi-FI')} HEL</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function selectTier(tierId) {
+    selectedTierId = tierId;
+    renderTiers();
+    const t = tiersCache.find(x => x.id === tierId);
+    document.getElementById('selectedTierInfo').textContent =
+      `Valittu: ${fmtDuration(t.lockDuration)} lukitus, minimi ${parseFloat(ethers.formatUnits(t.minStake,18)).toLocaleString('fi-FI')} HEL, tuotto ${(t.rewardBps/100).toFixed(2)}%`;
+    const btn = document.getElementById('stakeBtn');
+    btn.disabled = false;
+    btn.textContent = 'Stake';
+  }
+
+  async function refreshWalletBalance() {
+    if (!signer || !account) return;
+    try {
+      const token = new ethers.Contract(HEL_ADDRESS, TOKEN_ABI, provider);
+      const bal = await token.balanceOf(account);
+      document.getElementById('walletBalance').textContent =
+        parseFloat(ethers.formatUnits(bal, 18)).toLocaleString('fi-FI', {maximumFractionDigits: 3}) + ' HEL';
+    } catch (e) {
+      console.warn('Saldon haku epäonnistui:', e.message);
+    }
+  }
+
+  async function refreshRewardPool() {
+    try {
+      const readProvider = getReadProvider();
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, readProvider);
+      const pool = await staking.rewardPool();
+      document.getElementById('rewardPoolInfo').textContent =
+        parseFloat(ethers.formatUnits(pool, 18)).toLocaleString('fi-FI', {maximumFractionDigits: 2}) + ' HEL';
+    } catch (e) {
+      document.getElementById('rewardPoolInfo').textContent = '–';
+    }
+  }
+
+  async function loadPositions() {
+    const listEl = document.getElementById('positionsList');
+    if (!signer || !account) return;
+    try {
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, provider);
+      const positions = await staking.getUserStakes(account);
+
+      if (positionTimerInterval) clearInterval(positionTimerInterval);
+
+      if (positions.length === 0) {
+        listEl.innerHTML = '<div class="empty-note">Ei vielä aktiivisia stake-positioita.</div>';
+        return;
+      }
+
+      listEl.innerHTML = '';
+      positions.forEach((pos, idx) => {
+        const card = document.createElement('div');
+        card.className = 'position-card';
+        card.dataset.startTime = Number(pos.startTime) * 1000;
+        card.dataset.lockDuration = Number(pos.lockDuration) * 1000;
+        card.dataset.withdrawn = pos.withdrawn;
+        card.dataset.index = idx;
+        card.dataset.amount = ethers.formatUnits(pos.amount, 18);
+        card.dataset.rewardBps = Number(pos.rewardBps);
+
+        const amountFloat = parseFloat(ethers.formatUnits(pos.amount, 18));
+        const rewardFloat = amountFloat * Number(pos.rewardBps) / 10000;
+
+        card.innerHTML = `
+          <div class="position-top">
+            <div>
+              <div class="position-amount">${amountFloat.toLocaleString('fi-FI',{maximumFractionDigits:2})} HEL</div>
+            </div>
+            <div class="position-tag" data-role="tag">–</div>
+          </div>
+          <div class="progress-track"><div class="progress-fill" data-role="progress" style="width:0%"></div></div>
+          <div class="position-meta">
+            <span data-role="countdown">–</span>
+            <span>Tuotto: ${rewardFloat.toLocaleString('fi-FI',{maximumFractionDigits:3})} HEL</span>
+          </div>
+          <div class="position-actions">
+            <button class="btn-withdraw" data-role="withdrawBtn" onclick="handleWithdraw(${idx})">Nosta</button>
+            <button class="btn-early" data-role="earlyBtn" onclick="handleEarlyWithdraw(${idx})">Nosta aikaisin (menetä tuotto)</button>
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+
+      updateAllPositionTimers();
+      positionTimerInterval = setInterval(updateAllPositionTimers, 1000);
+    } catch (e) {
+      console.warn('Positioiden haku epäonnistui:', e.message);
+      listEl.innerHTML = '<div class="empty-note">Positioiden haku epäonnistui.</div>';
+    }
+  }
+
+  function updateAllPositionTimers() {
+    document.querySelectorAll('.position-card').forEach(card => {
+      const startTime = parseFloat(card.dataset.startTime);
+      const lockDuration = parseFloat(card.dataset.lockDuration);
+      const withdrawn = card.dataset.withdrawn === 'true';
+      const endTime = startTime + lockDuration;
+      const remaining = endTime - Date.now();
+      const elapsed = Date.now() - startTime;
+      const progressPct = Math.min(100, Math.max(0, (elapsed / lockDuration) * 100));
+
+      const tag = card.querySelector('[data-role="tag"]');
+      const countdown = card.querySelector('[data-role="countdown"]');
+      const progress = card.querySelector('[data-role="progress"]');
+      const withdrawBtn = card.querySelector('[data-role="withdrawBtn"]');
+      const earlyBtn = card.querySelector('[data-role="earlyBtn"]');
+
+      progress.style.width = progressPct + '%';
+
+      if (withdrawn) {
+        tag.textContent = 'Nostettu';
+        tag.className = 'position-tag done';
+        countdown.textContent = 'Suoritettu';
+        withdrawBtn.disabled = true;
+        earlyBtn.disabled = true;
+        withdrawBtn.textContent = 'Nostettu';
+        earlyBtn.style.display = 'none';
+      } else if (remaining <= 0) {
+        tag.textContent = 'Valmis';
+        tag.className = 'position-tag ready';
+        countdown.textContent = 'Lukitusaika päättynyt';
+        withdrawBtn.disabled = false;
+        earlyBtn.style.display = 'none';
+      } else {
+        tag.textContent = 'Lukossa';
+        tag.className = 'position-tag locked';
+        countdown.textContent = fmtCountdown(remaining);
+        withdrawBtn.disabled = true;
+        earlyBtn.style.display = 'block';
+        earlyBtn.disabled = false;
+      }
+    });
+  }
+
+  async function connectWallet() {
+    try {
+      if (!window.ethereum) { toast("MetaMask ei löytynyt selaimesta.", "error"); return; }
+      provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = await provider.getSigner();
+      account = await signer.getAddress();
+
+      document.getElementById("accountDisplay").textContent = `${account.slice(0,8)}...${account.slice(-6)}`;
+      document.getElementById("walletPillText").textContent = `${account.slice(0,6)}...${account.slice(-4)}`;
+      document.getElementById("walletPill").classList.add("connected");
+      document.getElementById("connectScreen").classList.add("hidden");
+      document.getElementById("mainUI").classList.remove("hidden");
+
+      await loadTiers();
+      await refreshWalletBalance();
+      await refreshRewardPool();
+      await loadPositions();
+      toast("Lompakko yhdistetty onnistuneesti.", "success");
+    } catch (e) {
+      toast("Yhdistäminen epäonnistui: " + e.message, "error");
+    }
+  }
+
+  async function ensureApproval(amount) {
+    const token = new ethers.Contract(HEL_ADDRESS, TOKEN_ABI, signer);
+    const allowance = await token.allowance(account, STAKING_ADDRESS);
+    if (allowance < amount) {
+      const tx = await token.approve(STAKING_ADDRESS, amount);
+      await tx.wait();
+    }
+  }
+
+  async function doStake() {
+    if (!signer) return;
+    if (selectedTierId === null) { toast("Valitse taso ensin.", "error"); return; }
+    const val = document.getElementById('stakeAmount').value;
+    if (!val || parseFloat(val) <= 0) { toast("Syötä kelvollinen määrä.", "error"); return; }
+
+    const btn = document.getElementById('stakeBtn');
+    btn.disabled = true; btn.textContent = "Vahvistetaan…";
+    try {
+      const amount = ethers.parseUnits(val, 18);
+      await ensureApproval(amount);
+
+      const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
+      const tx = await staking.stake(selectedTierId, amount);
+      await tx.wait();
+
+      toast("Stake onnistui!", "success");
+      document.getElementById('stakeAmount').value = '';
+      await refreshWalletBalance();
+      await loadPositions();
+    } catch (e) {
+      toast("Virhe stakessa: " + (e.reason || e.message), "error");
+    } finally {
+      btn.disabled = false; btn.textContent = "Stake";
+    }
+  }
+
+  async function handleWithdraw(index) {
+    const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
+    try {
+      const tx = await staking.withdraw(index);
+      await tx.wait();
+      toast("Nosto onnistui — pääoma ja tuotto lompakossasi!", "success");
+      await refreshWalletBalance();
+      await refreshRewardPool();
+      await loadPositions();
+    } catch (e) {
+      toast("Virhe nostossa: " + (e.reason || e.message), "error");
+    }
+  }
+
+  async function handleEarlyWithdraw(index) {
+    const confirmed = confirm("Haluatko varmasti nostaa nyt? Menetät tämän position koko tuoton, saat vain alkuperäisen stake-summan takaisin.");
+    if (!confirmed) return;
+
+    const staking = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
+    try {
+      const tx = await staking.earlyWithdraw(index);
+      await tx.wait();
+      toast("Pääoma nostettu (ilman tuottoa).", "success");
+      await refreshWalletBalance();
+      await loadPositions();
+    } catch (e) {
+      toast("Virhe nostossa: " + (e.reason || e.message), "error");
+    }
+  }
+
+  if (window.ethereum) {
+    window.ethereum.on?.('accountsChanged', () => window.location.reload());
+    window.ethereum.on?.('chainChanged', () => window.location.reload());
+  }
+
+  (async function tryAutoConnect() {
+    if (!window.ethereum) return;
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accounts && accounts.length > 0) connectWallet();
+    } catch (e) { /* ei haittaa, käyttäjä yhdistää manuaalisesti */ }
+  })();
+</script>
+</body>
+</html>
