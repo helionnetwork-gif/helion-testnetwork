@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helion Network — BSC Testnet</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0C10;
+    --panel: #14171D;
+    --panel-2: #1B1F27;
+    --line: #262B35;
+    --gold: #F2A93B;
+    --gold-dim: #7A5C22;
+    --violet: #7C5CFC;
+    --violet-dim: #4A3B8C;
+    --text: #F5F3EE;
+    --muted: #8B8F98;
+    --danger: #E5484D;
+    --success: #3DD68C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .display{ font-family:'Chakra Petch', sans-serif; }
+
+  .wrap{ max-width: 760px; margin: 0 auto; }
+
+  /* Header */
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 40px; flex-wrap: wrap; gap: 16px;
+  }
+  .brand{ display:flex; align-items:center; gap: 12px; }
+
+  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
+  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; transition: all .15s ease; min-width:70px; }
+  .site-nav .nav-item:hover{ color: var(--text); }
+  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
+  .brand-logo{
+    height: 40px; width: 40px; border-radius: 50%; object-fit: cover;
+    display:block; border: 2px solid var(--gold);
+    box-shadow: 0 0 16px rgba(242,169,59,0.35);
+  }
+  .connect-logo{
+    width: 128px; height: 128px; border-radius: 50%; object-fit: cover;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 32px rgba(242,169,59,0.45);
+    margin-bottom: 4px;
+  }
+  .brand .mark{
+    width: 38px; height: 38px; border-radius: 10px;
+    background: conic-gradient(from 220deg, var(--gold), #8a5a1e, var(--gold));
+    box-shadow: 0 0 24px rgba(242,169,59,0.35);
+  }
+  .brand h1{ font-size: 22px; letter-spacing: 0.5px; }
+  .brand .tag{ font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;}
+
+  .wallet-pill{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    display:flex; align-items:center; gap:8px;
+    cursor: pointer;
+    transition: border-color .15s ease;
+  }
+  .wallet-pill:hover{ border-color: var(--gold-dim); }
+  .wallet-pill .dot{ width:8px; height:8px; border-radius:50%; background: var(--muted); }
+  .wallet-pill.connected .dot{ background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+  /* Connect screen */
+  .connect-screen{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 80px 20px; text-align:center;
+  }
+  .connect-screen p{ color: var(--muted); max-width: 380px; margin: 12px 0 28px; line-height:1.6; font-size: 14px;}
+  .btn-primary{
+    background: linear-gradient(180deg, var(--gold), #d68f26);
+    color: #1a1305; border: none; font-weight: 700;
+    padding: 16px 32px; border-radius: 14px; font-size: 15px;
+    cursor: pointer; font-family:'Chakra Petch', sans-serif; letter-spacing: 0.3px;
+    box-shadow: 0 8px 24px rgba(242,169,59,0.25);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-1px); box-shadow: 0 10px 28px rgba(242,169,59,0.35); }
+  .btn-primary:active{ transform: translateY(0px); }
+  .btn-primary:disabled{ opacity:0.55; cursor:not-allowed; transform:none; }
+
+  /* Reactor gauge (signature element) */
+  .reactor-card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 36px 24px 28px;
+    display:flex; flex-direction:column; align-items:center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .reactor-card::before{
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(circle at 50% 0%, rgba(242,169,59,0.08), transparent 60%);
+    pointer-events:none;
+  }
+  .gauge-wrap{ position:relative; width: 220px; height: 220px; }
+  .gauge-wrap svg{ width:100%; height:100%; transform: rotate(-90deg); }
+  .gauge-track{ fill:none; stroke: var(--panel-2); stroke-width: 14; }
+  .gauge-fill{ fill:none; stroke: var(--gold); stroke-width: 14; stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear; filter: drop-shadow(0 0 6px rgba(242,169,59,0.6)); }
+  .gauge-fill.idle{ stroke: var(--panel-2); filter:none; }
+  .gauge-center{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+  }
+  .gauge-center .time{ font-size: 30px; font-weight: 700; font-family:'JetBrains Mono', monospace; letter-spacing: 1px;}
+  .gauge-center .label{ font-size: 11px; color: var(--muted); text-transform:uppercase; letter-spacing: 1.5px; margin-top: 6px;}
+  .gauge-center .status-badge{
+    margin-top: 10px; font-size: 11px; padding: 4px 10px; border-radius: 999px;
+    background: var(--panel-2); color: var(--muted);
+  }
+  .gauge-center .status-badge.active{ background: rgba(242,169,59,0.15); color: var(--gold); }
+  .gauge-center .status-badge.ready{ background: rgba(61,214,140,0.15); color: var(--success); }
+
+  .reactor-card .action-row{ margin-top: 24px; width:100%; display:flex; justify-content:center; }
+
+  .btn-gold{
+    background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305;
+  }
+  .btn-violet{
+    background: linear-gradient(180deg, var(--violet), #5b3fd6); color:#f4f1ff;
+  }
+  .btn-block{
+    width:100%; border:none; padding: 16px; border-radius:14px;
+    font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px;
+    letter-spacing:0.3px; cursor:pointer; transition: transform .12s ease, opacity .12s ease;
+  }
+  .btn-block:hover{ transform: translateY(-1px); }
+  .btn-block:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
+
+  /* Card grid */
+  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 560px){ .grid{ grid-template-columns: 1fr; } }
+
+  .card{
+    background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 22px;
+  }
+  .card h3{ font-family:'Chakra Petek', 'Chakra Petch', sans-serif; font-size: 15px; margin-bottom: 4px; }
+  .card .sub{ font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height:1.5; }
+
+  .input-row{
+    display:flex; align-items:center; background: var(--panel-2);
+    border: 1px solid var(--line); border-radius: 12px; padding: 4px 4px 4px 14px;
+    margin-bottom: 12px;
+  }
+  .input-row input{
+    background: transparent; border:none; outline:none; color: var(--text);
+    font-family:'JetBrains Mono', monospace; font-size: 14px; width: 100%; padding: 10px 0;
+  }
+  .input-row .unit{ color: var(--muted); font-size: 12px; padding: 0 10px; white-space:nowrap; }
+
+  .full-card{
+    background: var(--panel); border:1px solid var(--line); border-radius:20px; padding:22px; margin-bottom:16px;
+  }
+  .ref-box{
+    background: var(--panel-2); border:1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; font-family:'JetBrains Mono', monospace; font-size: 12.5px;
+    word-break: break-all; color: var(--muted); margin-bottom: 12px;
+  }
+  .link-btn{
+    background:none; border:none; color: var(--gold); font-size: 13px; font-weight:600;
+    cursor:pointer; padding: 0; font-family:'Inter', sans-serif;
+  }
+
+  .account-strip{
+    display:flex; align-items:center; justify-content:space-between;
+    font-size: 12px; color: var(--muted); margin-bottom: 20px;
+    padding: 10px 16px; background: var(--panel); border:1px solid var(--line); border-radius: 12px;
+  }
+  .account-strip .addr{ color: var(--text); font-family:'JetBrains Mono', monospace; }
+  .network-badge{
+    font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(124,92,252,0.15); color: var(--violet);
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+
+  .hidden{ display:none !important; }
+
+  /* Toasts */
+  #toastHost{
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px);
+  }
+  .toast{
+    background: var(--panel-2); border:1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; font-size: 13px; display:flex; align-items:flex-start; gap:10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    animation: slideUp .2s ease;
+  }
+  @keyframes slideUp{ from{ opacity:0; transform: translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  .toast.success{ border-color: rgba(61,214,140,0.4); }
+  .toast.error{ border-color: rgba(229,72,77,0.4); }
+  .toast .icon{ font-size:15px; line-height:1; margin-top:1px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="logo.jpg" alt="Helion Network" class="brand-logo">
+      <div>
+        <h1 class="display">Helion Network</h1>
+        <div class="tag">BSC Testnet · Kaivos</div>
+      </div>
+    </div>
+    <div id="walletPill" class="wallet-pill" onclick="connectWallet()">
+      <div class="dot"></div>
+      <span id="walletPillText">Ei yhdistetty</span>
+    </div>
+  </header>
+
+  <div id="telegramFallback" class="hidden" style="background: rgba(242,169,59,0.08); border:1px solid var(--gold); border-radius: 12px; padding: 14px 16px; font-size: 12.5px; color: var(--muted); margin-bottom: 20px; line-height: 1.6;">
+    <strong style="color: var(--gold);">Huom:</strong> Telegramin sisäinen selain ei tue MetaMaskia. Avaa tämä sivu puhelimesi omassa selaimessa yhdistääksesi lompakkosi.
+    <div style="margin-top:10px;">
+      <button class="btn-primary" style="padding:10px 18px; font-size:13px;" onclick="openInExternalBrowser()">Avaa selaimessa</button>
+    </div>
+  </div>
+
+  <!-- Connect screen -->
+  <div id="connectScreen" class="connect-screen">
+    <img src="logo.jpg" alt="Helion Network" class="connect-logo">
+    <h2 class="display" style="font-size:24px; margin-top:20px;">Yhdistä lompakkosi</h2>
+    <p>Yhdistä MetaMask nähdäksesi kaivos-tilasi, aktivoidaksesi louhinnan ja lunastaaksesi palkkiosi BSC-testiverkossa.</p>
+    <button class="btn-primary" onclick="connectWallet()" id="connectBtn">Yhdistä MetaMask</button>
+  </div>
+
+  <!-- Main dashboard -->
+  <div id="mainUI" class="hidden">
+
+    <div class="account-strip">
+      <span>Lompakko: <span class="addr" id="accountDisplay">–</span></span>
+      <span class="network-badge">BSC Testnet</span>
+    </div>
+
+    <!-- Balance stats -->
+    <div class="grid" style="margin-bottom:20px;">
+      <div class="card" style="padding:18px 22px;">
+        <div class="sub" style="margin-bottom:6px;">Lompakkosaldo</div>
+        <div class="display" id="walletBalance" style="font-size:22px;">– HEL</div>
+      </div>
+      <div class="card" style="padding:18px 22px;">
+        <div class="sub" style="margin-bottom:6px;">Staked</div>
+        <div class="display" id="stakedBalance" style="font-size:22px;">– HEL</div>
+      </div>
+    </div>
+
+    <!-- Reactor gauge -->
+    <div class="reactor-card">
+      <div class="gauge-wrap">
+        <svg viewBox="0 0 220 220">
+          <circle class="gauge-track" cx="110" cy="110" r="96"></circle>
+          <circle id="gaugeFill" class="gauge-fill idle" cx="110" cy="110" r="96"
+                  stroke-dasharray="603.19" stroke-dashoffset="603.19"></circle>
+        </svg>
+        <div class="gauge-center">
+          <div class="time" id="gaugeTime">12:00:00</div>
+          <div class="label">Kaivos-aika jäljellä</div>
+          <div class="status-badge" id="gaugeStatus">Ei aktiivinen</div>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn-block btn-gold" style="max-width:280px;" onclick="activateMining()" id="mineBtn">
+          Aktivoi Kaivos (12h)
+        </button>
+      </div>
+    </div>
+
+    <!-- Stake + Claim -->
+    <div class="grid">
+      <div class="card">
+        <h3 class="display">Stake HEL</h3>
+        <div class="sub">Lukitse HEL-tokenit kasvattaaksesi louhinnan tehoa.</div>
+        <div class="input-row">
+          <input type="number" id="stakeAmount" placeholder="0.0" min="0" step="0.01">
+          <span class="unit">HEL</span>
+        </div>
+        <button class="btn-block btn-violet" onclick="stake()" id="stakeBtn">Stake</button>
+      </div>
+
+      <div class="card">
+        <h3 class="display">Palkkiot</h3>
+        <div class="sub">Lunasta kertyneet louhintapalkkiosi.</div>
+        <button class="btn-block btn-gold" onclick="claim()" id="claimBtn" style="margin-top:38px;">
+          Claim Palkkiot
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<script>
+  let signer = null;
+  let account = null;
+  let miningInterval = null;
+  let miningEndsAt = null; // epoch ms
+
+  const TOKEN_ADDRESS = "0xE4BCF45d177Cea1DFB6Fb8fCD2F32Bc9Dc79814B";
+  const MINER_ADDRESS = "0x04c09909619Ca3CDe42bb100ab8AC43dFF3BB93b";
+  const MINING_DURATION_MS = 12 * 60 * 60 * 1000;
+  const GAUGE_CIRCUMFERENCE = 2 * Math.PI * 96;
+
+  function toast(message, type = 'default') {
+    const host = document.getElementById('toastHost');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : '•';
+    el.innerHTML = `<span class="icon">${icon}</span><span>${message}</span>`;
+    host.appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(()=>el.remove(), 300); }, 4200);
+  }
+
+  function setButtonLoading(btn, loadingText) {
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = loadingText;
+    btn.disabled = true;
+  }
+  function resetButton(btn) {
+    btn.textContent = btn.dataset.originalText || btn.textContent;
+    btn.disabled = false;
+  }
+
+  function formatTime(ms) {
+    if (ms <= 0) return "00:00:00";
+    const totalSec = Math.floor(ms / 1000);
+    const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+    const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+    const s = String(totalSec % 60).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+
+  function updateGauge() {
+    const gaugeTime = document.getElementById('gaugeTime');
+    const gaugeFill = document.getElementById('gaugeFill');
+    const gaugeStatus = document.getElementById('gaugeStatus');
+    const mineBtn = document.getElementById('mineBtn');
+
+    if (!miningEndsAt) {
+      gaugeTime.textContent = "12:00:00";
+      gaugeFill.style.strokeDashoffset = GAUGE_CIRCUMFERENCE;
+      gaugeFill.classList.add('idle');
+      gaugeStatus.textContent = "Ei aktiivinen";
+      gaugeStatus.className = "status-badge";
+      mineBtn.disabled = false;
+      mineBtn.textContent = "Aktivoi Kaivos (12h)";
+      return;
+    }
+
+    const remaining = miningEndsAt - Date.now();
+
+    if (remaining <= 0) {
+      gaugeTime.textContent = "00:00:00";
+      gaugeFill.style.strokeDashoffset = 0;
+      gaugeFill.classList.remove('idle');
+      gaugeStatus.textContent = "Valmis lunastettavaksi";
+      gaugeStatus.className = "status-badge ready";
+      mineBtn.disabled = false;
+      mineBtn.textContent = "Aktivoi uudelleen";
+      clearInterval(miningInterval);
+      return;
+    }
+
+    gaugeTime.textContent = formatTime(remaining);
+    const progress = 1 - (remaining / MINING_DURATION_MS);
+    gaugeFill.style.strokeDashoffset = GAUGE_CIRCUMFERENCE * (1 - progress);
+    gaugeFill.classList.remove('idle');
+    gaugeStatus.textContent = "Louhinta käynnissä";
+    gaugeStatus.className = "status-badge active";
+    mineBtn.disabled = true;
+    mineBtn.textContent = "Louhinta käynnissä…";
+  }
+
+  function startGaugeClock() {
+    if (miningInterval) clearInterval(miningInterval);
+    updateGauge();
+    miningInterval = setInterval(updateGauge, 1000);
+  }
+
+  async function refreshBalances() {
+    if (!signer || !account) return;
+    const provider = signer.provider;
+
+    try {
+      const token = new ethers.Contract(
+        TOKEN_ADDRESS,
+        ["function balanceOf(address) view returns (uint256)"],
+        provider
+      );
+      const rawBalance = await token.balanceOf(account);
+      document.getElementById("walletBalance").textContent =
+        `${parseFloat(ethers.formatUnits(rawBalance, 18)).toLocaleString('fi-FI', {maximumFractionDigits: 4})} HEL`;
+    } catch (e) {
+      document.getElementById("walletBalance").textContent = "– HEL";
+      console.warn("Saldon haku epäonnistui:", e.message);
+    }
+
+    // Luetaan staked-määrä suoraan public users(address) getteristä
+    // Palauttaa tuplen: [stakedAmount, miningEndTime, referrer, totalMined]
+    try {
+      const miner = new ethers.Contract(
+        MINER_ADDRESS,
+        ["function users(address) view returns (uint256 stakedAmount, uint256 miningEndTime, address referrer, uint256 totalMined)"],
+        provider
+      );
+      const userInfo = await miner.users(account);
+      document.getElementById("stakedBalance").textContent =
+        `${parseFloat(ethers.formatUnits(userInfo.stakedAmount, 18)).toLocaleString('fi-FI', {maximumFractionDigits: 4})} HEL`;
+    } catch (e) {
+      document.getElementById("stakedBalance").textContent = "– HEL";
+      console.warn("Staked-määrän haku epäonnistui:", e.message);
+    }
+  }
+
+  async function loadMiningState() {
+    try {
+      const provider = signer.provider;
+      const miner = new ethers.Contract(
+        MINER_ADDRESS,
+        ["function users(address) view returns (uint256 stakedAmount, uint256 miningEndTime, address referrer, uint256 totalMined)"],
+        provider
+      );
+      const userInfo = await miner.users(account);
+      const chainMiningEndTime = Number(userInfo.miningEndTime); // sekunteina
+
+      if (chainMiningEndTime === 0) {
+        // Ei koskaan aktivoitu, tai juuri claimattu (resetoitu 0:aan)
+        miningEndsAt = null;
+      } else {
+        // Muunnetaan kontraktin sekunti-timestamp millisekunneiksi.
+        // Käytetään paikallista kelloa arviona lohkoketjun ajasta (riittävän tarkka UI:lle).
+        const endsAtMs = chainMiningEndTime * 1000;
+        if (endsAtMs > Date.now()) {
+          // Louhinta on oikeasti aktiivinen kontraktin mukaan
+          miningEndsAt = endsAtMs;
+        } else {
+          // miningEndTime on menneisyydessä -> valmis lunastettavaksi (tai voi aktivoida uudelleen)
+          miningEndsAt = endsAtMs; // gauge näyttää tämän "valmis"-tilana, koska remaining <= 0
+        }
+      }
+    } catch (e) {
+      console.warn("Kaivostilan haku kontraktilta epäonnistui, käytetään paikallista varmuuskopiota:", e.message);
+      const saved = localStorage.getItem(`helion_mining_${account}`);
+      miningEndsAt = saved ? parseInt(saved, 10) : null;
+    }
+    startGaugeClock();
+  }
+
+  async function connectWallet() {
+    try {
+      if (!window.ethereum) {
+        if (isInsideTelegram()) {
+          document.getElementById('telegramFallback').classList.remove('hidden');
+          toast("Avaa sivu selaimessa yhdistääksesi MetaMaskin.", "error");
+        } else {
+          toast("MetaMask ei löytynyt selaimesta.", "error");
+        }
+        return;
+      }
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = await provider.getSigner();
+      account = await signer.getAddress();
+
+      document.getElementById("accountDisplay").textContent = `${account.slice(0,8)}...${account.slice(-6)}`;
+      document.getElementById("walletPillText").textContent = `${account.slice(0,6)}...${account.slice(-4)}`;
+      document.getElementById("walletPill").classList.add("connected");
+      document.getElementById("connectScreen").classList.add("hidden");
+      document.getElementById("mainUI").classList.remove("hidden");
+
+      await loadMiningState();
+      refreshBalances();
+      toast("Lompakko yhdistetty onnistuneesti.", "success");
+    } catch (e) {
+      toast("Yhdistäminen epäonnistui: " + e.message, "error");
+    }
+  }
+
+  async function stake() {
+    if (!signer) return;
+    const amountInput = document.getElementById('stakeAmount');
+    const value = amountInput.value;
+    if (!value || parseFloat(value) <= 0) { toast("Syötä kelvollinen määrä.", "error"); return; }
+
+    const btn = document.getElementById('stakeBtn');
+    setButtonLoading(btn, "Vahvistetaan…");
+    try {
+      const token = new ethers.Contract(TOKEN_ADDRESS, ["function approve(address,uint256)"], signer);
+      const miner = new ethers.Contract(MINER_ADDRESS, ["function stake(uint256)"], signer);
+      const amount = ethers.parseUnits(value, 18);
+      await token.approve(MINER_ADDRESS, amount);
+      await miner.stake(amount);
+      toast(`Stake onnistui: ${value} HEL`, "success");
+      amountInput.value = "";
+      refreshBalances();
+    } catch (e) {
+      toast("Virhe stakessa: " + (e.reason || e.message), "error");
+    } finally {
+      resetButton(btn);
+    }
+  }
+
+  async function activateMining() {
+    if (!signer) return;
+    const btn = document.getElementById('mineBtn');
+    setButtonLoading(btn, "Aktivoidaan…");
+    try {
+      const miner = new ethers.Contract(MINER_ADDRESS, ["function activateMining(address)"], signer);
+      await miner.activateMining("0x0000000000000000000000000000000000000000");
+      await loadMiningState();
+      toast("Kaivos aktivoitu 12 tunniksi!", "success");
+    } catch (e) {
+      toast("Virhe aktivoinnissa: " + (e.reason || e.message), "error");
+      resetButton(btn);
+    }
+  }
+
+  async function claim() {
+    if (!signer) return;
+    const btn = document.getElementById('claimBtn');
+    setButtonLoading(btn, "Lunastetaan…");
+    try {
+      const miner = new ethers.Contract(MINER_ADDRESS, ["function claim()"], signer);
+      await miner.claim();
+      toast("Palkkiot claimattu lompakkoosi!", "success");
+      refreshBalances();
+      loadMiningState();
+    } catch (e) {
+      toast("Virhe claimissa: " + (e.reason || e.message), "error");
+    } finally {
+      resetButton(btn);
+    }
+  }
+
+  if (window.ethereum) {
+    window.ethereum.on?.('accountsChanged', () => window.location.reload());
+    window.ethereum.on?.('chainChanged', () => window.location.reload());
+  }
+
+  // Hiljainen automaattinen yhdistäminen: jos MetaMask on jo antanut luvan
+  // tälle sivustolle aiemmin, ei vaadita uutta klikkausta joka sivulla.
+  (async function tryAutoConnect() {
+    if (!window.ethereum) return;
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accounts && accounts.length > 0) connectWallet();
+    } catch (e) { /* ei haittaa, käyttäjä yhdistää manuaalisesti */ }
+  })();
+
+  // ---- Telegram Mini App -integraatio ----
+  function isInsideTelegram() {
+    return typeof window.Telegram !== 'undefined' && window.Telegram.WebApp && window.Telegram.WebApp.initData;
+  }
+
+  function openInExternalBrowser() {
+    const url = window.location.href;
+    if (isInsideTelegram() && window.Telegram.WebApp.openLink) {
+      window.Telegram.WebApp.openLink(url, { try_instant_view: false });
+    } else {
+      window.open(url, '_blank');
+    }
+  }
+
+  if (isInsideTelegram()) {
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // Sovitetaan väriteema Telegramin omiin teemamuuttujiin jos saatavilla
+    if (tg.themeParams && tg.themeParams.bg_color) {
+      document.body.style.background = tg.themeParams.bg_color;
+    }
+
+    // Jos ollaan Telegramin sisäisessä webviewissä eikä window.ethereum löydy,
+    // näytetään kehote avata sivu ulkoisessa selaimessa MetaMaskia varten.
+    if (!window.ethereum) {
+      document.getElementById('telegramFallback').classList.remove('hidden');
+    }
+  }
+</script>
+</body>
+</html>
