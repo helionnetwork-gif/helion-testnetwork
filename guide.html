@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helion — Ohjeet</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
+    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
+    --danger: #E5484D; --success: #3DD68C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
+    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .display{ font-family:'Chakra Petch', sans-serif; }
+  .wrap{ max-width: 680px; margin: 0 auto; }
+
+  header{ display:flex; align-items:center; gap: 12px; margin-bottom: 20px; }
+  .brand-logo{ height: 40px; width: 40px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 16px rgba(242,169,59,0.35); }
+  header h1{ font-size: 21px; }
+  header .tag{ font-size: 11px; color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase; margin-top:2px; }
+
+  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:28px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
+  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; transition: all .15s ease; min-width:70px; }
+  .site-nav .nav-item:hover{ color: var(--text); }
+  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
+
+  .intro-card{
+    background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 22px;
+    margin-bottom: 28px; font-size: 13.5px; color: var(--muted); line-height: 1.7;
+  }
+  .intro-card strong{ color: var(--text); }
+
+  .step-section{ margin-bottom: 30px; }
+  .step-header{ display:flex; align-items:center; gap:12px; margin-bottom: 14px; }
+  .step-number{
+    width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(180deg, var(--gold), #d68f26);
+    color:#1a1305; display:flex; align-items:center; justify-content:center; font-family:'Chakra Petch',sans-serif;
+    font-weight:700; font-size:14px; flex-shrink:0;
+  }
+  .step-header h2{ font-size: 16px; }
+
+  .step-card{
+    background: var(--panel); border:1px solid var(--line); border-radius: 18px; padding: 20px 22px;
+    margin-left: 42px; font-size: 13.5px; line-height: 1.7; color: var(--text);
+  }
+  .step-card p{ margin-bottom: 10px; }
+  .step-card p:last-child{ margin-bottom: 0; }
+  .step-card a{ color: var(--gold); }
+  .step-card ol, .step-card ul{ margin: 10px 0 10px 20px; color: var(--muted); }
+  .step-card li{ margin-bottom: 6px; }
+  .step-card li strong{ color: var(--text); }
+
+  .param-table{ width:100%; border-collapse: collapse; margin: 12px 0; font-size: 12.5px; }
+  .param-table td{ padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  .param-table td:first-child{ color: var(--muted); width: 40%; }
+  .param-table td:last-child{ font-family:'JetBrains Mono',monospace; color: var(--gold); word-break: break-all; }
+
+  .btn-gold{
+    background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; border:none;
+    padding: 12px 20px; border-radius: 12px; font-family:'Chakra Petch',sans-serif; font-weight:700;
+    font-size: 13px; cursor:pointer; margin-top: 8px;
+  }
+  .btn-gold:hover{ opacity: 0.92; }
+  .btn-gold:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .warn-note{
+    background: rgba(242,169,59,0.08); border:1px solid var(--gold); border-radius: 10px;
+    padding: 10px 14px; font-size: 11.5px; color: var(--muted); margin-top: 10px; line-height:1.5;
+  }
+  .warn-note strong{ color: var(--gold); }
+
+  .link-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  @media (max-width: 500px){ .link-grid{ grid-template-columns: 1fr; } }
+  .link-card{
+    background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px;
+    text-decoration:none; color: var(--text); display:block;
+  }
+  .link-card .name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size: 13px; color: var(--gold); margin-bottom:4px; }
+  .link-card .desc{ font-size: 11.5px; color: var(--muted); }
+
+  .contracts-table{ width:100%; border-collapse: collapse; font-size: 11.5px; }
+  .contracts-table td{ padding: 9px 8px; border-bottom: 1px solid var(--line); }
+  .contracts-table td:first-child{ color: var(--muted); white-space:nowrap; }
+  .contracts-table td:last-child{ font-family:'JetBrains Mono',monospace; color: var(--text); word-break: break-all; font-size:11px; }
+
+  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
+  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; display:flex; gap:10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .toast.success{ border-color: rgba(61,214,140,0.4); }
+  .toast.error{ border-color: rgba(229,72,77,0.4); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="logo.jpg" alt="Helion" class="brand-logo">
+    <div>
+      <h1 class="display">Ohjeet</h1>
+      <div class="tag">Aloita tästä — BSC Testnet</div>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <a href="index.html" class="nav-item">🔒 Staking</a>
+    <a href="helion-trading.html" class="nav-item">🔄 Trading</a>
+    <a href="guide.html" class="nav-item active">📖 Ohjeet</a>
+  </nav>
+
+  <div class="intro-card">
+    <strong>Helion</strong> on testnet-projekti BSC Testnetissä (BNB Smart Chain Testnet, Chain ID 97). Kaikki tässä liikkuva raha on <strong>testi-tokeneita ilman oikeaa rahallista arvoa</strong> — täydellinen paikka kokeilla DeFi-toimintoja (staking, swap, likviditeetti) ilman riskiä. Tällä sivulla käydään läpi kaikki mitä tarvitset päästäksesi alkuun.
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-section">
+    <div class="step-header"><div class="step-number">1</div><h2 class="display">Asenna MetaMask</h2></div>
+    <div class="step-card">
+      <p>MetaMask on selainlaajennus/lompakko jolla hoidat kaiken kaupankäynnin ja stakingin.</p>
+      <p>Lataa se osoitteesta <a href="https://metamask.io" target="_blank" rel="noopener">metamask.io</a> — valitse oma selaimesi (Chrome, Firefox, Brave, Edge) tai mobiilisovellus. Asennuksen jälkeen luo uusi lompakko ja <strong>tallenna siemenlause (seed phrase) turvallisesti</strong> — sitä ei voi palauttaa jos se katoaa.</p>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-section">
+    <div class="step-header"><div class="step-number">2</div><h2 class="display">Lisää BSC Testnet -verkko</h2></div>
+    <div class="step-card">
+      <p>Helion toimii BSC Testnetissä, ei Ethereumin pääverkossa tai BSC:n mainnetissä. MetaMask ei näytä sitä oletuksena, joten se täytyy lisätä erikseen.</p>
+
+      <button class="btn-gold" onclick="addNetwork()" id="addNetworkBtn">Lisää BSC Testnet MetaMaskiin automaattisesti</button>
+
+      <p style="margin-top:16px; font-size:12px; color:var(--muted);">Tai lisää manuaalisesti (MetaMask → Asetukset → Verkot → Lisää verkko):</p>
+      <table class="param-table">
+        <tr><td>Verkon nimi</td><td>BNB Smart Chain Testnet</td></tr>
+        <tr><td>RPC URL</td><td>https://data-seed-prebsc-1-s1.bnbchain.org:8545</td></tr>
+        <tr><td>Chain ID</td><td>97</td></tr>
+        <tr><td>Valuuttasymboli</td><td>tBNB</td></tr>
+        <tr><td>Block explorer</td><td>https://testnet.bscscan.com</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-section">
+    <div class="step-header"><div class="step-number">3</div><h2 class="display">Hae testi-BNB (tBNB)</h2></div>
+    <div class="step-card">
+      <p>Tarvitset pienen määrän tBNB:tä maksaaksesi gas-kulut (transaktiomaksut) — ilman sitä mikään nappi ei toimi.</p>
+      <ol>
+        <li>Mene <a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noopener">bnbchain.org/en/testnet-faucet</a></li>
+        <li>Liitä lompakko-osoitteesi (kopioi se MetaMaskista)</li>
+        <li>Pyydä tBNB:tä — saat yleensä 0.1–0.3 tBNB kerran 24h:ssa</li>
+      </ol>
+      <div class="warn-note">
+        <strong>Huom:</strong> virallinen faucet vaatii pienen (0.002 BNB) saldon BSC:n <em>mainnetissä</em> bottien torjuntaa varten. Jos sinulla ei ole mainnet-BNB:tä, kokeile vaihtoehtoisia faucetteja alla.
+      </div>
+      <div class="link-grid">
+        <a href="https://faucets.chain.link/bnb-chain-testnet" target="_blank" rel="noopener" class="link-card">
+          <div class="name">Chainlink Faucet</div>
+          <div class="desc">Ei vaadi mainnet-saldoa</div>
+        </a>
+        <a href="https://faucet.quicknode.com/binance-smart-chain/bnb-testnet" target="_blank" rel="noopener" class="link-card">
+          <div class="name">QuickNode Faucet</div>
+          <div class="desc">Vaihtoehtoinen lähde</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-section">
+    <div class="step-header"><div class="step-number">4</div><h2 class="display">Hae testi-HUSD</h2></div>
+    <div class="step-card">
+      <p><strong>HUSD (Helion Test USD)</strong> on oma testi-stablecoinimme HEL/HUSD-kaupankäyntiparia varten. Kuka tahansa voi hakea sitä ilmaiseksi kerran 24h:ssa.</p>
+      <div id="husdConnectSection">
+        <button class="btn-gold" onclick="connectAndClaim()" id="husdBtn">Yhdistä lompakko ja hae 1000 HUSD</button>
+      </div>
+      <p style="margin-top:10px; font-size:12px; color:var(--muted);" id="husdStatus"></p>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-section">
+    <div class="step-header"><div class="step-number">5</div><h2 class="display">Miten sivut toimivat</h2></div>
+    <div class="step-card">
+      <p><strong>⛏ Miner</strong> — alkuperäinen 12h louhintasykli: aktivoi, odota, claimaa palkkio.</p>
+      <p><strong>🔒 Staking</strong> — valitse taso (7/30/90 vrk lukitus), stakettaa HEL, saa kiinteän tuoton lukitusajan päätyttyä. Voit nostaa pääoman pois kesken ajan, mutta menetät silloin tuoton.</p>
+      <p style="font-size:11.5px; color:var(--muted);">⛏ Miner-toiminto on siirretty omaksi Telegram Mini Appiksi — löydät sen Telegram-botistamme.</p>
+      <p><strong>🔄 Trading</strong> — vaihda HEL ↔ TBNB tai HEL ↔ HUSD PancakeSwapin testnet-routerin kautta. Voit myös lisätä likviditeettiä ja ansaita osan swap-maksuista.</p>
+      <p style="font-size:11.5px; color:var(--muted);">🏆 Kilpailu ja leaderboard on siirretty Telegram-bottiin — kutsu kavereita omalla referral-linkilläsi ja kilpaile eniten kutsutuista käyttäjistä.</p>
+    </div>
+  </div>
+
+  <!-- CONTRACTS -->
+  <div class="step-section">
+    <div class="step-header"><div class="step-number">📋</div><h2 class="display">Kontraktiosoitteet (läpinäkyvyyden vuoksi)</h2></div>
+    <div class="step-card">
+      <table class="contracts-table">
+        <tr><td>HEL Token</td><td>0xE4BCF45d177Cea1DFB6Fb8fCD2F32Bc9Dc79814B</td></tr>
+        <tr><td>HUSD (Test USD)</td><td>0xd86c64447e433B9d30cB8f8506Cd49356bc6A0d7</td></tr>
+        <tr><td>HelionStaking</td><td>0x44eD13BD90dCAf748F80e8faC8bbcd4dc498f5dd</td></tr>
+        <tr><td>HelionMiner (alkuperäinen)</td><td>0x04c09909619Ca3CDe42bb100ab8AC43dFF3BB93b</td></tr>
+        <tr><td>PancakeSwap Router (v2)</td><td>0xD99D1c33F9fC3444f8101754aBC46c52416550D1</td></tr>
+        <tr><td>PancakeSwap Factory (v2)</td><td>0x6725F303b657a9451d8BA641348b6761A6CC7a17</td></tr>
+      </table>
+      <p style="margin-top:12px; font-size:11.5px; color:var(--muted);">Voit tarkistaa minkä tahansa osoitteen ja transaktion suoraan <a href="https://testnet.bscscan.com" target="_blank" rel="noopener">testnet.bscscan.com</a>:sta.</p>
+    </div>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<script>
+  const HUSD_ADDRESS = "0xd86c64447e433B9d30cB8f8506Cd49356bc6A0d7";
+  const HUSD_ABI = [
+    "function faucet()",
+    "function lastFaucetClaim(address) view returns (uint256)"
+  ];
+
+  function toast(message, type = 'default') {
+    const host = document.getElementById('toastHost');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = `<span>${message}</span>`;
+    host.appendChild(el);
+    setTimeout(() => el.remove(), 5000);
+  }
+
+  async function addNetwork() {
+    if (!window.ethereum) { toast("MetaMask ei löytynyt selaimesta.", "error"); return; }
+    try {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: '0x61', // 97 desimaalina
+          chainName: 'BNB Smart Chain Testnet',
+          nativeCurrency: { name: 'tBNB', symbol: 'tBNB', decimals: 18 },
+          rpcUrls: ['https://data-seed-prebsc-1-s1.bnbchain.org:8545'],
+          blockExplorerUrls: ['https://testnet.bscscan.com']
+        }]
+      });
+      toast("BSC Testnet lisätty MetaMaskiin!", "success");
+    } catch (e) {
+      toast("Verkon lisäys epäonnistui: " + e.message, "error");
+    }
+  }
+
+  async function connectAndClaim() {
+    if (!window.ethereum) { toast("MetaMask ei löytynyt selaimesta.", "error"); return; }
+    const btn = document.getElementById('husdBtn');
+    const status = document.getElementById('husdStatus');
+    btn.disabled = true; btn.textContent = "Käsitellään…";
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      const account = await signer.getAddress();
+
+      const husd = new ethers.Contract(HUSD_ADDRESS, HUSD_ABI, signer);
+      const lastClaim = await husd.lastFaucetClaim(account);
+      const cooldownEnds = (Number(lastClaim) + 86400) * 1000;
+
+      if (Date.now() < cooldownEnds) {
+        const remainingH = Math.ceil((cooldownEnds - Date.now()) / 3600000);
+        status.textContent = `Olet jo hakenut HUSD:ia viimeisen 24h aikana. Yritä uudelleen ~${remainingH}h kuluttua.`;
+        toast("Faucet on jäähdyllä.", "error");
+        return;
+      }
+
+      const tx = await husd.faucet();
+      await tx.wait();
+      status.textContent = "1000 HUSD lisätty lompakkoosi!";
+      toast("HUSD haettu onnistuneesti!", "success");
+    } catch (e) {
+      toast("Virhe: " + (e.reason || e.message), "error");
+    } finally {
+      btn.disabled = false; btn.textContent = "Yhdistä lompakko ja hae 1000 HUSD";
+    }
+  }
+</script>
+</body>
+</html>
