@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helion Wallet</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
+    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
+    --danger: #E5484D; --success: #3DD68C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
+    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+  .display{ font-family:'Chakra Petch', sans-serif; }
+  .wrap{ max-width: 460px; margin: 0 auto; }
+
+  header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
+  .brand{ display:flex; align-items:center; gap: 10px; }
+  .brand-logo{ height: 38px; width: 38px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 14px rgba(242,169,59,0.3); }
+  header h1{ font-size: 19px; }
+  header .tag{ font-size: 10.5px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+  .user-pill{ background: var(--panel); border: 1px solid var(--line); padding: 9px 14px; border-radius: 999px; font-size: 12.5px; display:flex; align-items:center; gap:8px; }
+  .user-pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
+  .user-pill button{ background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; text-decoration:underline; }
+
+  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
+  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
+  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
+
+  .card{ background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 22px; margin-bottom:16px; }
+  .card h2{ font-size:15px; margin-bottom:14px; }
+  .card .desc{ font-size:11.5px; color:var(--muted); margin-bottom:14px; line-height:1.5; }
+
+  .input-row{ background: var(--panel-2); border:1px solid var(--line); border-radius:12px; padding: 4px 14px; margin-bottom: 12px; }
+  .input-row input{ background:transparent; border:none; outline:none; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:14px; width:100%; padding:12px 0; }
+
+  .btn-block{ width:100%; border:none; padding:14px; border-radius:12px; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:13.5px; cursor:pointer; background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
+  .btn-block.secondary{ background:linear-gradient(180deg, var(--violet), #5b3fd6); color:#f4f1ff; }
+  .btn-block:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .balance-row{ display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; }
+  .balance-row .label{ color:var(--muted); }
+  .balance-row .value{ font-family:'JetBrains Mono',monospace; font-weight:600; }
+  .addr-box{ background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-family:'JetBrains Mono',monospace; font-size:11.5px; word-break:break-all; color:var(--muted); margin-bottom:12px; }
+
+  .fee-note{ font-size:11.5px; color:var(--muted); margin-top:8px; padding:10px 12px; background:var(--panel-2); border-radius:10px; }
+  .fee-note.internal{ color: var(--success); }
+  .fee-note.external{ color: var(--gold); }
+
+  .linked-list{ display:flex; flex-direction:column; gap:6px; margin-top:10px; }
+  .linked-item{ background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:8px 12px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); word-break:break-all; }
+
+  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
+  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .toast.success{ border-color: rgba(61,214,140,0.4); }
+  .toast.error{ border-color: rgba(229,72,77,0.4); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="logo.jpg" alt="Helion" class="brand-logo">
+      <div><h1 class="display">Wallet</h1><div class="tag">Sisäänrakennettu lompakko</div></div>
+    </div>
+    <div class="user-pill">
+      <div class="dot"></div>
+      <span id="usernameDisplay">–</span>
+      <button onclick="logout()">Kirjaudu ulos</button>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <a href="miner.html" class="nav-item">⛏ Miner</a>
+    <a href="staking.html" class="nav-item">🔒 Staking</a>
+    <a href="helion-trading.html" class="nav-item">🔄 Trading</a>
+    <a href="wallet.html" class="nav-item active">💼 Wallet</a>
+    <a href="guide.html" class="nav-item">📖 Ohjeet</a>
+  </nav>
+
+  <div class="card">
+    <h2 class="display">Lompakkosi</h2>
+    <div class="addr-box" id="walletAddress">–</div>
+    <div class="balance-row"><span class="label">HEL</span><span class="value" id="helBalance">–</span></div>
+    <div class="balance-row"><span class="label">tBNB (gas)</span><span class="value" id="bnbBalance">–</span></div>
+    <button class="btn-block secondary" style="margin-top:10px;" onclick="refreshWallet()">Päivitä</button>
+  </div>
+
+  <div class="card">
+    <h2 class="display">Lähetä HEL</h2>
+    <div class="input-row"><input type="text" id="recipientInput" placeholder="Käyttäjänimi tai 0x-osoite" oninput="onRecipientChange()"></div>
+    <div class="input-row"><input type="number" id="amountInput" placeholder="Määrä"></div>
+    <div id="feeNote" class="fee-note">Kirjoita vastaanottaja nähdäksesi sovelletaanko fee:tä.</div>
+    <button class="btn-block" style="margin-top:12px;" onclick="doTransfer()" id="transferBtn">Lähetä</button>
+  </div>
+
+  <div class="card">
+    <h2 class="display">Linkitä oma lompakko</h2>
+    <div class="desc">Linkitä oma MetaMask-lompakkosi tähän tiliin allekirjoittamalla viesti — sen jälkeen voit kirjautua Helioniin ilman salasanaa suoraan lompakolla.</div>
+    <button class="btn-block secondary" onclick="linkWallet()" id="linkWalletBtn">🦊 Linkitä MetaMask</button>
+    <div class="linked-list" id="linkedList"></div>
+  </div>
+</div>
+
+<div id="toastHost"></div>
+
+<script>
+  const BACKEND_URL = "http://localhost:3001";
+
+  const token = localStorage.getItem('helion_token');
+  const username = localStorage.getItem('helion_username');
+  if (!token) { window.location.href = 'index.html'; }
+
+  function authHeaders() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
+
+  function logout() {
+    localStorage.removeItem('helion_token');
+    localStorage.removeItem('helion_username');
+    window.location.href = 'index.html';
+  }
+
+  function toast(message, type = 'default') {
+    const host = document.getElementById('toastHost');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    host.appendChild(el);
+    setTimeout(() => el.remove(), 4500);
+  }
+
+  async function refreshWallet() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/wallet', { headers: authHeaders() });
+      const data = await res.json();
+      if (!res.ok) { toast(data.error || 'Istunto vanhentunut.', 'error'); logout(); return; }
+      document.getElementById('walletAddress').textContent = data.address;
+      document.getElementById('helBalance').textContent = parseFloat(data.helBalance).toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+      document.getElementById('bnbBalance').textContent = parseFloat(data.bnbBalance).toFixed(4) + ' tBNB';
+    } catch (e) {
+      toast('Saldon haku epäonnistui: ' + e.message, 'error');
+    }
+  }
+
+  function onRecipientChange() {
+    const val = document.getElementById('recipientInput').value.trim();
+    const note = document.getElementById('feeNote');
+    if (!val) {
+      note.textContent = 'Kirjoita vastaanottaja nähdäksesi sovelletaanko fee:tä.';
+      note.className = 'fee-note';
+      return;
+    }
+    if (val.startsWith('0x') && val.length === 42) {
+      note.textContent = 'Osoite — jos se ei kuulu järjestelmän käyttäjälle, 1% fee sovelletaan lähetettäessä.';
+      note.className = 'fee-note external';
+    } else {
+      note.textContent = 'Käyttäjänimi — sisäinen siirto toiselle Helion-käyttäjälle on ilmainen.';
+      note.className = 'fee-note internal';
+    }
+  }
+
+  async function doTransfer() {
+    const recipient = document.getElementById('recipientInput').value.trim();
+    const amount = document.getElementById('amountInput').value;
+    if (!recipient || !amount || parseFloat(amount) <= 0) { toast('Täytä vastaanottaja ja määrä.', 'error'); return; }
+
+    const btn = document.getElementById('transferBtn');
+    btn.disabled = true; btn.textContent = 'Lähetetään…';
+    try {
+      const res = await fetch(BACKEND_URL + '/api/transfer', {
+        method: 'POST', headers: authHeaders(),
+        body: JSON.stringify({ recipient, amount })
+      });
+      const data = await res.json();
+      if (!res.ok) { toast(data.error || 'Siirto epäonnistui.', 'error'); return; }
+
+      const feeText = parseFloat(data.fee) > 0 ? ` (fee: ${data.fee} HEL)` : ' (sisäinen, ei fee:tä)';
+      toast(`✅ Lähetetty ${data.sentAmount} HEL → ${data.recipient}${feeText}`, 'success');
+      document.getElementById('recipientInput').value = '';
+      document.getElementById('amountInput').value = '';
+      refreshWallet();
+    } catch (e) {
+      toast('Yhteysvirhe: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Lähetä';
+    }
+  }
+
+  async function linkWallet() {
+    if (!window.ethereum) { toast('MetaMask ei löytynyt.', 'error'); return; }
+    const btn = document.getElementById('linkWalletBtn');
+    btn.disabled = true; btn.textContent = 'Odotetaan MetaMaskia…';
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+
+      const nonceRes = await fetch(BACKEND_URL + '/api/auth/nonce?address=' + address);
+      const nonceData = await nonceRes.json();
+      if (!nonceRes.ok) { toast(nonceData.error || 'Virhe.', 'error'); return; }
+
+      const signature = await signer.signMessage(nonceData.message);
+
+      const linkRes = await fetch(BACKEND_URL + '/api/link-wallet', {
+        method: 'POST', headers: authHeaders(),
+        body: JSON.stringify({ address, message: nonceData.message, signature })
+      });
+      const linkData = await linkRes.json();
+      if (!linkRes.ok) { toast(linkData.error || 'Linkitys epäonnistui.', 'error'); return; }
+
+      toast('Lompakko linkitetty! Voit nyt kirjautua sillä ilman salasanaa.', 'success');
+      loadLinkedWallets();
+    } catch (e) {
+      toast('Virhe: ' + (e.reason || e.message), 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = '🦊 Linkitä MetaMask';
+    }
+  }
+
+  async function loadLinkedWallets() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/linked-wallets', { headers: authHeaders() });
+      const data = await res.json();
+      const listEl = document.getElementById('linkedList');
+      if (!data.wallets || data.wallets.length === 0) {
+        listEl.innerHTML = '';
+        return;
+      }
+      listEl.innerHTML = data.wallets.map(w => `<div class="linked-item">${w}</div>`).join('');
+    } catch (e) { /* hiljainen */ }
+  }
+
+  document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
+  refreshWallet();
+  loadLinkedWallets();
+</script>
+</body>
+</html>
