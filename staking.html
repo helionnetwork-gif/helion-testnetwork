@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helion Staking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
+    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
+    --danger: #E5484D; --success: #3DD68C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
+    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+  .display{ font-family:'Chakra Petch', sans-serif; }
+  .wrap{ max-width: 760px; margin: 0 auto; }
+
+  header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
+  .brand{ display:flex; align-items:center; gap: 12px; }
+  .brand h1{ font-size: 22px; }
+  .brand .tag{ font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;}
+  .brand-logo{ height: 40px; width: 40px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 16px rgba(242,169,59,0.35); }
+
+  .user-pill{ background: var(--panel); border: 1px solid var(--line); padding: 10px 16px; border-radius: 999px; font-size: 13px; display:flex; align-items:center; gap:10px; }
+  .user-pill .dot{ width:8px; height:8px; border-radius:50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
+  .user-pill button{ background:none; border:none; color:var(--muted); font-size:11.5px; cursor:pointer; text-decoration:underline; }
+
+  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
+  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
+  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
+
+  .balance-card{ background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 20px 22px; margin-bottom: 20px; }
+  .balance-card .label{ font-size: 11.5px; color: var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
+  .balance-card .value{ font-size: 24px; font-family:'JetBrains Mono',monospace; font-weight:700; }
+  .balance-card .addr{ font-size:11px; color:var(--muted); margin-top:8px; word-break:break-all; }
+
+  h2.section-title{ font-size:14px; margin-bottom:14px; }
+
+  .tiers-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 640px){ .tiers-grid{ grid-template-columns: 1fr; } }
+  .tier-card{ background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 18px 16px; cursor: pointer; transition: all .15s ease; text-align:center; }
+  .tier-card.selected{ border-color: var(--gold); background: rgba(242,169,59,0.06); }
+  .tier-card .name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:15px; margin-bottom:8px; }
+  .tier-card .duration{ font-size: 22px; font-family:'JetBrains Mono',monospace; font-weight:700; color: var(--gold); margin-bottom: 4px;}
+  .tier-card .reward{ font-size: 12.5px; color: var(--success); font-weight:600; margin-bottom: 8px; }
+  .tier-card .min{ font-size: 11px; color: var(--muted); }
+
+  .stake-box{ background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 20px; margin-bottom: 24px; }
+  .input-row{ display:flex; align-items:center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 4px 4px 4px 14px; margin-bottom: 12px; }
+  .input-row input{ background: transparent; border:none; outline:none; color: var(--text); font-family:'JetBrains Mono', monospace; font-size: 15px; width: 100%; padding: 12px 0; }
+  .input-row .unit{ color: var(--muted); font-size: 12px; padding: 0 10px; white-space:nowrap; }
+  .btn-block{ width:100%; border:none; padding: 16px; border-radius:14px; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px; cursor:pointer; background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
+  .btn-block:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .positions-list{ display:flex; flex-direction:column; gap: 12px; }
+  .position-card{ background: var(--panel); border:1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
+  .position-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; flex-wrap:wrap; gap:8px;}
+  .position-amount{ font-size: 18px; font-family:'JetBrains Mono',monospace; font-weight:700; }
+  .position-tag{ font-size: 10.5px; padding: 4px 10px; border-radius: 999px; background: var(--panel-2); color: var(--muted); text-transform:uppercase; }
+  .position-tag.locked{ color: var(--gold); }
+  .position-tag.ready{ background: rgba(61,214,140,0.15); color: var(--success); }
+
+  .position-actions{ display:flex; gap: 10px; }
+  .position-actions button{ flex:1; padding: 11px; border-radius: 10px; font-size:12.5px; font-family:'Chakra Petch',sans-serif; font-weight:700; cursor:pointer; border:none; }
+  .btn-withdraw{ background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
+  .btn-early{ background: transparent; border:1px solid var(--danger) !important; color: var(--danger); }
+
+  .empty-note{ text-align:center; color: var(--muted); font-size: 13px; padding: 30px 0; }
+
+  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
+  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .toast.success{ border-color: rgba(61,214,140,0.4); }
+  .toast.error{ border-color: rgba(229,72,77,0.4); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="logo.jpg" alt="Helion" class="brand-logo">
+      <div><h1 class="display">Helion Staking</h1><div class="tag">BSC Testnet</div></div>
+    </div>
+    <div class="user-pill">
+      <div class="dot"></div>
+      <span id="usernameDisplay">–</span>
+      <button onclick="logout()">Kirjaudu ulos</button>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <a href="miner.html" class="nav-item">⛏ Miner</a>
+    <a href="staking.html" class="nav-item active">🔒 Staking</a>
+    <a href="helion-trading.html" class="nav-item">🔄 Trading</a>
+    <a href="wallet.html" class="nav-item">💼 Wallet</a>
+    <a href="guide.html" class="nav-item">📖 Ohjeet</a>
+  </nav>
+
+  <div class="balance-card">
+    <div class="label">Lompakkosaldo</div>
+    <div class="value" id="walletBalance">– HEL</div>
+    <div class="addr" id="walletAddress"></div>
+  </div>
+
+  <h2 class="section-title display">Valitse taso</h2>
+  <div class="tiers-grid" id="tiersGrid"><div class="empty-note">Ladataan…</div></div>
+
+  <div class="stake-box">
+    <div class="input-row">
+      <input type="number" id="stakeAmount" placeholder="0.0" min="0" step="0.01">
+      <span class="unit">HEL</span>
+    </div>
+    <div style="font-size:11.5px; color:var(--muted); margin-bottom:12px;" id="selectedTierInfo">
+      Valitse taso yllä ennen staketusta.
+    </div>
+    <button class="btn-block" id="stakeBtn" onclick="doStake()" disabled>Valitse taso ensin</button>
+  </div>
+
+  <h2 class="section-title display">Omat stake-positiot</h2>
+  <div class="positions-list" id="positionsList"><div class="empty-note">Ladataan…</div></div>
+</div>
+
+<div id="toastHost"></div>
+
+<script>
+  const BACKEND_URL = "http://localhost:3001";
+
+  const token = localStorage.getItem('helion_token');
+  const username = localStorage.getItem('helion_username');
+  if (!token) { window.location.href = 'index.html'; }
+
+  let selectedTierId = null;
+  let tiersCache = [];
+
+  function authHeaders() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
+
+  function logout() {
+    localStorage.removeItem('helion_token');
+    localStorage.removeItem('helion_username');
+    window.location.href = 'index.html';
+  }
+
+  function toast(message, type = 'default') {
+    const host = document.getElementById('toastHost');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    host.appendChild(el);
+    setTimeout(() => el.remove(), 4500);
+  }
+
+  function fmtDuration(seconds) {
+    const totalSec = Math.max(0, seconds);
+    const d = Math.floor(totalSec / 86400);
+    const h = Math.floor((totalSec % 86400) / 3600);
+    if (d > 0) return `${d}pv ${h}h`;
+    const m = Math.floor((totalSec % 3600) / 60);
+    return `${h}h ${m}min`;
+  }
+
+  async function apiGet(path) {
+    const res = await fetch(BACKEND_URL + path, { headers: authHeaders() });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Virhe');
+    return data;
+  }
+  async function apiPost(path, body) {
+    const res = await fetch(BACKEND_URL + path, { method: 'POST', headers: authHeaders(), body: JSON.stringify(body || {}) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Virhe');
+    return data;
+  }
+
+  async function refreshWallet() {
+    try {
+      const data = await apiGet('/api/wallet');
+      document.getElementById('walletBalance').textContent =
+        parseFloat(data.helBalance).toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+      document.getElementById('walletAddress').textContent = data.address;
+    } catch (e) {
+      toast('Saldon haku epäonnistui: ' + e.message, 'error');
+    }
+  }
+
+  async function loadTiers() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/staking/tiers');
+      const data = await res.json();
+      tiersCache = data.tiers.filter(t => t.active);
+      renderTiers();
+    } catch (e) {
+      document.getElementById('tiersGrid').innerHTML = '<div class="empty-note">Tasojen haku epäonnistui.</div>';
+    }
+  }
+
+  function renderTiers() {
+    const grid = document.getElementById('tiersGrid');
+    grid.innerHTML = '';
+    tiersCache.forEach(t => {
+      const card = document.createElement('div');
+      card.className = 'tier-card' + (selectedTierId === t.id ? ' selected' : '');
+      card.onclick = () => selectTier(t.id);
+      card.innerHTML = `
+        <div class="name">${t.name}</div>
+        <div class="duration">${t.lockDurationDays} vrk</div>
+        <div class="reward">+${t.rewardPct.toFixed(2)}% tuotto</div>
+        <div class="min">Min. ${parseFloat(t.minStake).toLocaleString('fi-FI')} HEL</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function selectTier(tierId) {
+    selectedTierId = tierId;
+    renderTiers();
+    const t = tiersCache.find(x => x.id === tierId);
+    document.getElementById('selectedTierInfo').textContent =
+      `Valittu: ${t.lockDurationDays} vrk lukitus, minimi ${parseFloat(t.minStake).toLocaleString('fi-FI')} HEL, tuotto ${t.rewardPct.toFixed(2)}%`;
+    const btn = document.getElementById('stakeBtn');
+    btn.disabled = false;
+    btn.textContent = 'Stake';
+  }
+
+  async function doStake() {
+    if (selectedTierId === null) { toast('Valitse taso ensin.', 'error'); return; }
+    const val = document.getElementById('stakeAmount').value;
+    if (!val || parseFloat(val) <= 0) { toast('Syötä kelvollinen määrä.', 'error'); return; }
+
+    const btn = document.getElementById('stakeBtn');
+    btn.disabled = true; btn.textContent = 'Vahvistetaan…';
+    try {
+      await apiPost('/api/staking/stake', { tierId: selectedTierId, amount: val });
+      toast('Stake onnistui!', 'success');
+      document.getElementById('stakeAmount').value = '';
+      await refreshWallet();
+      await loadPositions();
+    } catch (e) {
+      toast('Virhe: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Stake';
+    }
+  }
+
+  async function loadPositions() {
+    const listEl = document.getElementById('positionsList');
+    try {
+      const data = await apiGet('/api/staking/positions');
+      const active = data.positions.filter(p => !p.withdrawn);
+      if (active.length === 0) {
+        listEl.innerHTML = '<div class="empty-note">Ei vielä aktiivisia stake-positioita.</div>';
+        return;
+      }
+      const now = Math.floor(Date.now() / 1000);
+      listEl.innerHTML = '';
+      active.forEach(p => {
+        const remaining = p.unlocksAt - now;
+        const card = document.createElement('div');
+        card.className = 'position-card';
+        card.innerHTML = `
+          <div class="position-top">
+            <div class="position-amount">${parseFloat(p.amount).toLocaleString('fi-FI',{maximumFractionDigits:2})} HEL</div>
+            <div class="position-tag ${p.ready ? 'ready' : 'locked'}">${p.ready ? 'Valmis' : 'Lukossa'}</div>
+          </div>
+          <div style="font-size:11.5px; color:var(--muted); margin-bottom:14px;">
+            ${p.ready ? 'Lukitusaika päättynyt' : fmtDuration(remaining) + ' jäljellä'} · tuotto ${p.rewardPct.toFixed(2)}%
+          </div>
+          <div class="position-actions">
+            ${p.ready
+              ? `<button class="btn-withdraw" onclick="handleWithdraw(${p.index})">Nosta</button>`
+              : `<button class="btn-early" onclick="handleEarlyWithdraw(${p.index})">Nosta aikaisin (menetä tuotto)</button>`}
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+    } catch (e) {
+      listEl.innerHTML = '<div class="empty-note">Positioiden haku epäonnistui.</div>';
+    }
+  }
+
+  async function handleWithdraw(index) {
+    try {
+      await apiPost('/api/staking/withdraw', { stakeIndex: index });
+      toast('Nosto onnistui!', 'success');
+      await refreshWallet();
+      await loadPositions();
+    } catch (e) {
+      toast('Virhe: ' + e.message, 'error');
+    }
+  }
+
+  async function handleEarlyWithdraw(index) {
+    if (!confirm('Menetät tämän position tuoton kokonaan. Jatketaanko?')) return;
+    try {
+      await apiPost('/api/staking/early-withdraw', { stakeIndex: index });
+      toast('Pääoma nostettu (ilman tuottoa).', 'success');
+      await refreshWallet();
+      await loadPositions();
+    } catch (e) {
+      toast('Virhe: ' + e.message, 'error');
+    }
+  }
+
+  document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
+  loadTiers();
+  refreshWallet();
+  loadPositions();
+</script>
+</body>
+</html>
