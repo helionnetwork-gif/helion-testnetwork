@@ -38,7 +38,7 @@
   .powered-by{ text-align:center; font-size: 11px; color: var(--muted); margin-bottom: 18px; }
   .powered-by b{ color: var(--gold); }
 
-  .pool-stats{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .pool-stats{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
   .pool-stat{ background: var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
   .pool-stat .label{ font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:5px;}
   .pool-stat .value{ font-size:16px; font-family:'JetBrains Mono',monospace; font-weight:600; }
@@ -61,7 +61,7 @@
   .swap-divider{ display:flex; justify-content:center; margin: -8px 0; position:relative; z-index:2; }
   .swap-flip{ width:36px; height:36px; border-radius:50%; background: var(--panel-2); border:3px solid var(--panel); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gold); font-size:15px; }
 
-  .info-row{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:12px; }
+  .info-row{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:10px; }
   .info-row span:last-child{ color: var(--text); font-family:'JetBrains Mono',monospace; }
 
   .btn-block{ width:100%; border:none; padding: 16px; border-radius:14px; margin-top:16px; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px; cursor:pointer; background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
@@ -113,6 +113,11 @@
     <div class="pool-stat"><div class="label">Pool TBNB</div><div class="value" id="poolBnb">–</div></div>
   </div>
 
+  <div class="pool-stats" style="margin-bottom:16px;">
+    <div class="pool-stat"><div class="label">HEL hinta</div><div class="value" id="priceHel" style="font-size:14px;">–</div></div>
+    <div class="pool-stat"><div class="label">tBNB hinta</div><div class="value" id="priceBnb" style="font-size:14px;">–</div></div>
+  </div>
+
   <div class="tabs">
     <div class="tab active" id="tabSwap" onclick="switchTab('swap')">Swap</div>
     <div class="tab" id="tabLiquidity" onclick="switchTab('liquidity')">Likviditeetti</div>
@@ -136,6 +141,8 @@
     </div>
 
     <div class="info-row"><span>Platform-fee (1%)</span><span id="feeInfo">–</span></div>
+    <div class="info-row"><span>Fee USD</span><span id="feeUsd">–</span></div>
+    <div class="info-row"><span>Saat arviolta (USD)</span><span id="outUsd">–</span></div>
     <div class="info-row"><span>Reitti</span><span id="routeInfo">–</span></div>
 
     <button class="btn-block" id="swapBtn" onclick="doSwap()">Swap</button>
@@ -163,6 +170,7 @@
   if (!token) { window.location.href = 'index.html'; }
 
   let direction = 'buy'; // 'buy' = TBNB -> HEL, 'sell' = HEL -> TBNB
+  let lastPrices = { bnbUsd: 0, helUsd: 0, poolExists: false };
 
   function authHeaders() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
 
@@ -181,6 +189,15 @@
     setTimeout(() => el.remove(), 4500);
   }
 
+  function fmtUsd(n) {
+    if (n === null || n === undefined || isNaN(n)) return '–';
+    if (n <= 0) return '$0.00';
+    if (n < 0.0001) return '< $0.0001';
+    if (n < 0.01) return '$' + n.toFixed(6);
+    if (n < 1) return '$' + n.toFixed(4);
+    return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
   async function apiGet(path, auth) {
     const res = await fetch(BACKEND_URL + path, auth ? { headers: authHeaders() } : {});
     const data = await res.json();
@@ -192,6 +209,21 @@
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Virhe');
     return data;
+  }
+
+  async function refreshPrices() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/prices');
+      const p = await res.json();
+      if (!res.ok) return;
+      lastPrices = p;
+      document.getElementById('priceBnb').textContent = fmtUsd(p.bnbUsd);
+      if (p.poolExists && p.helUsd > 0) {
+        document.getElementById('priceHel').textContent = fmtUsd(p.helUsd);
+      } else {
+        document.getElementById('priceHel').textContent = 'Ei poolia';
+      }
+    } catch (_) {}
   }
 
   function switchTab(tab) {
@@ -214,6 +246,9 @@
     }
     document.getElementById('fromAmount').value = '';
     document.getElementById('toAmount').value = '';
+    document.getElementById('feeInfo').textContent = '–';
+    document.getElementById('feeUsd').textContent = '–';
+    document.getElementById('outUsd').textContent = '–';
     document.getElementById('routeInfo').textContent = direction === 'buy' ? 'TBNB → HEL' : 'HEL → TBNB';
   }
 
@@ -243,16 +278,34 @@
     if (!val || parseFloat(val) <= 0) {
       document.getElementById('toAmount').value = '';
       document.getElementById('feeInfo').textContent = '–';
+      document.getElementById('feeUsd').textContent = '–';
+      document.getElementById('outUsd').textContent = '–';
       return;
     }
     quoteTimer = setTimeout(async () => {
       try {
         const data = await apiGet(`/api/trading/quote?direction=${direction}&amount=${val}`, false);
         document.getElementById('toAmount').value = data.amountOut;
-        document.getElementById('feeInfo').textContent = parseFloat(data.fee).toLocaleString('fi-FI',{maximumFractionDigits:6}) + (direction === 'buy' ? ' TBNB' : ' HEL');
+        const feeNum = parseFloat(data.fee) || 0;
+        const outNum = parseFloat(data.amountOut) || 0;
+        const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
+        document.getElementById('feeInfo').textContent =
+          feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit;
+
+        let feeUsd = 0;
+        if (direction === 'buy') feeUsd = feeNum * (lastPrices.bnbUsd || 0);
+        else feeUsd = feeNum * (lastPrices.helUsd || 0);
+        document.getElementById('feeUsd').textContent = fmtUsd(feeUsd);
+
+        let outUsd = 0;
+        if (direction === 'buy') outUsd = outNum * (lastPrices.helUsd || 0);
+        else outUsd = outNum * (lastPrices.bnbUsd || 0);
+        document.getElementById('outUsd').textContent = fmtUsd(outUsd);
       } catch (e) {
         document.getElementById('toAmount').value = '';
         document.getElementById('feeInfo').textContent = 'Ei likviditeettiä';
+        document.getElementById('feeUsd').textContent = '–';
+        document.getElementById('outUsd').textContent = '–';
       }
     }, 400);
   }
@@ -265,12 +318,26 @@
     btn.disabled = true; btn.textContent = 'Vahvistetaan…';
     try {
       const expectedOut = parseFloat(document.getElementById('toAmount').value || '0');
-      const minAmountOut = (expectedOut * 0.97).toFixed(18); // 3% slippage-suoja
-      await apiPost('/api/trading/swap', { direction, amount: val, minAmountOut });
-      toast('Swap onnistui!', 'success');
+      const minAmountOut = (expectedOut * 0.97).toFixed(18);
+      const result = await apiPost('/api/trading/swap', { direction, amount: val, minAmountOut });
+      const feeNum = parseFloat(result.fee) || 0;
+      let feeUsd = 0;
+      if (direction === 'buy') feeUsd = feeNum * (lastPrices.bnbUsd || 0);
+      else feeUsd = feeNum * (lastPrices.helUsd || 0);
+      const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
+      toast(
+        'Swap onnistui! Fee: ' +
+          feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit +
+          ' (' + fmtUsd(feeUsd) + ')',
+        'success'
+      );
       document.getElementById('fromAmount').value = '';
       document.getElementById('toAmount').value = '';
+      document.getElementById('feeInfo').textContent = '–';
+      document.getElementById('feeUsd').textContent = '–';
+      document.getElementById('outUsd').textContent = '–';
       await refreshPool();
+      await refreshPrices();
     } catch (e) {
       toast('Virhe swapissa: ' + e.message, 'error');
     } finally {
@@ -293,6 +360,7 @@
       document.getElementById('lpBnbAmount').value = '';
       await refreshPool();
       await refreshLpBalance();
+      await refreshPrices();
     } catch (e) {
       toast('Virhe: ' + e.message, 'error');
     } finally {
@@ -311,6 +379,7 @@
       document.getElementById('lpRemoveAmount').value = '';
       await refreshPool();
       await refreshLpBalance();
+      await refreshPrices();
     } catch (e) {
       toast('Virhe: ' + e.message, 'error');
     } finally {
@@ -330,6 +399,8 @@
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
   renderDirection();
   refreshPool();
+  refreshPrices();
+  setInterval(refreshPrices, 60000);
 </script>
 </body>
 </html>
