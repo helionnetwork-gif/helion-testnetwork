@@ -90,8 +90,8 @@
   </nav>
 
   <div class="grid">
-    <div class="card"><div class="sub">Lompakkosaldo</div><div class="value" id="walletBalance">– HEL</div></div>
-    <div class="card"><div class="sub">Yhteensä louhittu</div><div class="value" id="totalMinedDisplay">– HEL</div></div>
+    <div class="card"><div class="sub">Lompakkosaldo</div><div class="value" id="walletBalance">– HEL</div><div style="font-size:11px; color:var(--muted); margin-top:4px;" id="walletUsd">–</div></div>
+    <div class="card"><div class="sub">Yhteensä louhittu</div><div class="value" id="totalMinedDisplay">– HEL</div><div style="font-size:11px; color:var(--muted); margin-top:4px;" id="minedUsd">–</div></div>
   </div>
 
   <div class="reactor-card">
@@ -216,11 +216,31 @@
     miningInterval = setInterval(updateGauge, 1000);
   }
 
+  let lastHelPrice = 0;
+
+  async function fetchHelPrice() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/prices');
+      const p = await res.json();
+      if (res.ok && p.poolExists) lastHelPrice = p.helUsd;
+    } catch (_) {}
+    return lastHelPrice;
+  }
+
+  function fmtUsdAmt(amt, price) {
+    if (!price || !amt) return '–';
+    const u = amt * price;
+    return '≈ $' + (u < 0.01 ? u.toFixed(6) : u.toLocaleString('en-US', {maximumFractionDigits: 2}));
+  }
+
   async function refreshWallet() {
     try {
       const data = await apiGet('/api/wallet');
+      const helAmt = parseFloat(data.helBalance);
       document.getElementById('walletBalance').textContent =
-        parseFloat(data.helBalance).toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+        helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+      await fetchHelPrice();
+      document.getElementById('walletUsd').textContent = fmtUsdAmt(helAmt, lastHelPrice);
     } catch (e) {
       toast('Saldon haku epäonnistui: ' + e.message, 'error');
     }
@@ -231,8 +251,11 @@
       const data = await apiGet('/api/miner/status');
       miningEndsAt = data.miningEndTime === 0 ? null : data.miningEndTime * 1000;
       rewardPerCycleDisplay = parseFloat(data.rewardPerCycle).toLocaleString('fi-FI', {maximumFractionDigits: 2});
+      const mined = parseFloat(data.totalMined);
       document.getElementById('totalMinedDisplay').textContent =
-        parseFloat(data.totalMined).toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+        mined.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+      await fetchHelPrice();
+      document.getElementById('minedUsd').textContent = fmtUsdAmt(mined, lastHelPrice);
     } catch (e) {
       toast('Kaivostilan haku epäonnistui: ' + e.message, 'error');
     }
