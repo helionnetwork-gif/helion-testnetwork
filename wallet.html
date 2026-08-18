@@ -98,8 +98,8 @@
     <div style="height:1px; background:var(--line); margin:12px 0;"></div>
     <div class="balance-row" style="font-size:12px;"><span class="label">Token-hinnat</span><span></span></div>
     <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>HEL</span><span id="priceHel">–</span></div>
-    <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>tBNB ≈ BNB</span><span id="priceBnb">–</span></div>
-    <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>HUSD ≈ USDT</span><span id="priceHusd">$1.00</span></div>
+    <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>tBNB</span><span id="priceBnb">–</span></div>
+    <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>HUSD</span><span id="priceHusd">$1.00</span></div>
     <button class="btn-block secondary" style="margin-top:14px;" onclick="refreshWallet()">Päivitä</button>
   </div>
 
@@ -146,7 +146,8 @@
   }
 
   function fmtUsd(n) {
-    if (n === null || n === undefined || isNaN(n) || n <= 0) return '–';
+    if (n === null || n === undefined || isNaN(n)) return '–';
+    if (n <= 0) return '$0.00';
     if (n < 0.0001) return '< $0.0001';
     if (n < 0.01) return '$' + n.toFixed(6);
     if (n < 1) return '$' + n.toFixed(4);
@@ -159,21 +160,35 @@
       const data = await res.json();
       if (!res.ok) { toast(data.error || 'Istunto vanhentunut.', 'error'); logout(); return; }
       document.getElementById('walletAddress').textContent = data.address;
-      const helAmt = parseFloat(data.helBalance);
-      const bnbAmt = parseFloat(data.bnbBalance);
+      const helAmt = parseFloat(data.helBalance) || 0;
+      const bnbAmt = parseFloat(data.bnbBalance) || 0;
       document.getElementById('helBalance').textContent = helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
       document.getElementById('bnbBalance').textContent = bnbAmt.toFixed(4) + ' tBNB';
+
       try {
         const priceRes = await fetch(BACKEND_URL + '/api/prices');
         const prices = await priceRes.json();
-        if (priceRes.ok) {
-          document.getElementById('priceHel').textContent = prices.poolExists ? fmtUsd(prices.helUsd) : 'Ei poolia';
-          document.getElementById('priceBnb').textContent = fmtUsd(prices.bnbUsd);
-          document.getElementById('priceHusd').textContent = '$1.00';
-          document.getElementById('helUsd').textContent = prices.poolExists ? '≈ ' + fmtUsd(helAmt * prices.helUsd) : '–';
-          document.getElementById('bnbUsd').textContent = '≈ ' + fmtUsd(bnbAmt * prices.bnbUsd);
+        if (!priceRes.ok) throw new Error(prices.error || 'Hinnat epäonnistui');
+
+        document.getElementById('priceBnb').textContent = fmtUsd(prices.bnbUsd);
+        document.getElementById('priceHusd').textContent = '$1.00';
+        if (prices.poolExists && prices.helUsd > 0) {
+          document.getElementById('priceHel').textContent = fmtUsd(prices.helUsd);
+          document.getElementById('helUsd').textContent = '≈ ' + fmtUsd(helAmt * prices.helUsd);
+        } else {
+          document.getElementById('priceHel').textContent = 'Ei poolia / 0 likviditeetti';
+          document.getElementById('helUsd').textContent = '–';
         }
-      } catch (_) {}
+        document.getElementById('bnbUsd').textContent = prices.bnbUsd > 0
+          ? '≈ ' + fmtUsd(bnbAmt * prices.bnbUsd)
+          : '–';
+      } catch (pe) {
+        console.warn('Hinnat:', pe);
+        document.getElementById('priceHel').textContent = '–';
+        document.getElementById('priceBnb').textContent = '–';
+        document.getElementById('helUsd').textContent = '–';
+        document.getElementById('bnbUsd').textContent = '–';
+      }
     } catch (e) {
       toast('Saldon haku epäonnistui: ' + e.message, 'error');
     }
