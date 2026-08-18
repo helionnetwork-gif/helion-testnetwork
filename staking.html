@@ -105,6 +105,7 @@
   <div class="balance-card">
     <div class="label">Lompakkosaldo</div>
     <div class="value" id="walletBalance">– HEL</div>
+    <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="walletUsd">–</div>
     <div class="addr" id="walletAddress"></div>
   </div>
 
@@ -180,9 +181,20 @@
   async function refreshWallet() {
     try {
       const data = await apiGet('/api/wallet');
+      const helAmt = parseFloat(data.helBalance);
       document.getElementById('walletBalance').textContent =
-        parseFloat(data.helBalance).toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+        helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
       document.getElementById('walletAddress').textContent = data.address;
+      try {
+        const priceRes = await fetch(BACKEND_URL + '/api/prices');
+        const prices = await priceRes.json();
+        if (priceRes.ok && prices.poolExists) {
+          const usd = helAmt * prices.helUsd;
+          document.getElementById('walletUsd').textContent = '≈ $' + (usd < 0.01 ? usd.toFixed(6) : usd.toLocaleString('en-US', {maximumFractionDigits: 2}));
+        } else {
+          document.getElementById('walletUsd').textContent = '–';
+        }
+      } catch (_) {}
     } catch (e) {
       toast('Saldon haku epäonnistui: ' + e.message, 'error');
     }
