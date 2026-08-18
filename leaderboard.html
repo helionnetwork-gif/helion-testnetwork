@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helion Leaderboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
+    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
+    --danger: #E5484D; --success: #3DD68C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
+    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+  .display{ font-family:'Chakra Petch', sans-serif; }
+  .wrap{ max-width: 620px; margin: 0 auto; }
+
+  header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
+  .brand{ display:flex; align-items:center; gap: 10px; }
+  .brand-logo{ height: 38px; width: 38px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 14px rgba(242,169,59,0.3); }
+  .brand h1{ font-size: 19px; }
+  .brand .tag{ font-size: 10.5px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+  .user-pill{ background: var(--panel); border: 1px solid var(--line); padding: 9px 14px; border-radius: 999px; font-size: 12.5px; display:flex; align-items:center; gap:8px; }
+  .user-pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
+  .user-pill button{ background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; text-decoration:underline; }
+
+  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
+  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
+  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
+
+  .rules-card{ background: rgba(124,92,252,0.08); border:1px solid var(--violet); border-radius: 14px; padding: 14px 16px; font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
+  .rules-card strong{ color: var(--violet); }
+
+  .my-score-card{ background: var(--panel); border:2px solid var(--gold); border-radius: 18px; padding: 18px 20px; margin-bottom: 22px; display:flex; justify-content:space-between; align-items:center; }
+  .my-score-card .label{ font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; }
+  .my-score-card .score{ font-size:28px; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--gold); }
+  .my-score-card .breakdown{ font-size:11px; color:var(--muted); margin-top:4px; }
+
+  .board-list{ display:flex; flex-direction:column; gap: 8px; }
+  .board-row{ background: var(--panel); border:1px solid var(--line); border-radius: 14px; padding: 13px 16px; display:flex; align-items:center; gap: 14px; }
+  .board-row.you{ border-color: var(--gold); background: rgba(242,169,59,0.06); }
+  .board-row.rank-1{ border-color: var(--gold); }
+  .board-row.rank-2{ border-color: #C0C0C0; }
+  .board-row.rank-3{ border-color: #B08D57; }
+
+  .rank-badge{ width: 30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:13px; flex-shrink:0; background: var(--panel-2); color: var(--muted); }
+  .rank-badge.gold{ background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
+  .rank-badge.silver{ background: linear-gradient(180deg, #E8E8E8, #A8A8A8); color:#1a1305; }
+  .rank-badge.bronze{ background: linear-gradient(180deg, #CD8E5C, #9c6a3d); color:#1a1305; }
+
+  .row-name{ font-family:'JetBrains Mono',monospace; font-size: 13px; flex:1; }
+  .row-value{ text-align:right; }
+  .row-value .main{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:14px; color:var(--gold); }
+  .row-value .sub{ font-size: 10px; color: var(--muted); }
+
+  .empty-note{ text-align:center; color: var(--muted); font-size: 13px; padding: 30px 0; background:var(--panel); border:1px solid var(--line); border-radius:14px; }
+
+  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
+  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .toast.error{ border-color: rgba(229,72,77,0.4); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="logo.jpg" alt="Helion" class="brand-logo">
+      <div><h1 class="display">Leaderboard</h1><div class="tag">Contribution-kilpailu</div></div>
+    </div>
+    <div class="user-pill">
+      <div class="dot"></div>
+      <span id="usernameDisplay">–</span>
+      <button onclick="logout()">Kirjaudu ulos</button>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <a href="miner.html" class="nav-item">⛏ Miner</a>
+    <a href="staking.html" class="nav-item">🔒 Staking</a>
+    <a href="helion-trading.html" class="nav-item">🔄 Trading</a>
+    <a href="wallet.html" class="nav-item">💼 Wallet</a>
+    <a href="leaderboard.html" class="nav-item active">🏆 Leaderboard</a>
+    <a href="guide.html" class="nav-item">📖 Ohjeet</a>
+  </nav>
+
+  <div class="rules-card">
+    <strong>Pisteytys:</strong> +1 piste / 100 HEL stakettu · +1 piste / tehty kauppa · +0.1 piste / lähetys · +5 pistettä / kaivauksen aktivointi
+  </div>
+
+  <div class="my-score-card">
+    <div>
+      <div class="label">Sinun pisteesi</div>
+      <div class="breakdown" id="myBreakdown">–</div>
+    </div>
+    <div class="score" id="myScore">–</div>
+  </div>
+
+  <div class="board-list" id="boardList"><div class="empty-note">Ladataan…</div></div>
+</div>
+
+<div id="toastHost"></div>
+
+<script>
+  const BACKEND_URL = "http://localhost:3001";
+
+  const token = localStorage.getItem('helion_token');
+  const username = localStorage.getItem('helion_username');
+  if (!token) { window.location.href = 'index.html'; }
+
+  function authHeaders() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
+
+  function logout() {
+    localStorage.removeItem('helion_token');
+    localStorage.removeItem('helion_username');
+    window.location.href = 'index.html';
+  }
+
+  function toast(message, type = 'default') {
+    const host = document.getElementById('toastHost');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    host.appendChild(el);
+    setTimeout(() => el.remove(), 4500);
+  }
+
+  async function loadMyScore() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/contribution', { headers: authHeaders() });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Virhe');
+      document.getElementById('myScore').textContent = data.score;
+      document.getElementById('myBreakdown').textContent =
+        `${Math.floor(data.stakeVolume/100)} staking · ${data.tradeCount} kauppaa · ${data.sendCount} lähetystä · ${data.mineCount} kaivausta`;
+    } catch (e) {
+      toast('Pisteiden haku epäonnistui: ' + e.message, 'error');
+    }
+  }
+
+  async function loadLeaderboard() {
+    const listEl = document.getElementById('boardList');
+    try {
+      const res = await fetch(BACKEND_URL + '/api/leaderboard?limit=20');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Virhe');
+
+      if (data.leaderboard.length === 0) {
+        listEl.innerHTML = '<div class="empty-note">Ei vielä dataa leaderboardille.</div>';
+        return;
+      }
+
+      listEl.innerHTML = '';
+      data.leaderboard.forEach((entry, i) => {
+        const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+        const rowRankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+        const isYou = entry.username === username;
+        const row = document.createElement('div');
+        row.className = `board-row ${rowRankClass} ${isYou ? 'you' : ''}`;
+        row.innerHTML = `
+          <div class="rank-badge ${rankClass}">${i + 1}</div>
+          <div class="row-name">@${entry.username}${isYou ? ' (sinä)' : ''}</div>
+          <div class="row-value">
+            <div class="main">${entry.score} pistettä</div>
+            <div class="sub">${Math.floor(entry.stakeVolume/100)}·${entry.tradeCount}·${entry.sendCount}·${entry.mineCount}</div>
+          </div>
+        `;
+        listEl.appendChild(row);
+      });
+    } catch (e) {
+      listEl.innerHTML = '<div class="empty-note">Leaderboardin haku epäonnistui.</div>';
+    }
+  }
+
+  document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
+  loadMyScore();
+  loadLeaderboard();
+</script>
+</body>
+</html>
