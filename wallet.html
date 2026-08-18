@@ -92,8 +92,15 @@
     <h2 class="display">Lompakkosi</h2>
     <div class="addr-box" id="walletAddress">–</div>
     <div class="balance-row"><span class="label">HEL</span><span class="value" id="helBalance">–</span></div>
+    <div class="balance-row" style="font-size:11.5px; color:var(--muted); margin-top:-4px; margin-bottom:10px;"><span></span><span id="helUsd">–</span></div>
     <div class="balance-row"><span class="label">tBNB (gas)</span><span class="value" id="bnbBalance">–</span></div>
-    <button class="btn-block secondary" style="margin-top:10px;" onclick="refreshWallet()">Päivitä</button>
+    <div class="balance-row" style="font-size:11.5px; color:var(--muted); margin-top:-4px; margin-bottom:10px;"><span></span><span id="bnbUsd">–</span></div>
+    <div style="height:1px; background:var(--line); margin:12px 0;"></div>
+    <div class="balance-row" style="font-size:12px;"><span class="label">Token-hinnat</span><span></span></div>
+    <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>HEL</span><span id="priceHel">–</span></div>
+    <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>tBNB ≈ BNB</span><span id="priceBnb">–</span></div>
+    <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>HUSD ≈ USDT</span><span id="priceHusd">$1.00</span></div>
+    <button class="btn-block secondary" style="margin-top:14px;" onclick="refreshWallet()">Päivitä</button>
   </div>
 
   <div class="card">
@@ -138,14 +145,35 @@
     setTimeout(() => el.remove(), 4500);
   }
 
+  function fmtUsd(n) {
+    if (n === null || n === undefined || isNaN(n) || n <= 0) return '–';
+    if (n < 0.0001) return '< $0.0001';
+    if (n < 0.01) return '$' + n.toFixed(6);
+    if (n < 1) return '$' + n.toFixed(4);
+    return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
   async function refreshWallet() {
     try {
       const res = await fetch(BACKEND_URL + '/api/wallet', { headers: authHeaders() });
       const data = await res.json();
       if (!res.ok) { toast(data.error || 'Istunto vanhentunut.', 'error'); logout(); return; }
       document.getElementById('walletAddress').textContent = data.address;
-      document.getElementById('helBalance').textContent = parseFloat(data.helBalance).toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
-      document.getElementById('bnbBalance').textContent = parseFloat(data.bnbBalance).toFixed(4) + ' tBNB';
+      const helAmt = parseFloat(data.helBalance);
+      const bnbAmt = parseFloat(data.bnbBalance);
+      document.getElementById('helBalance').textContent = helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+      document.getElementById('bnbBalance').textContent = bnbAmt.toFixed(4) + ' tBNB';
+      try {
+        const priceRes = await fetch(BACKEND_URL + '/api/prices');
+        const prices = await priceRes.json();
+        if (priceRes.ok) {
+          document.getElementById('priceHel').textContent = prices.poolExists ? fmtUsd(prices.helUsd) : 'Ei poolia';
+          document.getElementById('priceBnb').textContent = fmtUsd(prices.bnbUsd);
+          document.getElementById('priceHusd').textContent = '$1.00';
+          document.getElementById('helUsd').textContent = prices.poolExists ? '≈ ' + fmtUsd(helAmt * prices.helUsd) : '–';
+          document.getElementById('bnbUsd').textContent = '≈ ' + fmtUsd(bnbAmt * prices.bnbUsd);
+        }
+      } catch (_) {}
     } catch (e) {
       toast('Saldon haku epäonnistui: ' + e.message, 'error');
     }
