@@ -20,62 +20,49 @@
   }
   .display{ font-family:'Chakra Petch', sans-serif; }
   .wrap{ max-width: 460px; margin: 0 auto; }
-
   header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap:wrap; gap:12px; }
   .brand{ display:flex; align-items:center; gap: 10px; }
   .brand-logo{ height: 34px; width: 34px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 14px rgba(242,169,59,0.3); }
   .brand h1{ font-size: 19px; }
   .brand .tag{ font-size: 10.5px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-
   .user-pill{ background: var(--panel); border: 1px solid var(--line); padding: 9px 14px; border-radius: 999px; font-size: 12.5px; display:flex; align-items:center; gap:8px; }
   .user-pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
   .user-pill button{ background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; text-decoration:underline; }
-
   .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
   .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
   .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
-
   .powered-by{ text-align:center; font-size: 11px; color: var(--muted); margin-bottom: 18px; }
   .powered-by b{ color: var(--gold); }
-
   .pool-stats{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
-  .pool-stat{ background: var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
-  .pool-stat .label{ font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:5px;}
-  .pool-stat .value{ font-size:16px; font-family:'JetBrains Mono',monospace; font-weight:600; }
-
+  .pool-stat{ background: var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px 14px; }
+  .pool-stat .label{ font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;}
+  .pool-stat .value{ font-size:14px; font-family:'JetBrains Mono',monospace; font-weight:600; word-break:break-all; }
   .tabs{ display:flex; gap:6px; margin-bottom:16px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:4px; }
   .tab{ flex:1; text-align:center; padding:10px; border-radius:10px; font-size:13px; font-weight:600; font-family:'Chakra Petch',sans-serif; color: var(--muted); cursor:pointer; }
   .tab.active{ background: var(--panel-2); color: var(--gold); }
-
   .card{ background: var(--panel); border:1px solid var(--line); border-radius: 22px; padding: 20px; margin-bottom:16px; }
-
+  .balances-bar{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .bal-chip{ background: var(--panel-2); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:11.5px; font-family:'JetBrains Mono',monospace; }
+  .bal-chip b{ color: var(--gold); font-family:'Chakra Petch',sans-serif; margin-right:4px; }
   .swap-box{ background: var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom: 4px; }
   .swap-box .row-top{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted); margin-bottom:10px; }
+  .swap-box .row-top .max-btn{ color:var(--gold); cursor:pointer; font-weight:600; border:none; background:none; font-size:11px; }
   .swap-box .row-input{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .swap-box input{ background:transparent; border:none; outline:none; color:var(--text); font-family:'JetBrains Mono',monospace; font-size: 22px; width:100%; min-width:0; }
-  .token-badge{ display:flex; align-items:center; gap:6px; background: var(--panel); border:1px solid var(--line); padding: 8px 12px; border-radius: 999px; font-weight:700; font-size:13px; white-space:nowrap; font-family:'Chakra Petch',sans-serif; }
-  .token-dot{ width:9px; height:9px; border-radius:50%; }
-  .token-dot.hel{ background: var(--gold); }
-  .token-dot.pair{ background: var(--violet); }
-
+  .token-select{ display:flex; align-items:center; gap:6px; background: var(--panel); border:1px solid var(--line); padding: 8px 12px; border-radius: 999px; font-weight:700; font-size:13px; white-space:nowrap; font-family:'Chakra Petch',sans-serif; color:var(--text); cursor:pointer; }
+  select.token-select{ -webkit-appearance:none; appearance:none; padding-right:28px; }
   .swap-divider{ display:flex; justify-content:center; margin: -8px 0; position:relative; z-index:2; }
   .swap-flip{ width:36px; height:36px; border-radius:50%; background: var(--panel-2); border:3px solid var(--panel); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gold); font-size:15px; }
-
   .info-row{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:10px; }
   .info-row span:last-child{ color: var(--text); font-family:'JetBrains Mono',monospace; }
-
   .btn-block{ width:100%; border:none; padding: 16px; border-radius:14px; margin-top:16px; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px; cursor:pointer; background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
   .btn-block:disabled{ opacity:0.5; cursor:not-allowed; }
-
   .lp-input-row{ display:flex; align-items:center; background: var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:4px 4px 4px 14px; margin-bottom:10px; }
   .lp-input-row input{ background:transparent; border:none; outline:none; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:14px; width:100%; padding:10px 0; }
   .lp-input-row .unit{ color:var(--muted); font-size:12px; padding:0 10px; white-space:nowrap; }
-
   .hidden{ display:none !important; }
-
   .fee-banner{ background: rgba(242,169,59,0.08); border:1px solid var(--gold); border-radius: 12px; padding: 10px 14px; font-size: 11.5px; color: var(--muted); margin-bottom: 16px; }
   .fee-banner strong{ color: var(--gold); }
-
   #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
   .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   .toast.success{ border-color: rgba(61,214,140,0.4); }
@@ -105,17 +92,16 @@
     <a href="guide.html" class="nav-item">📖 Ohjeet</a>
   </nav>
 
-  <div class="powered-by">Kaupankäynti tapahtuu <b>PancakeSwap</b>-routerin kautta, oman lompakkosi kautta</div>
-  <div class="fee-banner"><strong>Huom:</strong> jokaisesta swapista peritään 1% platform-fee (jaetaan staking-poolille ja emergency vaultille), tämän lisäksi PancakeSwapin oma 0.3% pooli-fee.</div>
+  <div class="powered-by">Kaupankäynti <b>PancakeSwap</b>-routerin kautta · HEL · tBNB · HUSD</div>
+  <div class="fee-banner"><strong>Huom:</strong> jokaisesta swapista 1% platform-fee (+ PancakeSwap 0.3%). HUSD = $1 stablecoin.</div>
 
   <div class="pool-stats">
     <div class="pool-stat"><div class="label">Pool HEL</div><div class="value" id="poolHel">–</div></div>
     <div class="pool-stat"><div class="label">Pool TBNB</div><div class="value" id="poolBnb">–</div></div>
   </div>
-
   <div class="pool-stats" style="margin-bottom:16px;">
-    <div class="pool-stat"><div class="label">HEL hinta</div><div class="value" id="priceHel" style="font-size:14px;">–</div></div>
-    <div class="pool-stat"><div class="label">tBNB hinta</div><div class="value" id="priceBnb" style="font-size:14px;">–</div></div>
+    <div class="pool-stat"><div class="label">HEL hinta</div><div class="value" id="priceHel" style="font-size:13px;">–</div></div>
+    <div class="pool-stat"><div class="label">tBNB hinta</div><div class="value" id="priceBnb" style="font-size:13px;">–</div></div>
   </div>
 
   <div class="tabs">
@@ -124,19 +110,33 @@
   </div>
 
   <div class="card" id="swapPanel">
+    <div class="balances-bar">
+      <div class="bal-chip"><b>HEL</b> <span id="balHel">–</span></div>
+      <div class="bal-chip"><b>tBNB</b> <span id="balBnb">–</span></div>
+      <div class="bal-chip"><b>HUSD</b> <span id="balHusd">–</span></div>
+    </div>
+
     <div class="swap-box">
-      <div class="row-top"><span>Maksat</span><span>&nbsp;</span></div>
+      <div class="row-top"><span>Maksat</span><button type="button" class="max-btn" onclick="setMaxFrom()">MAX</button></div>
       <div class="row-input">
         <input type="number" id="fromAmount" placeholder="0.0" oninput="onFromAmountChange()">
-        <div class="token-badge" id="fromTokenBadge"><span class="token-dot pair"></span>TBNB</div>
+        <select class="token-select" id="fromToken" onchange="onTokenChange()">
+          <option value="tbnb">TBNB</option>
+          <option value="hel">HEL</option>
+          <option value="husd">HUSD</option>
+        </select>
       </div>
     </div>
-    <div class="swap-divider"><div class="swap-flip" onclick="flipDirection()">⇅</div></div>
+    <div class="swap-divider"><div class="swap-flip" onclick="flipTokens()">⇅</div></div>
     <div class="swap-box">
       <div class="row-top"><span>Saat (arvio)</span><span>&nbsp;</span></div>
       <div class="row-input">
         <input type="text" id="toAmount" placeholder="0.0" readonly>
-        <div class="token-badge" id="toTokenBadge"><span class="token-dot hel"></span>HEL</div>
+        <select class="token-select" id="toToken" onchange="onTokenChange()">
+          <option value="hel" selected>HEL</option>
+          <option value="tbnb">TBNB</option>
+          <option value="husd">HUSD</option>
+        </select>
       </div>
     </div>
 
@@ -144,51 +144,43 @@
     <div class="info-row"><span>Fee USD</span><span id="feeUsd">–</span></div>
     <div class="info-row"><span>Saat arviolta (USD)</span><span id="outUsd">–</span></div>
     <div class="info-row"><span>Reitti</span><span id="routeInfo">–</span></div>
-
     <button class="btn-block" id="swapBtn" onclick="doSwap()">Swap</button>
   </div>
 
   <div class="card hidden" id="liquidityPanel">
     <div class="lp-input-row"><input type="number" id="lpHelAmount" placeholder="0.0"><span class="unit">HEL</span></div>
     <div class="lp-input-row"><input type="number" id="lpBnbAmount" placeholder="0.0"><span class="unit">TBNB</span></div>
-    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn">Lisää likviditeettiä</button>
-
+    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn">Lisää likviditeettiä (HEL/TBNB)</button>
     <div style="height:1px; background:var(--line); margin:20px 0;"></div>
     <div class="info-row" style="margin-top:0;"><span>LP-tokenisi</span><span id="lpBalanceInfo">–</span></div>
     <div class="lp-input-row" style="margin-top:10px;"><input type="number" id="lpRemoveAmount" placeholder="0.0"><span class="unit">LP</span></div>
     <button class="btn-block" style="background:linear-gradient(180deg, var(--violet), #5b3fd6); color:#f4f1ff;" onclick="removeLiquidity()" id="removeLiqBtn">Poista likviditeetti</button>
   </div>
 </div>
-
 <div id="toastHost"></div>
-
 <script>
   const BACKEND_URL = "https://testnetworkserver.onrender.com";
-
   const token = localStorage.getItem('helion_token');
   const username = localStorage.getItem('helion_username');
   if (!token) { window.location.href = 'index.html'; }
 
-  let direction = 'buy'; // 'buy' = TBNB -> HEL, 'sell' = HEL -> TBNB
-  let lastPrices = { bnbUsd: 0, helUsd: 0, poolExists: false };
+  let lastPrices = { bnbUsd: 0, helUsd: 0, husdUsd: 1, poolExists: false };
+  let userBal = { hel: 0, bnb: 0, husd: 0 };
 
   function authHeaders() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
-
   function logout() {
     localStorage.removeItem('helion_token');
     localStorage.removeItem('helion_username');
     window.location.href = 'index.html';
   }
-
   function toast(message, type = 'default') {
     const host = document.getElementById('toastHost');
     const el = document.createElement('div');
     el.className = `toast ${type}`;
     el.textContent = message;
     host.appendChild(el);
-    setTimeout(() => el.remove(), 4500);
+    setTimeout(() => el.remove(), 5000);
   }
-
   function fmtUsd(n) {
     if (n === null || n === undefined || isNaN(n)) return '–';
     if (n <= 0) return '$0.00';
@@ -197,7 +189,17 @@
     if (n < 1) return '$' + n.toFixed(4);
     return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 2 });
   }
-
+  function fmtBal(n, digits) {
+    if (n === null || isNaN(n)) return '–';
+    return n.toLocaleString('fi-FI', { maximumFractionDigits: digits || 4 });
+  }
+  function tokenUsd(sym, amount) {
+    const s = String(sym).toLowerCase();
+    if (s === 'tbnb' || s === 'bnb') return amount * (lastPrices.bnbUsd || 0);
+    if (s === 'hel') return amount * (lastPrices.helUsd || 0);
+    if (s === 'husd') return amount * 1;
+    return 0;
+  }
   async function apiGet(path, auth) {
     const res = await fetch(BACKEND_URL + path, auth ? { headers: authHeaders() } : {});
     const data = await res.json();
@@ -210,7 +212,17 @@
     if (!res.ok) throw new Error(data.error || 'Virhe');
     return data;
   }
-
+  async function refreshBalances() {
+    try {
+      const data = await apiGet('/api/wallet', true);
+      userBal.hel = parseFloat(data.helBalance) || 0;
+      userBal.bnb = parseFloat(data.bnbBalance) || 0;
+      userBal.husd = parseFloat(data.husdBalance) || 0;
+      document.getElementById('balHel').textContent = fmtBal(userBal.hel, 4);
+      document.getElementById('balBnb').textContent = fmtBal(userBal.bnb, 4);
+      document.getElementById('balHusd').textContent = fmtBal(userBal.husd, 2);
+    } catch (e) { console.warn('Saldot:', e); }
+  }
   async function refreshPrices() {
     try {
       const res = await fetch(BACKEND_URL + '/api/prices');
@@ -218,14 +230,9 @@
       if (!res.ok) return;
       lastPrices = p;
       document.getElementById('priceBnb').textContent = fmtUsd(p.bnbUsd);
-      if (p.poolExists && p.helUsd > 0) {
-        document.getElementById('priceHel').textContent = fmtUsd(p.helUsd);
-      } else {
-        document.getElementById('priceHel').textContent = 'Ei poolia';
-      }
+      document.getElementById('priceHel').textContent = (p.poolExists && p.helUsd > 0) ? fmtUsd(p.helUsd) : 'Ei poolia';
     } catch (_) {}
   }
-
   function switchTab(tab) {
     document.getElementById('tabSwap').classList.toggle('active', tab === 'swap');
     document.getElementById('tabLiquidity').classList.toggle('active', tab === 'liquidity');
@@ -233,44 +240,55 @@
     document.getElementById('liquidityPanel').classList.toggle('hidden', tab !== 'liquidity');
     if (tab === 'liquidity') refreshLpBalance();
   }
-
-  function renderDirection() {
-    const fromBadge = document.getElementById('fromTokenBadge');
-    const toBadge = document.getElementById('toTokenBadge');
-    if (direction === 'buy') {
-      fromBadge.innerHTML = '<span class="token-dot pair"></span>TBNB';
-      toBadge.innerHTML = '<span class="token-dot hel"></span>HEL';
-    } else {
-      fromBadge.innerHTML = '<span class="token-dot hel"></span>HEL';
-      toBadge.innerHTML = '<span class="token-dot pair"></span>TBNB';
+  function getFrom() { return document.getElementById('fromToken').value; }
+  function getTo() { return document.getElementById('toToken').value; }
+  function updateRouteLabel() {
+    document.getElementById('routeInfo').textContent = getFrom().toUpperCase() + ' → ' + getTo().toUpperCase();
+  }
+  function onTokenChange() {
+    if (getFrom() === getTo()) {
+      const opts = ['tbnb', 'hel', 'husd'];
+      document.getElementById('toToken').value = opts.find(t => t !== getFrom()) || 'hel';
     }
     document.getElementById('fromAmount').value = '';
     document.getElementById('toAmount').value = '';
     document.getElementById('feeInfo').textContent = '–';
     document.getElementById('feeUsd').textContent = '–';
     document.getElementById('outUsd').textContent = '–';
-    document.getElementById('routeInfo').textContent = direction === 'buy' ? 'TBNB → HEL' : 'HEL → TBNB';
+    updateRouteLabel();
   }
-
-  function flipDirection() {
-    direction = direction === 'buy' ? 'sell' : 'buy';
-    renderDirection();
+  function flipTokens() {
+    const a = getFrom(), b = getTo();
+    document.getElementById('fromToken').value = b;
+    document.getElementById('toToken').value = a;
+    document.getElementById('fromAmount').value = '';
+    document.getElementById('toAmount').value = '';
+    document.getElementById('feeInfo').textContent = '–';
+    document.getElementById('feeUsd').textContent = '–';
+    document.getElementById('outUsd').textContent = '–';
+    updateRouteLabel();
+  }
+  function setMaxFrom() {
+    const t = getFrom();
+    let max = 0;
+    if (t === 'hel') max = userBal.hel;
+    else if (t === 'tbnb') max = Math.max(0, userBal.bnb - 0.002);
+    else if (t === 'husd') max = userBal.husd;
+    document.getElementById('fromAmount').value = max > 0 ? String(max) : '';
     onFromAmountChange();
   }
-
   async function refreshPool() {
     try {
       const data = await apiGet('/api/trading/pool', false);
       if (!data.exists) {
-        document.getElementById('poolHel').textContent = 'Ei paria vielä';
-        document.getElementById('poolBnb').textContent = 'Ei paria vielä';
+        document.getElementById('poolHel').textContent = 'Ei paria';
+        document.getElementById('poolBnb').textContent = 'Ei paria';
         return;
       }
-      document.getElementById('poolHel').textContent = parseFloat(data.helReserve).toLocaleString('fi-FI', {maximumFractionDigits: 2}) + ' HEL';
-      document.getElementById('poolBnb').textContent = parseFloat(data.bnbReserve).toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' TBNB';
-    } catch (e) { /* hiljainen */ }
+      document.getElementById('poolHel').textContent = parseFloat(data.helReserve).toLocaleString('fi-FI', {maximumFractionDigits: 2});
+      document.getElementById('poolBnb').textContent = parseFloat(data.bnbReserve).toLocaleString('fi-FI', {maximumFractionDigits: 4});
+    } catch (e) {}
   }
-
   let quoteTimer = null;
   function onFromAmountChange() {
     clearTimeout(quoteTimer);
@@ -284,23 +302,15 @@
     }
     quoteTimer = setTimeout(async () => {
       try {
-        const data = await apiGet(`/api/trading/quote?direction=${direction}&amount=${val}`, false);
+        const from = getFrom(), to = getTo();
+        const data = await apiGet(`/api/trading/quote?fromToken=${from}&toToken=${to}&amount=${val}`, false);
         document.getElementById('toAmount').value = data.amountOut;
         const feeNum = parseFloat(data.fee) || 0;
         const outNum = parseFloat(data.amountOut) || 0;
-        const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
-        document.getElementById('feeInfo').textContent =
-          feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit;
-
-        let feeUsd = 0;
-        if (direction === 'buy') feeUsd = feeNum * (lastPrices.bnbUsd || 0);
-        else feeUsd = feeNum * (lastPrices.helUsd || 0);
-        document.getElementById('feeUsd').textContent = fmtUsd(feeUsd);
-
-        let outUsd = 0;
-        if (direction === 'buy') outUsd = outNum * (lastPrices.helUsd || 0);
-        else outUsd = outNum * (lastPrices.bnbUsd || 0);
-        document.getElementById('outUsd').textContent = fmtUsd(outUsd);
+        document.getElementById('feeInfo').textContent = feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + ' ' + from.toUpperCase();
+        document.getElementById('feeUsd').textContent = fmtUsd(tokenUsd(from, feeNum));
+        document.getElementById('outUsd').textContent = fmtUsd(tokenUsd(to, outNum));
+        updateRouteLabel();
       } catch (e) {
         document.getElementById('toAmount').value = '';
         document.getElementById('feeInfo').textContent = 'Ei likviditeettiä';
@@ -309,48 +319,35 @@
       }
     }, 400);
   }
-
   async function doSwap() {
     const val = document.getElementById('fromAmount').value;
     if (!val || parseFloat(val) <= 0) { toast('Syötä kelvollinen määrä.', 'error'); return; }
-
+    const from = getFrom(), to = getTo();
+    if (from === to) { toast('Valitse eri tokenit.', 'error'); return; }
     const btn = document.getElementById('swapBtn');
     btn.disabled = true; btn.textContent = 'Vahvistetaan…';
     try {
       const expectedOut = parseFloat(document.getElementById('toAmount').value || '0');
       const minAmountOut = (expectedOut * 0.97).toFixed(18);
-      const result = await apiPost('/api/trading/swap', { direction, amount: val, minAmountOut });
+      const result = await apiPost('/api/trading/swap', { fromToken: from, toToken: to, amount: val, minAmountOut });
       const feeNum = parseFloat(result.fee) || 0;
-      let feeUsd = 0;
-      if (direction === 'buy') feeUsd = feeNum * (lastPrices.bnbUsd || 0);
-      else feeUsd = feeNum * (lastPrices.helUsd || 0);
-      const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
-      toast(
-        'Swap onnistui! Fee: ' +
-          feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit +
-          ' (' + fmtUsd(feeUsd) + ')',
-        'success'
-      );
+      toast('Swap onnistui! Fee: ' + feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + ' ' + from.toUpperCase() + ' (' + fmtUsd(tokenUsd(from, feeNum)) + ')', 'success');
       document.getElementById('fromAmount').value = '';
       document.getElementById('toAmount').value = '';
       document.getElementById('feeInfo').textContent = '–';
       document.getElementById('feeUsd').textContent = '–';
       document.getElementById('outUsd').textContent = '–';
-      await refreshPool();
-      await refreshPrices();
+      await refreshPool(); await refreshPrices(); await refreshBalances();
     } catch (e) {
       toast('Virhe swapissa: ' + e.message, 'error');
     } finally {
       btn.disabled = false; btn.textContent = 'Swap';
     }
   }
-
   async function addLiquidity() {
     const helVal = document.getElementById('lpHelAmount').value;
     const bnbVal = document.getElementById('lpBnbAmount').value;
-    if (!helVal || !bnbVal || parseFloat(helVal) <= 0 || parseFloat(bnbVal) <= 0) {
-      toast('Syötä molemmat määrät.', 'error'); return;
-    }
+    if (!helVal || !bnbVal || parseFloat(helVal) <= 0 || parseFloat(bnbVal) <= 0) { toast('Syötä molemmat määrät.', 'error'); return; }
     const btn = document.getElementById('addLiqBtn');
     btn.disabled = true; btn.textContent = 'Lisätään…';
     try {
@@ -358,16 +355,10 @@
       toast('Likviditeetti lisätty!', 'success');
       document.getElementById('lpHelAmount').value = '';
       document.getElementById('lpBnbAmount').value = '';
-      await refreshPool();
-      await refreshLpBalance();
-      await refreshPrices();
-    } catch (e) {
-      toast('Virhe: ' + e.message, 'error');
-    } finally {
-      btn.disabled = false; btn.textContent = 'Lisää likviditeettiä';
-    }
+      await refreshPool(); await refreshLpBalance(); await refreshBalances(); await refreshPrices();
+    } catch (e) { toast('Virhe: ' + e.message, 'error'); }
+    finally { btn.disabled = false; btn.textContent = 'Lisää likviditeettiä (HEL/TBNB)'; }
   }
-
   async function removeLiquidity() {
     const val = document.getElementById('lpRemoveAmount').value;
     if (!val || parseFloat(val) <= 0) { toast('Syötä poistettava määrä.', 'error'); return; }
@@ -377,30 +368,21 @@
       await apiPost('/api/trading/remove-liquidity', { lpAmount: val });
       toast('Likviditeetti poistettu!', 'success');
       document.getElementById('lpRemoveAmount').value = '';
-      await refreshPool();
-      await refreshLpBalance();
-      await refreshPrices();
-    } catch (e) {
-      toast('Virhe: ' + e.message, 'error');
-    } finally {
-      btn.disabled = false; btn.textContent = 'Poista likviditeetti';
-    }
+      await refreshPool(); await refreshLpBalance(); await refreshBalances(); await refreshPrices();
+    } catch (e) { toast('Virhe: ' + e.message, 'error'); }
+    finally { btn.disabled = false; btn.textContent = 'Poista likviditeetti'; }
   }
-
   async function refreshLpBalance() {
     try {
       const data = await apiGet('/api/trading/lp-balance', true);
       document.getElementById('lpBalanceInfo').textContent = parseFloat(data.balance).toLocaleString('fi-FI', {maximumFractionDigits: 6}) + ' LP';
-    } catch (e) {
-      document.getElementById('lpBalanceInfo').textContent = '–';
-    }
+    } catch (e) { document.getElementById('lpBalanceInfo').textContent = '–'; }
   }
-
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
-  renderDirection();
-  refreshPool();
-  refreshPrices();
+  updateRouteLabel();
+  refreshPool(); refreshPrices(); refreshBalances();
   setInterval(refreshPrices, 60000);
+  setInterval(refreshBalances, 30000);
 </script>
 </body>
 </html>
