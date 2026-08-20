@@ -177,19 +177,7 @@
 
   <!-- STEP 4 -->
   <div class="step-section">
-    <div class="step-header"><div class="step-number">4</div><h2 class="display">Hae testi-HUSD</h2></div>
-    <div class="step-card">
-      <p><strong>HUSD (Helion Test USD)</strong> on oma testi-stablecoinimme HEL/HUSD-kaupankäyntiparia varten. Kuka tahansa voi hakea sitä ilmaiseksi kerran 24h:ssa.</p>
-      <div id="husdConnectSection">
-        <button class="btn-gold" onclick="connectAndClaim()" id="husdBtn">Yhdistä lompakko ja hae 1000 HUSD</button>
-      </div>
-      <p style="margin-top:10px; font-size:12px; color:var(--muted);" id="husdStatus"></p>
-    </div>
-  </div>
-
-  <!-- STEP 5 -->
-  <div class="step-section">
-    <div class="step-header"><div class="step-number">5</div><h2 class="display">Miten sivut toimivat</h2></div>
+    <div class="step-header"><div class="step-number">4</div><h2 class="display">Miten sivut toimivat</h2></div>
     <div class="step-card">
       <p><strong>⛏ Miner</strong> — alkuperäinen 12h louhintasykli: aktivoi, odota, claimaa palkkio. Toimii MetaMaskilla samoin kuin muutkin sivut.</p>
       <p><strong>🔒 Staking</strong> — valitse taso (7/30/90 vrk lukitus), stakettaa HEL, saa kiinteän tuoton lukitusajan päätyttyä. Voit nostaa pääoman pois kesken ajan, mutta menetät silloin tuoton.</p>
@@ -204,7 +192,6 @@
     <div class="step-card">
       <table class="contracts-table">
         <tr><td>HEL Token</td><td>0xE4BCF45d177Cea1DFB6Fb8fCD2F32Bc9Dc79814B</td></tr>
-        <tr><td>HUSD (Test USD)</td><td>0xd86c64447e433B9d30cB8f8506Cd49356bc6A0d7</td></tr>
         <tr><td>HelionStaking</td><td>0x44eD13BD90dCAf748F80e8faC8bbcd4dc498f5dd</td></tr>
         <tr><td>HelionMiner (alkuperäinen)</td><td>0x04c09909619Ca3CDe42bb100ab8AC43dFF3BB93b</td></tr>
         <tr><td>PancakeSwap Router (v2)</td><td>0xD99D1c33F9fC3444f8101754aBC46c52416550D1</td></tr>
@@ -218,12 +205,6 @@
 <div id="toastHost"></div>
 
 <script>
-  const HUSD_ADDRESS = "0xd86c64447e433B9d30cB8f8506Cd49356bc6A0d7";
-  const HUSD_ABI = [
-    "function faucet()",
-    "function lastFaucetClaim(address) view returns (uint256)"
-  ];
-
   function toast(message, type = 'default') {
     const host = document.getElementById('toastHost');
     const el = document.createElement('div');
@@ -249,39 +230,6 @@
       toast("BSC Testnet lisätty MetaMaskiin!", "success");
     } catch (e) {
       toast("Verkon lisäys epäonnistui: " + e.message, "error");
-    }
-  }
-
-  async function connectAndClaim() {
-    if (!window.ethereum) { toast("MetaMask ei löytynyt selaimesta.", "error"); return; }
-    const btn = document.getElementById('husdBtn');
-    const status = document.getElementById('husdStatus');
-    btn.disabled = true; btn.textContent = "Käsitellään…";
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = await provider.getSigner();
-      const account = await signer.getAddress();
-
-      const husd = new ethers.Contract(HUSD_ADDRESS, HUSD_ABI, signer);
-      const lastClaim = await husd.lastFaucetClaim(account);
-      const cooldownEnds = (Number(lastClaim) + 86400) * 1000;
-
-      if (Date.now() < cooldownEnds) {
-        const remainingH = Math.ceil((cooldownEnds - Date.now()) / 3600000);
-        status.textContent = `Olet jo hakenut HUSD:ia viimeisen 24h aikana. Yritä uudelleen ~${remainingH}h kuluttua.`;
-        toast("Faucet on jäähdyllä.", "error");
-        return;
-      }
-
-      const tx = await husd.faucet();
-      await tx.wait();
-      status.textContent = "1000 HUSD lisätty lompakkoosi!";
-      toast("HUSD haettu onnistuneesti!", "success");
-    } catch (e) {
-      toast("Virhe: " + (e.reason || e.message), "error");
-    } finally {
-      btn.disabled = false; btn.textContent = "Yhdistä lompakko ja hae 1000 HUSD";
     }
   }
 </script>
