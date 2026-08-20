@@ -49,8 +49,10 @@
   .swap-box .row-top .max-btn{ color:var(--gold); cursor:pointer; font-weight:600; border:none; background:none; font-size:11px; }
   .swap-box .row-input{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .swap-box input{ background:transparent; border:none; outline:none; color:var(--text); font-family:'JetBrains Mono',monospace; font-size: 22px; width:100%; min-width:0; }
-  .token-select{ display:flex; align-items:center; gap:6px; background: var(--panel); border:1px solid var(--line); padding: 8px 12px; border-radius: 999px; font-weight:700; font-size:13px; white-space:nowrap; font-family:'Chakra Petch',sans-serif; color:var(--text); cursor:pointer; }
-  select.token-select{ -webkit-appearance:none; appearance:none; padding-right:28px; }
+  .token-badge{ display:flex; align-items:center; gap:6px; background: var(--panel); border:1px solid var(--line); padding: 8px 12px; border-radius: 999px; font-weight:700; font-size:13px; white-space:nowrap; font-family:'Chakra Petch',sans-serif; }
+  .token-dot{ width:9px; height:9px; border-radius:50%; }
+  .token-dot.hel{ background: var(--gold); }
+  .token-dot.pair{ background: var(--violet); }
   .swap-divider{ display:flex; justify-content:center; margin: -8px 0; position:relative; z-index:2; }
   .swap-flip{ width:36px; height:36px; border-radius:50%; background: var(--panel-2); border:3px solid var(--panel); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gold); font-size:15px; }
   .info-row{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:10px; }
@@ -74,7 +76,7 @@
   <header>
     <div class="brand">
       <img src="logo.jpg" alt="Helion" class="brand-logo">
-      <div><h1 class="display">Helion Trading</h1><div class="tag">BSC Testnet</div></div>
+      <div><h1 class="display">Helion Trading</h1><div class="tag">BSC Testnet · HEL / tBNB</div></div>
     </div>
     <div class="user-pill">
       <div class="dot"></div>
@@ -92,12 +94,12 @@
     <a href="guide.html" class="nav-item">📖 Ohjeet</a>
   </nav>
 
-  <div class="powered-by">Kaupankäynti <b>PancakeSwap</b>-routerin kautta · HEL · tBNB</div>
-  <div class="fee-banner"><strong>Huom:</strong> jokaisesta swapista 1% platform-fee (+ PancakeSwap 0.3%).</div>
+  <div class="powered-by">Kaupankäynti <b>PancakeSwap</b>-routerin kautta · vain <b>HEL ↔ tBNB</b></div>
+  <div class="fee-banner"><strong>Huom:</strong> jokaisesta swapista peritään 1% platform-fee (+ PancakeSwap 0.3% pooli-fee).</div>
 
   <div class="pool-stats">
     <div class="pool-stat"><div class="label">Pool HEL</div><div class="value" id="poolHel">–</div></div>
-    <div class="pool-stat"><div class="label">Pool TBNB</div><div class="value" id="poolBnb">–</div></div>
+    <div class="pool-stat"><div class="label">Pool tBNB</div><div class="value" id="poolBnb">–</div></div>
   </div>
   <div class="pool-stats" style="margin-bottom:16px;">
     <div class="pool-stat"><div class="label">HEL hinta</div><div class="value" id="priceHel" style="font-size:13px;">–</div></div>
@@ -119,21 +121,15 @@
       <div class="row-top"><span>Maksat</span><button type="button" class="max-btn" onclick="setMaxFrom()">MAX</button></div>
       <div class="row-input">
         <input type="number" id="fromAmount" placeholder="0.0" oninput="onFromAmountChange()">
-        <select class="token-select" id="fromToken" onchange="onTokenChange()">
-          <option value="tbnb">TBNB</option>
-          <option value="hel">HEL</option>
-        </select>
+        <div class="token-badge" id="fromTokenBadge"><span class="token-dot pair"></span>TBNB</div>
       </div>
     </div>
-    <div class="swap-divider"><div class="swap-flip" onclick="flipTokens()">⇅</div></div>
+    <div class="swap-divider"><div class="swap-flip" onclick="flipDirection()">⇅</div></div>
     <div class="swap-box">
       <div class="row-top"><span>Saat (arvio)</span><span>&nbsp;</span></div>
       <div class="row-input">
         <input type="text" id="toAmount" placeholder="0.0" readonly>
-        <select class="token-select" id="toToken" onchange="onTokenChange()">
-          <option value="hel" selected>HEL</option>
-          <option value="tbnb">TBNB</option>
-        </select>
+        <div class="token-badge" id="toTokenBadge"><span class="token-dot hel"></span>HEL</div>
       </div>
     </div>
 
@@ -147,7 +143,7 @@
   <div class="card hidden" id="liquidityPanel">
     <div class="lp-input-row"><input type="number" id="lpHelAmount" placeholder="0.0"><span class="unit">HEL</span></div>
     <div class="lp-input-row"><input type="number" id="lpBnbAmount" placeholder="0.0"><span class="unit">TBNB</span></div>
-    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn">Lisää likviditeettiä (HEL/TBNB)</button>
+    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn">Lisää likviditeettiä (HEL/tBNB)</button>
     <div style="height:1px; background:var(--line); margin:20px 0;"></div>
     <div class="info-row" style="margin-top:0;"><span>LP-tokenisi</span><span id="lpBalanceInfo">–</span></div>
     <div class="lp-input-row" style="margin-top:10px;"><input type="number" id="lpRemoveAmount" placeholder="0.0"><span class="unit">LP</span></div>
@@ -161,6 +157,7 @@
   const username = localStorage.getItem('helion_username');
   if (!token) { window.location.href = 'index.html'; }
 
+  let direction = 'buy'; // buy = tBNB→HEL, sell = HEL→tBNB
   let lastPrices = { bnbUsd: 0, helUsd: 0, poolExists: false };
   let userBal = { hel: 0, bnb: 0 };
 
@@ -186,15 +183,9 @@
     if (n < 1) return '$' + n.toFixed(4);
     return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 2 });
   }
-  function fmtBal(n, digits) {
+  function fmtBal(n, d) {
     if (n === null || isNaN(n)) return '–';
-    return n.toLocaleString('fi-FI', { maximumFractionDigits: digits || 4 });
-  }
-  function tokenUsd(sym, amount) {
-    const s = String(sym).toLowerCase();
-    if (s === 'tbnb' || s === 'bnb') return amount * (lastPrices.bnbUsd || 0);
-    if (s === 'hel') return amount * (lastPrices.helUsd || 0);
-    return 0;
+    return n.toLocaleString('fi-FI', { maximumFractionDigits: d || 4 });
   }
   async function apiGet(path, auth) {
     const res = await fetch(BACKEND_URL + path, auth ? { headers: authHeaders() } : {});
@@ -215,7 +206,7 @@
       userBal.bnb = parseFloat(data.bnbBalance) || 0;
       document.getElementById('balHel').textContent = fmtBal(userBal.hel, 4);
       document.getElementById('balBnb').textContent = fmtBal(userBal.bnb, 4);
-    } catch (e) { console.warn('Saldot:', e); }
+    } catch (e) { console.warn(e); }
   }
   async function refreshPrices() {
     try {
@@ -234,39 +225,31 @@
     document.getElementById('liquidityPanel').classList.toggle('hidden', tab !== 'liquidity');
     if (tab === 'liquidity') refreshLpBalance();
   }
-  function getFrom() { return document.getElementById('fromToken').value; }
-  function getTo() { return document.getElementById('toToken').value; }
-  function updateRouteLabel() {
-    document.getElementById('routeInfo').textContent = getFrom().toUpperCase() + ' → ' + getTo().toUpperCase();
-  }
-  function onTokenChange() {
-    if (getFrom() === getTo()) {
-      const opts = ['tbnb', 'hel'];
-      document.getElementById('toToken').value = opts.find(t => t !== getFrom()) || 'hel';
+  function renderDirection() {
+    const fromBadge = document.getElementById('fromTokenBadge');
+    const toBadge = document.getElementById('toTokenBadge');
+    if (direction === 'buy') {
+      fromBadge.innerHTML = '<span class="token-dot pair"></span>TBNB';
+      toBadge.innerHTML = '<span class="token-dot hel"></span>HEL';
+    } else {
+      fromBadge.innerHTML = '<span class="token-dot hel"></span>HEL';
+      toBadge.innerHTML = '<span class="token-dot pair"></span>TBNB';
     }
     document.getElementById('fromAmount').value = '';
     document.getElementById('toAmount').value = '';
     document.getElementById('feeInfo').textContent = '–';
     document.getElementById('feeUsd').textContent = '–';
     document.getElementById('outUsd').textContent = '–';
-    updateRouteLabel();
+    document.getElementById('routeInfo').textContent = direction === 'buy' ? 'TBNB → HEL' : 'HEL → TBNB';
   }
-  function flipTokens() {
-    const a = getFrom(), b = getTo();
-    document.getElementById('fromToken').value = b;
-    document.getElementById('toToken').value = a;
-    document.getElementById('fromAmount').value = '';
-    document.getElementById('toAmount').value = '';
-    document.getElementById('feeInfo').textContent = '–';
-    document.getElementById('feeUsd').textContent = '–';
-    document.getElementById('outUsd').textContent = '–';
-    updateRouteLabel();
+  function flipDirection() {
+    direction = direction === 'buy' ? 'sell' : 'buy';
+    renderDirection();
   }
   function setMaxFrom() {
-    const t = getFrom();
     let max = 0;
-    if (t === 'hel') max = userBal.hel;
-    else if (t === 'tbnb') max = Math.max(0, userBal.bnb - 0.002);
+    if (direction === 'buy') max = Math.max(0, userBal.bnb - 0.002);
+    else max = userBal.hel;
     document.getElementById('fromAmount').value = max > 0 ? String(max) : '';
     onFromAmountChange();
   }
@@ -295,15 +278,16 @@
     }
     quoteTimer = setTimeout(async () => {
       try {
-        const from = getFrom(), to = getTo();
-        const data = await apiGet(`/api/trading/quote?fromToken=${from}&toToken=${to}&amount=${val}`, false);
+        const data = await apiGet(`/api/trading/quote?direction=${direction}&amount=${val}`, false);
         document.getElementById('toAmount').value = data.amountOut;
         const feeNum = parseFloat(data.fee) || 0;
         const outNum = parseFloat(data.amountOut) || 0;
-        document.getElementById('feeInfo').textContent = feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + ' ' + from.toUpperCase();
-        document.getElementById('feeUsd').textContent = fmtUsd(tokenUsd(from, feeNum));
-        document.getElementById('outUsd').textContent = fmtUsd(tokenUsd(to, outNum));
-        updateRouteLabel();
+        const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
+        document.getElementById('feeInfo').textContent = feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit;
+        const feeUsd = direction === 'buy' ? feeNum * (lastPrices.bnbUsd || 0) : feeNum * (lastPrices.helUsd || 0);
+        const outUsd = direction === 'buy' ? outNum * (lastPrices.helUsd || 0) : outNum * (lastPrices.bnbUsd || 0);
+        document.getElementById('feeUsd').textContent = fmtUsd(feeUsd);
+        document.getElementById('outUsd').textContent = fmtUsd(outUsd);
       } catch (e) {
         document.getElementById('toAmount').value = '';
         document.getElementById('feeInfo').textContent = 'Ei likviditeettiä';
@@ -315,16 +299,16 @@
   async function doSwap() {
     const val = document.getElementById('fromAmount').value;
     if (!val || parseFloat(val) <= 0) { toast('Syötä kelvollinen määrä.', 'error'); return; }
-    const from = getFrom(), to = getTo();
-    if (from === to) { toast('Valitse eri tokenit.', 'error'); return; }
     const btn = document.getElementById('swapBtn');
     btn.disabled = true; btn.textContent = 'Vahvistetaan…';
     try {
       const expectedOut = parseFloat(document.getElementById('toAmount').value || '0');
       const minAmountOut = (expectedOut * 0.97).toFixed(18);
-      const result = await apiPost('/api/trading/swap', { fromToken: from, toToken: to, amount: val, minAmountOut });
+      const result = await apiPost('/api/trading/swap', { direction, amount: val, minAmountOut });
       const feeNum = parseFloat(result.fee) || 0;
-      toast('Swap onnistui! Fee: ' + feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + ' ' + from.toUpperCase() + ' (' + fmtUsd(tokenUsd(from, feeNum)) + ')', 'success');
+      const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
+      const feeUsd = direction === 'buy' ? feeNum * (lastPrices.bnbUsd || 0) : feeNum * (lastPrices.helUsd || 0);
+      toast('Swap onnistui! Fee: ' + feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit + ' (' + fmtUsd(feeUsd) + ')', 'success');
       document.getElementById('fromAmount').value = '';
       document.getElementById('toAmount').value = '';
       document.getElementById('feeInfo').textContent = '–';
@@ -340,7 +324,9 @@
   async function addLiquidity() {
     const helVal = document.getElementById('lpHelAmount').value;
     const bnbVal = document.getElementById('lpBnbAmount').value;
-    if (!helVal || !bnbVal || parseFloat(helVal) <= 0 || parseFloat(bnbVal) <= 0) { toast('Syötä molemmat määrät.', 'error'); return; }
+    if (!helVal || !bnbVal || parseFloat(helVal) <= 0 || parseFloat(bnbVal) <= 0) {
+      toast('Syötä molemmat määrät.', 'error'); return;
+    }
     const btn = document.getElementById('addLiqBtn');
     btn.disabled = true; btn.textContent = 'Lisätään…';
     try {
@@ -350,7 +336,7 @@
       document.getElementById('lpBnbAmount').value = '';
       await refreshPool(); await refreshLpBalance(); await refreshBalances(); await refreshPrices();
     } catch (e) { toast('Virhe: ' + e.message, 'error'); }
-    finally { btn.disabled = false; btn.textContent = 'Lisää likviditeettiä (HEL/TBNB)'; }
+    finally { btn.disabled = false; btn.textContent = 'Lisää likviditeettiä (HEL/tBNB)'; }
   }
   async function removeLiquidity() {
     const val = document.getElementById('lpRemoveAmount').value;
@@ -372,7 +358,7 @@
     } catch (e) { document.getElementById('lpBalanceInfo').textContent = '–'; }
   }
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
-  updateRouteLabel();
+  renderDirection();
   refreshPool(); refreshPrices(); refreshBalances();
   setInterval(refreshPrices, 60000);
   setInterval(refreshBalances, 30000);
