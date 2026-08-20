@@ -95,13 +95,10 @@
     <div class="balance-row" style="font-size:11.5px; color:var(--muted); margin-top:-4px; margin-bottom:10px;"><span></span><span id="helUsd">–</span></div>
     <div class="balance-row"><span class="label">tBNB (gas)</span><span class="value" id="bnbBalance">–</span></div>
     <div class="balance-row" style="font-size:11.5px; color:var(--muted); margin-top:-4px; margin-bottom:10px;"><span></span><span id="bnbUsd">–</span></div>
-    <div class="balance-row"><span class="label">HUSD</span><span class="value" id="husdBalance">–</span></div>
-    <div class="balance-row" style="font-size:11.5px; color:var(--muted); margin-top:-4px; margin-bottom:10px;"><span></span><span id="husdUsd">–</span></div>
     <div style="height:1px; background:var(--line); margin:12px 0;"></div>
     <div class="balance-row" style="font-size:12px;"><span class="label">Token-hinnat</span><span></span></div>
     <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>HEL</span><span id="priceHel">–</span></div>
     <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>tBNB</span><span id="priceBnb">–</span></div>
-    <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>HUSD</span><span id="priceHusd">$1.00</span></div>
     <button class="btn-block secondary" style="margin-top:14px;" onclick="refreshWallet()">Päivitä</button>
   </div>
 
@@ -166,8 +163,6 @@
       const bnbAmt = parseFloat(data.bnbBalance) || 0;
       document.getElementById('helBalance').textContent = helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
       document.getElementById('bnbBalance').textContent = bnbAmt.toFixed(4) + ' tBNB';
-      const husdAmt = parseFloat(data.husdBalance) || 0;
-      document.getElementById('husdBalance').textContent = husdAmt.toLocaleString('fi-FI', {maximumFractionDigits: 2}) + ' HUSD';
 
       try {
         const priceRes = await fetch(BACKEND_URL + '/api/prices');
@@ -175,7 +170,6 @@
         if (!priceRes.ok) throw new Error(prices.error || 'Hinnat epäonnistui');
 
         document.getElementById('priceBnb').textContent = fmtUsd(prices.bnbUsd);
-        document.getElementById('priceHusd').textContent = '$1.00';
         if (prices.poolExists && prices.helUsd > 0) {
           document.getElementById('priceHel').textContent = fmtUsd(prices.helUsd);
           document.getElementById('helUsd').textContent = '≈ ' + fmtUsd(helAmt * prices.helUsd);
@@ -186,7 +180,6 @@
         document.getElementById('bnbUsd').textContent = prices.bnbUsd > 0
           ? '≈ ' + fmtUsd(bnbAmt * prices.bnbUsd)
           : '–';
-        document.getElementById('husdUsd').textContent = '≈ ' + fmtUsd(husdAmt * 1);
       } catch (pe) {
         console.warn('Hinnat:', pe);
         document.getElementById('priceHel').textContent = '–';
