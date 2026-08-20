@@ -92,8 +92,8 @@
     <a href="guide.html" class="nav-item">📖 Ohjeet</a>
   </nav>
 
-  <div class="powered-by">Kaupankäynti <b>PancakeSwap</b>-routerin kautta · HEL · tBNB · HUSD</div>
-  <div class="fee-banner"><strong>Huom:</strong> jokaisesta swapista 1% platform-fee (+ PancakeSwap 0.3%). HUSD = $1 stablecoin.</div>
+  <div class="powered-by">Kaupankäynti <b>PancakeSwap</b>-routerin kautta · HEL · tBNB</div>
+  <div class="fee-banner"><strong>Huom:</strong> jokaisesta swapista 1% platform-fee (+ PancakeSwap 0.3%).</div>
 
   <div class="pool-stats">
     <div class="pool-stat"><div class="label">Pool HEL</div><div class="value" id="poolHel">–</div></div>
@@ -113,7 +113,6 @@
     <div class="balances-bar">
       <div class="bal-chip"><b>HEL</b> <span id="balHel">–</span></div>
       <div class="bal-chip"><b>tBNB</b> <span id="balBnb">–</span></div>
-      <div class="bal-chip"><b>HUSD</b> <span id="balHusd">–</span></div>
     </div>
 
     <div class="swap-box">
@@ -123,7 +122,6 @@
         <select class="token-select" id="fromToken" onchange="onTokenChange()">
           <option value="tbnb">TBNB</option>
           <option value="hel">HEL</option>
-          <option value="husd">HUSD</option>
         </select>
       </div>
     </div>
@@ -135,7 +133,6 @@
         <select class="token-select" id="toToken" onchange="onTokenChange()">
           <option value="hel" selected>HEL</option>
           <option value="tbnb">TBNB</option>
-          <option value="husd">HUSD</option>
         </select>
       </div>
     </div>
@@ -164,8 +161,8 @@
   const username = localStorage.getItem('helion_username');
   if (!token) { window.location.href = 'index.html'; }
 
-  let lastPrices = { bnbUsd: 0, helUsd: 0, husdUsd: 1, poolExists: false };
-  let userBal = { hel: 0, bnb: 0, husd: 0 };
+  let lastPrices = { bnbUsd: 0, helUsd: 0, poolExists: false };
+  let userBal = { hel: 0, bnb: 0 };
 
   function authHeaders() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
   function logout() {
@@ -197,7 +194,6 @@
     const s = String(sym).toLowerCase();
     if (s === 'tbnb' || s === 'bnb') return amount * (lastPrices.bnbUsd || 0);
     if (s === 'hel') return amount * (lastPrices.helUsd || 0);
-    if (s === 'husd') return amount * 1;
     return 0;
   }
   async function apiGet(path, auth) {
@@ -217,10 +213,8 @@
       const data = await apiGet('/api/wallet', true);
       userBal.hel = parseFloat(data.helBalance) || 0;
       userBal.bnb = parseFloat(data.bnbBalance) || 0;
-      userBal.husd = parseFloat(data.husdBalance) || 0;
       document.getElementById('balHel').textContent = fmtBal(userBal.hel, 4);
       document.getElementById('balBnb').textContent = fmtBal(userBal.bnb, 4);
-      document.getElementById('balHusd').textContent = fmtBal(userBal.husd, 2);
     } catch (e) { console.warn('Saldot:', e); }
   }
   async function refreshPrices() {
@@ -247,7 +241,7 @@
   }
   function onTokenChange() {
     if (getFrom() === getTo()) {
-      const opts = ['tbnb', 'hel', 'husd'];
+      const opts = ['tbnb', 'hel'];
       document.getElementById('toToken').value = opts.find(t => t !== getFrom()) || 'hel';
     }
     document.getElementById('fromAmount').value = '';
@@ -273,7 +267,6 @@
     let max = 0;
     if (t === 'hel') max = userBal.hel;
     else if (t === 'tbnb') max = Math.max(0, userBal.bnb - 0.002);
-    else if (t === 'husd') max = userBal.husd;
     document.getElementById('fromAmount').value = max > 0 ? String(max) : '';
     onFromAmountChange();
   }
