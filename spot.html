@@ -3,173 +3,245 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Helion Spot — Binance Testnet</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Helion Spot Terminal</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0A0C10; --panel:#14171D; --panel-2:#1B1F27; --line:#262B35;
-    --gold:#F2A93B; --violet:#7C5CFC; --text:#F5F3EE; --muted:#8B8F98;
-    --danger:#E5484D; --success:#3DD68C; --buy:#3DD68C; --sell:#E5484D;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{
-    background:radial-gradient(circle at 50% -10%,#1a1408 0%,var(--bg) 45%);
-    color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:28px 16px 80px;
-  }
-  .display{font-family:'Chakra Petch',sans-serif;}
-  .wrap{max-width:960px;margin:0 auto;}
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:12px;}
-  .brand{display:flex;align-items:center;gap:10px;}
-  .brand-logo{height:34px;width:34px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);}
-  .brand h1{font-size:19px;}
-  .brand .tag{font-size:10.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-  .user-pill{background:var(--panel);border:1px solid var(--line);padding:9px 14px;border-radius:999px;font-size:12.5px;display:flex;align-items:center;gap:8px;}
-  .user-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);}
-  .user-pill button{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;}
-  .site-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;}
-  .site-nav .nav-item{flex:1;text-align:center;padding:10px 6px;border-radius:10px;font-size:11px;font-weight:600;font-family:'Chakra Petch',sans-serif;color:var(--muted);text-decoration:none;white-space:nowrap;}
-  .site-nav .nav-item.active{background:rgba(242,169,59,0.12);color:var(--gold);}
-  .banner{background:rgba(124,92,252,0.1);border:1px solid rgba(124,92,252,0.35);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.45;}
-  .banner strong{color:var(--violet);}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  @media(max-width:800px){.grid{grid-template-columns:1fr;}}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;}
-  .card h2{font-size:14px;margin-bottom:12px;}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
-  .stat{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;}
-  .stat .l{font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
-  .stat .v{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;}
-  .price-big{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;margin:4px 0 2px;}
-  .price-sub{font-size:12px;color:var(--muted);margin-bottom:12px;}
-  .side-tabs{display:flex;gap:6px;margin-bottom:12px;}
-  .side-tabs button{flex:1;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);padding:10px;border-radius:10px;font-family:'Chakra Petch',sans-serif;font-weight:700;cursor:pointer;}
-  .side-tabs button.buy.active{background:rgba(61,214,140,0.15);color:var(--buy);border-color:rgba(61,214,140,0.4);}
-  .side-tabs button.sell.active{background:rgba(229,72,77,0.15);color:var(--sell);border-color:rgba(229,72,77,0.4);}
-  .type-tabs{display:flex;gap:6px;margin-bottom:12px;}
-  .type-tabs button{flex:1;border:none;background:transparent;color:var(--muted);padding:8px;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;}
-  .type-tabs button.active{color:var(--gold);border-bottom-color:var(--gold);}
-  .field{margin-bottom:10px;}
-  .field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
-  .field .row{display:flex;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:4px 4px 4px 12px;}
-  .field input{background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;width:100%;padding:10px 0;}
-  .field .unit{color:var(--muted);font-size:12px;padding:0 10px;white-space:nowrap;}
-  .btn{width:100%;border:none;padding:14px;border-radius:12px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:6px;}
-  .btn.buy{background:linear-gradient(180deg,#3dd68c,#1fa86a);color:#062016;}
-  .btn.sell{background:linear-gradient(180deg,#e5484d,#b83035);color:#fff;}
-  .btn.secondary{background:var(--panel-2);color:var(--text);border:1px solid var(--line);margin-top:10px;}
-  .btn:disabled{opacity:0.5;cursor:not-allowed;}
-  table{width:100%;border-collapse:collapse;font-size:11.5px;}
-  th{text-align:left;color:var(--muted);font-weight:500;padding:6px 4px;border-bottom:1px solid var(--line);}
-  td{padding:7px 4px;border-bottom:1px solid rgba(38,43,53,0.6);font-family:'JetBrains Mono',monospace;}
-  .buy-c{color:var(--buy);} .sell-c{color:var(--sell);}
-  .depth{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;font-family:'JetBrains Mono',monospace;}
-  .depth .ask{color:var(--sell);} .depth .bid{color:var(--buy);}
-  .depth div{display:flex;justify-content:space-between;padding:2px 0;}
-  #toastHost{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:10px;z-index:100;width:min(90vw,380px);}
-  .toast{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13px;}
-  .toast.success{border-color:rgba(61,214,140,0.4);} .toast.error{border-color:rgba(229,72,77,0.4);}
+:root{
+  --bg:#0B0E11; --panel:#12151A; --panel2:#1A1E26; --line:#2A303C;
+  --text:#EAECEF; --muted:#848E9C; --gold:#F0B90B;
+  --buy:#0ECB81; --buy-dim:rgba(14,203,129,0.12);
+  --sell:#F6465D; --sell-dim:rgba(246,70,93,0.12);
+  --violet:#7C5CFC;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+.display{font-family:'Chakra Petch',sans-serif;}
+.mono{font-family:'JetBrains Mono',monospace;}
+a{color:inherit;text-decoration:none;}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel);gap:12px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand img{width:28px;height:28px;border-radius:50%;border:1px solid var(--gold);}
+.brand h1{font-size:15px;}
+.brand span{font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;}
+.ticker-strip{display:flex;gap:18px;align-items:center;flex-wrap:wrap;font-size:12px;}
+.ticker-strip .px{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.ticker-strip .up{color:var(--buy);} .ticker-strip .dn{color:var(--sell);}
+.nav{display:flex;gap:4px;flex-wrap:wrap;}
+.nav a{padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;color:var(--muted);font-family:'Chakra Petch',sans-serif;}
+.nav a.active{background:rgba(240,185,11,0.12);color:var(--gold);}
+.user{font-size:12px;color:var(--muted);}
+.user button{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:11px;margin-left:8px;}
+
+/* layout */
+.terminal{display:grid;grid-template-columns:280px 1fr 320px;grid-template-rows:1fr auto;height:calc(100vh - 54px);gap:1px;background:var(--line);}
+@media(max-width:1100px){.terminal{grid-template-columns:1fr;height:auto;}}
+.panel{background:var(--panel);overflow:hidden;display:flex;flex-direction:column;}
+.panel-h{padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--muted);display:flex;justify-content:space-between;align-items:center;}
+.panel-h b{color:var(--text);font-family:'Chakra Petch',sans-serif;font-weight:600;}
+
+/* vertical orderbook */
+.ob{flex:1;overflow:auto;display:flex;flex-direction:column;font-size:11px;font-family:'JetBrains Mono',monospace;}
+.ob-head{display:grid;grid-template-columns:1fr 1fr 1fr;padding:6px 10px;color:var(--muted);font-size:10px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:1;}
+.ob-row{display:grid;grid-template-columns:1fr 1fr 1fr;padding:3px 10px;position:relative;cursor:pointer;}
+.ob-row:hover{filter:brightness(1.15);}
+.ob-row .bar{position:absolute;top:0;bottom:0;right:0;opacity:0.15;pointer-events:none;}
+.ob-row.ask .bar{background:var(--sell);}
+.ob-row.bid .bar{background:var(--buy);}
+.ob-row.ask .p{color:var(--sell);}
+.ob-row.bid .p{color:var(--buy);}
+.ob-mid{padding:10px;text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel2);}
+.ob-mid .big{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.ob-mid .sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.ob-asks{display:flex;flex-direction:column-reverse;flex:1;overflow:hidden;}
+.ob-bids{flex:1;overflow:hidden;}
+
+/* center: trades + balances */
+.center-top{padding:12px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;}
+.stat .l{font-size:10px;color:var(--muted);text-transform:uppercase;}
+.stat .v{font-size:14px;font-family:'JetBrains Mono',monospace;margin-top:4px;font-weight:600;}
+.trades{flex:1;overflow:auto;font-size:11px;font-family:'JetBrains Mono',monospace;}
+.trades table{width:100%;border-collapse:collapse;}
+.trades th{text-align:left;color:var(--muted);font-weight:500;padding:6px 10px;position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);font-size:10px;}
+.trades td{padding:5px 10px;border-bottom:1px solid rgba(42,48,60,0.5);}
+.c-buy{color:var(--buy);} .c-sell{color:var(--sell);}
+
+/* order form */
+.form{padding:12px;overflow:auto;}
+.side-toggle{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:12px;border-radius:8px;overflow:hidden;border:1px solid var(--line);}
+.side-toggle button{border:none;padding:12px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:13px;cursor:pointer;background:var(--panel2);color:var(--muted);}
+.side-toggle button.buy.on{background:var(--buy);color:#04150e;}
+.side-toggle button.sell.on{background:var(--sell);color:#fff;}
+.type-row{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap;}
+.type-row button{border:1px solid var(--line);background:transparent;color:var(--muted);padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
+.type-row button.on{border-color:var(--gold);color:var(--gold);background:rgba(240,185,11,0.08);}
+.field{margin-bottom:10px;}
+.field label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.field label span{color:var(--text);font-family:'JetBrains Mono',monospace;font-size:10px;}
+.field .box{display:flex;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:0 10px;}
+.field input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;padding:11px 0;width:100%;}
+.field .u{color:var(--muted);font-size:11px;}
+.pcts{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:12px;}
+.pcts button{border:1px solid var(--line);background:var(--panel2);color:var(--muted);padding:6px;border-radius:6px;font-size:10px;cursor:pointer;}
+.pcts button:hover{color:var(--text);}
+.submit{width:100%;border:none;padding:14px;border-radius:8px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px;}
+.submit.buy{background:var(--buy);color:#04150e;}
+.submit.sell{background:var(--sell);color:#fff;}
+.submit:disabled{opacity:0.5;cursor:not-allowed;}
+.hint{font-size:10px;color:var(--muted);margin-top:10px;line-height:1.4;}
+
+/* bottom tables */
+.bottom{grid-column:1 / -1;background:var(--panel);min-height:180px;max-height:220px;display:flex;flex-direction:column;}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);}
+.tabs button{background:transparent;border:none;color:var(--muted);padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;}
+.tabs button.on{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-body{flex:1;overflow:auto;font-size:11px;}
+.tab-body table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}
+.tab-body th{text-align:left;color:var(--muted);padding:6px 12px;font-weight:500;font-size:10px;position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);}
+.tab-body td{padding:7px 12px;border-bottom:1px solid rgba(42,48,60,0.45);}
+.tab-body button.link{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:11px;}
+.banner{font-size:10px;color:var(--muted);padding:6px 12px;background:rgba(124,92,252,0.08);border-bottom:1px solid var(--line);}
+#toastHost{position:fixed;bottom:16px;right:16px;z-index:50;display:flex;flex-direction:column;gap:8px;width:min(360px,90vw);}
+.toast{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.toast.ok{border-color:rgba(14,203,129,0.4);} .toast.err{border-color:rgba(246,70,93,0.4);}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand">
-      <img src="logo.jpg" alt="Helion" class="brand-logo">
-      <div>
-        <h1 class="display">Spot Trading</h1>
-        <div class="tag">Helion Matching Engine · BTC/USDT</div>
-      </div>
+<div class="topbar">
+  <div class="brand">
+    <img src="logo.jpg" alt="">
+    <div>
+      <h1 class="display">Helion Spot</h1>
+      <span>BTC/USDT · Matching Engine</span>
     </div>
-    <div class="user-pill">
-      <div class="dot"></div>
-      <span id="usernameDisplay">–</span>
-      <button onclick="logout()">Kirjaudu ulos</button>
-    </div>
-  </header>
-
-  <nav class="site-nav">
-    <a href="miner.html" class="nav-item">⛏ Miner</a>
-    <a href="staking.html" class="nav-item">🔒 Staking</a>
-    <a href="helion-trading.html" class="nav-item">🔄 Swap</a>
-    <a href="spot.html" class="nav-item active">📈 Spot</a>
-    <a href="wallet.html" class="nav-item">💼 Wallet</a>
-    <a href="leaderboard.html" class="nav-item">🏆 Board</a>
-    <a href="guide.html" class="nav-item">📖 Ohjeet</a>
+  </div>
+  <div class="ticker-strip">
+    <div><span class="muted" style="color:var(--muted)">Last</span> <span class="px" id="lastPx">–</span></div>
+    <div>Bid <span class="mono c-buy" id="bidPx">–</span></div>
+    <div>Ask <span class="mono c-sell" id="askPx">–</span></div>
+    <div>Oracle <span class="mono" id="oraclePx" style="color:var(--muted)">–</span></div>
+  </div>
+  <nav class="nav">
+    <a href="miner.html">Miner</a>
+    <a href="staking.html">Staking</a>
+    <a href="helion-trading.html">Swap</a>
+    <a href="spot.html" class="active">Spot</a>
+    <a href="wallet.html">Wallet</a>
+    <a href="leaderboard.html">Board</a>
+    <a href="admin.html">Admin</a>
   </nav>
+  <div class="user"><span id="userLabel">–</span><button onclick="logout()">Logout</button></div>
+</div>
 
-  <div class="banner">
-    <strong>Helion Spot (matching engine):</strong> käyttäjät treidaavat <span style="color:var(--text)">toisiaan vastaan</span>.
-    Market maker seuraa Binance-hintaa ja pitää bookin (admin käynnistää). Sama malli testissä ja mainnetissä — mainnetissä deposit/withdraw ketjusta.
-    Maker fee 0.08% · Taker fee 0.1%. Ei käyttäjän API-avaimia.
-  </div>
+<div class="banner">Institutional test terminal · sisäinen matching · market maker seuraa markkinahintaa · maker 0.08% / taker 0.1% · ei oikeaa rahaa testnetissä</div>
 
-  <div class="stats">
-    <div class="stat"><div class="l">USDT</div><div class="v" id="balUsdt">–</div></div>
-    <div class="stat"><div class="l">BTC</div><div class="v" id="balBtc">–</div></div>
-    <div class="stat"><div class="l">Equity</div><div class="v" id="balEquity">–</div></div>
-  </div>
-
-  <div class="grid">
-    <div class="card">
-      <h2 class="display">BTC/USDT</h2>
-      <div class="price-big" id="lastPrice">–</div>
-      <div class="price-sub">Bid <span id="bidPrice">–</span> · Ask <span id="askPrice">–</span></div>
-      <div class="depth">
-        <div>
-          <div style="color:var(--muted);margin-bottom:4px;">Asks</div>
-          <div id="asksBox"></div>
-        </div>
-        <div>
-          <div style="color:var(--muted);margin-bottom:4px;">Bids</div>
-          <div id="bidsBox"></div>
-        </div>
+<div class="terminal">
+  <!-- LEFT: vertical order book -->
+  <div class="panel">
+    <div class="panel-h"><b>Order Book</b><span class="mono" id="spreadLbl">spread –</span></div>
+    <div class="ob-head"><span>Price (USDT)</span><span>Size (BTC)</span><span>Total</span></div>
+    <div class="ob">
+      <div class="ob-asks" id="asksBox"></div>
+      <div class="ob-mid">
+        <div class="big" id="midPx">–</div>
+        <div class="sub" id="midSub">Mark price</div>
       </div>
-    </div>
-
-    <div class="card">
-      <h2 class="display">Order</h2>
-      <div class="side-tabs">
-        <button class="buy active" id="tabBuy" onclick="setSide('BUY')">Buy</button>
-        <button class="sell" id="tabSell" onclick="setSide('SELL')">Sell</button>
-      </div>
-      <div class="type-tabs">
-        <button class="active" id="tabMarket" onclick="setType('MARKET')">Market</button>
-        <button id="tabLimit" onclick="setType('LIMIT')">Limit</button>
-      </div>
-      <div class="field" id="priceField" style="display:none;">
-        <label>Hinta</label>
-        <div class="row"><input type="number" id="limitPrice" placeholder="0.00"><span class="unit">USDT</span></div>
-      </div>
-      <div class="field" id="qtyField">
-        <label id="qtyLabel">Määrä (BTC)</label>
-        <div class="row"><input type="number" id="qtyInput" placeholder="0.001"><span class="unit" id="qtyUnit">BTC</span></div>
-      </div>
-      <div class="field" id="quoteField">
-        <label>Tai summa (USDT) — market buy</label>
-        <div class="row"><input type="number" id="quoteInput" placeholder="100"><span class="unit">USDT</span></div>
-      </div>
-      <button class="btn buy" id="submitBtn" onclick="submitOrder()">Buy BTC</button>
-      <button class="btn secondary" onclick="resetAccount()">Nollaa testisaldot</button>
+      <div class="ob-bids" id="bidsBox"></div>
     </div>
   </div>
 
-  <div class="grid" style="margin-top:14px;">
-    <div class="card">
-      <h2 class="display">Open orders</h2>
-      <div style="overflow:auto;max-height:220px;">
+  <!-- CENTER -->
+  <div class="panel">
+    <div class="center-top">
+      <div class="stat"><div class="l">USDT Available</div><div class="v" id="balUsdt">–</div></div>
+      <div class="stat"><div class="l">BTC Available</div><div class="v" id="balBtc">–</div></div>
+      <div class="stat"><div class="l">Locked</div><div class="v" id="balLocked">–</div></div>
+      <div class="stat"><div class="l">Equity</div><div class="v" id="balEq">–</div></div>
+    </div>
+    <div class="panel-h"><b>Market Trades</b></div>
+    <div class="trades">
+      <table>
+        <thead><tr><th>Time</th><th>Price</th><th>Size</th><th>Side</th></tr></thead>
+        <tbody id="mktTrades"><tr><td colspan="4" style="color:var(--muted);padding:12px;">No trades yet</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RIGHT: order ticket -->
+  <div class="panel">
+    <div class="panel-h"><b>Order Ticket</b><span>BTC/USDT</span></div>
+    <div class="form">
+      <div class="side-toggle">
+        <button class="buy on" id="btnBuy" onclick="setSide('BUY')">Buy</button>
+        <button class="sell" id="btnSell" onclick="setSide('SELL')">Sell</button>
+      </div>
+      <div class="type-row">
+        <button class="on" id="tLimit" onclick="setType('LIMIT')">Limit</button>
+        <button id="tMarket" onclick="setType('MARKET')">Market</button>
+        <button id="tStopLimit" onclick="setType('STOP_LIMIT')">Stop Limit</button>
+        <button id="tStopMarket" onclick="setType('STOP_MARKET')">Stop Market</button>
+      </div>
+
+      <div class="field" id="fStop" style="display:none;">
+        <label>Stop Price <span id="availStop"></span></label>
+        <div class="box"><input type="number" id="stopPrice" placeholder="0.00" step="0.01"><span class="u">USDT</span></div>
+      </div>
+      <div class="field" id="fPrice">
+        <label>Price <span id="availPrice"></span></label>
+        <div class="box"><input type="number" id="limitPrice" placeholder="0.00" step="0.01"><span class="u">USDT</span></div>
+      </div>
+      <div class="field">
+        <label>Amount <span id="availAmt"></span></label>
+        <div class="box"><input type="number" id="qty" placeholder="0.0000" step="0.0001"><span class="u">BTC</span></div>
+      </div>
+      <div class="pcts">
+        <button type="button" onclick="setPct(0.25)">25%</button>
+        <button type="button" onclick="setPct(0.5)">50%</button>
+        <button type="button" onclick="setPct(0.75)">75%</button>
+        <button type="button" onclick="setPct(1)">100%</button>
+      </div>
+      <div class="field">
+        <label>Total (est.)</label>
+        <div class="box"><input type="text" id="totalEst" readonly placeholder="–"><span class="u">USDT</span></div>
+      </div>
+      <button class="submit buy" id="submitBtn" onclick="submitOrder()">Buy BTC</button>
+      <p class="hint" id="typeHint">Limit: order rests on the book until filled or cancelled.</p>
+    </div>
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="bottom">
+    <div class="tabs">
+      <button class="on" data-tab="open" onclick="switchTab('open')">Open Orders</button>
+      <button data-tab="stops" onclick="switchTab('stops')">Stop Orders</button>
+      <button data-tab="history" onclick="switchTab('history')">Trade History</button>
+      <button data-tab="balances" onclick="switchTab('balances')">Balances</button>
+    </div>
+    <div class="tab-body">
+      <div id="tab-open">
         <table>
-          <thead><tr><th>Side</th><th>Price</th><th>Qty</th><th></th></tr></thead>
-          <tbody id="ordersBody"><tr><td colspan="4" style="color:var(--muted);">Ei avoimia</td></tr></tbody>
+          <thead><tr><th>Time</th><th>Side</th><th>Type</th><th>Price</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+          <tbody id="openBody"></tbody>
         </table>
       </div>
-    </div>
-    <div class="card">
-      <h2 class="display">Trade history</h2>
-      <div style="overflow:auto;max-height:220px;">
+      <div id="tab-stops" style="display:none;">
         <table>
-          <thead><tr><th>Time</th><th>Side</th><th>Price</th><th>Qty</th></tr></thead>
-          <tbody id="tradesBody"><tr><td colspan="4" style="color:var(--muted);">Ei tradeja</td></tr></tbody>
+          <thead><tr><th>Time</th><th>Side</th><th>Type</th><th>Stop</th><th>Limit</th><th>Amount</th><th></th></tr></thead>
+          <tbody id="stopBody"></tbody>
+        </table>
+      </div>
+      <div id="tab-history" style="display:none;">
+        <table>
+          <thead><tr><th>Time</th><th>Side</th><th>Price</th><th>Amount</th><th>Fee</th></tr></thead>
+          <tbody id="histBody"></tbody>
+        </table>
+      </div>
+      <div id="tab-balances" style="display:none;">
+        <table>
+          <thead><tr><th>Asset</th><th>Available</th><th>Locked</th><th>Total</th></tr></thead>
+          <tbody id="balBody"></tbody>
         </table>
       </div>
     </div>
@@ -177,196 +249,310 @@
 </div>
 <div id="toastHost"></div>
 <script>
-  const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-    ? 'http://localhost:3001'
-    : 'https://testnetworkserver.onrender.com';
+const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:3001'
+  : 'https://testnetworkserver.onrender.com';
 
-  const token = localStorage.getItem('helion_token');
-  const username = localStorage.getItem('helion_username');
-  if (!token) location.href = 'index.html';
+const token = localStorage.getItem('helion_token');
+const username = localStorage.getItem('helion_username');
+if (!token) location.href = 'index.html';
+document.getElementById('userLabel').textContent = '@' + (username || '–');
 
-  let side = 'BUY';
-  let orderType = 'MARKET';
+let side = 'BUY';
+let orderType = 'LIMIT';
+let balances = { USDT: 0, BTC: 0, USDT_LOCKED: 0, BTC_LOCKED: 0 };
+let lastPrice = 0;
 
-  function authHeaders() {
-    return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
-  }
-  function logout() {
-    localStorage.removeItem('helion_token');
-    localStorage.removeItem('helion_username');
-    location.href = 'index.html';
-  }
-  function toast(msg, type) {
-    const el = document.createElement('div');
-    el.className = 'toast ' + (type || '');
-    el.textContent = msg;
-    document.getElementById('toastHost').appendChild(el);
-    setTimeout(() => el.remove(), 4500);
-  }
-  function fmt(n, d) {
-    if (n == null || isNaN(n)) return '–';
-    return Number(n).toLocaleString('en-US', { maximumFractionDigits: d ?? 4 });
-  }
+function auth() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
+function logout() {
+  localStorage.removeItem('helion_token');
+  localStorage.removeItem('helion_username');
+  location.href = 'index.html';
+}
+function toast(msg, ok) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (ok ? 'ok' : 'err');
+  el.textContent = msg;
+  document.getElementById('toastHost').appendChild(el);
+  setTimeout(() => el.remove(), 4500);
+}
+function fmt(n, d=2) {
+  if (n == null || isNaN(n)) return '–';
+  return Number(n).toLocaleString('en-US', { maximumFractionDigits: d });
+}
 
-  document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
+function setSide(s) {
+  side = s;
+  document.getElementById('btnBuy').classList.toggle('on', s === 'BUY');
+  document.getElementById('btnSell').classList.toggle('on', s === 'SELL');
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = (s === 'BUY' ? 'Buy' : 'Sell') + ' BTC';
+  btn.className = 'submit ' + (s === 'BUY' ? 'buy' : 'sell');
+  updateAvailLabels();
+  calcTotal();
+}
+function setType(t) {
+  orderType = t;
+  ['LIMIT','MARKET','STOP_LIMIT','STOP_MARKET'].forEach(x => {
+    const el = document.getElementById('t' + x.split('_').map(w=>w[0]+w.slice(1).toLowerCase()).join('')
+      .replace('Stoplimit','StopLimit').replace('Stopmarket','StopMarket')
+      .replace('Limit','Limit').replace('Market','Market'));
+  });
+  // simpler:
+  document.getElementById('tLimit').classList.toggle('on', t==='LIMIT');
+  document.getElementById('tMarket').classList.toggle('on', t==='MARKET');
+  document.getElementById('tStopLimit').classList.toggle('on', t==='STOP_LIMIT');
+  document.getElementById('tStopMarket').classList.toggle('on', t==='STOP_MARKET');
 
-  function setSide(s) {
-    side = s;
-    document.getElementById('tabBuy').classList.toggle('active', s === 'BUY');
-    document.getElementById('tabSell').classList.toggle('active', s === 'SELL');
-    const btn = document.getElementById('submitBtn');
-    btn.textContent = s === 'BUY' ? 'Buy BTC' : 'Sell BTC';
-    btn.className = 'btn ' + (s === 'BUY' ? 'buy' : 'sell');
-    document.getElementById('quoteField').style.display = (s === 'BUY' && orderType === 'MARKET') ? 'block' : 'none';
-  }
-  function setType(t) {
-    orderType = t;
-    document.getElementById('tabMarket').classList.toggle('active', t === 'MARKET');
-    document.getElementById('tabLimit').classList.toggle('active', t === 'LIMIT');
-    document.getElementById('priceField').style.display = t === 'LIMIT' ? 'block' : 'none';
-    document.getElementById('quoteField').style.display = (side === 'BUY' && t === 'MARKET') ? 'block' : 'none';
-  }
+  const needPrice = t === 'LIMIT' || t === 'STOP_LIMIT';
+  const needStop = t === 'STOP_LIMIT' || t === 'STOP_MARKET';
+  document.getElementById('fPrice').style.display = needPrice ? 'block' : 'none';
+  document.getElementById('fStop').style.display = needStop ? 'block' : 'none';
 
-  async function refreshTicker() {
-    try {
-      const res = await fetch(BACKEND_URL + '/api/spot/ticker?symbol=BTCUSDT');
-      const d = await res.json();
-      if (!res.ok) throw new Error(d.error || 'ticker');
-      document.getElementById('lastPrice').textContent = fmt(d.price, 2);
-      document.getElementById('bidPrice').textContent = fmt(d.bid, 2);
-      document.getElementById('askPrice').textContent = fmt(d.ask, 2);
-    } catch (e) {
-      document.getElementById('lastPrice').textContent = '–';
+  const hints = {
+    LIMIT: 'Limit: rests on the book until filled or cancelled.',
+    MARKET: 'Market: fills immediately against the best opposite orders.',
+    STOP_LIMIT: 'Stop Limit: when stop triggers, a limit order is placed.',
+    STOP_MARKET: 'Stop Market: when stop triggers, a market order is sent.'
+  };
+  document.getElementById('typeHint').textContent = hints[t] || '';
+  calcTotal();
+}
+
+function updateAvailLabels() {
+  document.getElementById('availAmt').textContent =
+    side === 'SELL' ? ('Avail ' + fmt(balances.BTC, 6) + ' BTC') : '';
+  document.getElementById('availPrice').textContent =
+    side === 'BUY' ? ('Avail ' + fmt(balances.USDT, 2) + ' USDT') : '';
+}
+
+function setPct(p) {
+  if (side === 'SELL') {
+    document.getElementById('qty').value = (balances.BTC * p).toFixed(6);
+  } else {
+    const px = Number(document.getElementById('limitPrice').value) || lastPrice;
+    if (px > 0) document.getElementById('qty').value = ((balances.USDT * p) / px).toFixed(6);
+  }
+  calcTotal();
+}
+
+function calcTotal() {
+  const qty = Number(document.getElementById('qty').value) || 0;
+  let px = Number(document.getElementById('limitPrice').value) || lastPrice;
+  if (orderType === 'MARKET') px = lastPrice;
+  document.getElementById('totalEst').value = px && qty ? fmt(px * qty, 2) : '';
+}
+document.getElementById('qty').addEventListener('input', calcTotal);
+document.getElementById('limitPrice').addEventListener('input', calcTotal);
+
+function switchTab(name) {
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+  ['open','stops','history','balances'].forEach(n => {
+    document.getElementById('tab-' + n).style.display = n === name ? 'block' : 'none';
+  });
+}
+
+function renderBook(book) {
+  const asks = book.asks || [];
+  const bids = book.bids || [];
+  const maxQ = Math.max(0.0001, ...asks.map(o => o.quantity), ...bids.map(o => o.quantity));
+
+  // asks: show lowest ask near mid → use column-reverse container so highest at top
+  const askRows = asks.slice(0, 14).map(o => {
+    const pct = (o.quantity / maxQ) * 100;
+    return `<div class="ob-row ask" onclick="clickPrice(${o.price})">
+      <div class="bar" style="width:${pct}%"></div>
+      <span class="p">${fmt(o.price,2)}</span>
+      <span>${fmt(o.quantity,5)}</span>
+      <span>${fmt(o.price*o.quantity,2)}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('asksBox').innerHTML = askRows || '<div style="padding:8px;color:var(--muted);font-size:11px;">No asks</div>';
+
+  const bidRows = bids.slice(0, 14).map(o => {
+    const pct = (o.quantity / maxQ) * 100;
+    return `<div class="ob-row bid" onclick="clickPrice(${o.price})">
+      <div class="bar" style="width:${pct}%"></div>
+      <span class="p">${fmt(o.price,2)}</span>
+      <span>${fmt(o.quantity,5)}</span>
+      <span>${fmt(o.price*o.quantity,2)}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('bidsBox').innerHTML = bidRows || '<div style="padding:8px;color:var(--muted);font-size:11px;">No bids</div>';
+
+  const bestBid = bids[0]?.price;
+  const bestAsk = asks[0]?.price;
+  if (bestBid && bestAsk) {
+    const mid = (bestBid + bestAsk) / 2;
+    lastPrice = mid;
+    document.getElementById('midPx').textContent = fmt(mid, 2);
+    document.getElementById('lastPx').textContent = fmt(mid, 2);
+    document.getElementById('bidPx').textContent = fmt(bestBid, 2);
+    document.getElementById('askPx').textContent = fmt(bestAsk, 2);
+    const spr = ((bestAsk - bestBid) / mid * 100);
+    document.getElementById('spreadLbl').textContent = 'spread ' + spr.toFixed(3) + '%';
+  }
+}
+
+function clickPrice(p) {
+  document.getElementById('limitPrice').value = p;
+  calcTotal();
+}
+
+async function refreshDepth() {
+  try {
+    const res = await fetch(BACKEND_URL + '/api/spot/depth?limit=15');
+    const d = await res.json();
+    if (res.ok) renderBook(d);
+  } catch (_) {}
+}
+
+async function refreshTicker() {
+  try {
+    const res = await fetch(BACKEND_URL + '/api/spot/ticker');
+    const d = await res.json();
+    if (!res.ok) return;
+    if (d.oracle?.price) document.getElementById('oraclePx').textContent = fmt(d.oracle.price, 2);
+    else if (d.price) document.getElementById('oraclePx').textContent = fmt(d.price, 2);
+    if (d.price) {
+      lastPrice = d.price;
+      document.getElementById('lastPx').textContent = fmt(d.price, 2);
+      document.getElementById('midPx').textContent = fmt(d.price, 2);
     }
-  }
+    if (d.bid) document.getElementById('bidPx').textContent = fmt(d.bid, 2);
+    if (d.ask) document.getElementById('askPx').textContent = fmt(d.ask, 2);
+  } catch (_) {}
+}
 
-  async function refreshDepth() {
-    try {
-      const res = await fetch(BACKEND_URL + '/api/spot/depth?symbol=BTCUSDT&limit=8');
-      const d = await res.json();
-      if (!res.ok) return;
-      const asks = d.asks || [];
-      const bids = d.bids || [];
-      document.getElementById('asksBox').innerHTML = asks.slice(0, 8).reverse().map(
-        (o) => `<div class="ask"><span>${fmt(o.price,2)}</span><span>${fmt(o.quantity,5)}</span></div>`
-      ).join('') || '<div style="color:var(--muted)">tyhjä</div>';
-      document.getElementById('bidsBox').innerHTML = bids.slice(0, 8).map(
-        (o) => `<div class="bid"><span>${fmt(o.price,2)}</span><span>${fmt(o.quantity,5)}</span></div>`
-      ).join('') || '<div style="color:var(--muted)">tyhjä</div>';
-    } catch (_) {}
-  }
+async function refreshAccount() {
+  try {
+    const res = await fetch(BACKEND_URL + '/api/spot/account', { headers: auth() });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || 'account');
+    balances = d.balances || balances;
+    document.getElementById('balUsdt').textContent = fmt(balances.USDT, 2);
+    document.getElementById('balBtc').textContent = fmt(balances.BTC, 6);
+    document.getElementById('balLocked').textContent =
+      fmt(balances.USDT_LOCKED, 2) + ' U / ' + fmt(balances.BTC_LOCKED, 5) + ' B';
+    document.getElementById('balEq').textContent = '$' + fmt(d.equity, 2);
+    updateAvailLabels();
 
-  async function refreshAccount() {
-    try {
-      const res = await fetch(BACKEND_URL + '/api/spot/account', { headers: authHeaders() });
-      const d = await res.json();
-      if (!res.ok) throw new Error(d.error || 'account');
-      document.getElementById('balUsdt').textContent = fmt(d.balances.USDT, 2);
-      document.getElementById('balBtc').textContent = fmt(d.balances.BTC, 6);
-      document.getElementById('balEquity').textContent = '$' + fmt(d.equity, 2);
-      const orders = d.openOrders || [];
-      document.getElementById('ordersBody').innerHTML = orders.length
-        ? orders.map(o => `<tr>
-            <td class="${o.side==='BUY'?'buy-c':'sell-c'}">${o.side}</td>
-            <td>${fmt(o.price,2)}</td>
-            <td>${fmt(o.quantity,6)}</td>
-            <td><button style="background:none;border:none;color:var(--muted);cursor:pointer;text-decoration:underline;" onclick="cancelOrder('${o.id}')">Cancel</button></td>
-          </tr>`).join('')
-        : '<tr><td colspan="4" style="color:var(--muted);">Ei avoimia</td></tr>';
-    } catch (e) {
-      toast('Account: ' + e.message, 'error');
-    }
-  }
+    const open = (d.openOrders || []).filter(o => o.type === 'LIMIT' || !o.type || o.status === 'NEW');
+    const stops = (d.openOrders || []).filter(o => String(o.type || '').startsWith('STOP'));
+    document.getElementById('openBody').innerHTML = open.length ? open.map(o => `
+      <tr>
+        <td>${new Date(o.time).toLocaleTimeString()}</td>
+        <td class="${o.side==='BUY'?'c-buy':'c-sell'}">${o.side}</td>
+        <td>${o.type || 'LIMIT'}</td>
+        <td>${fmt(o.price,2)}</td>
+        <td>${fmt(o.quantity || o.remaining,6)}</td>
+        <td>${o.status || 'NEW'}</td>
+        <td><button class="link" onclick="cancelOrder('${o.id}')">Cancel</button></td>
+      </tr>`).join('') : '<tr><td colspan="7" style="color:var(--muted);padding:12px;">No open orders</td></tr>';
 
-  async function refreshTrades() {
-    try {
-      const res = await fetch(BACKEND_URL + '/api/spot/trades?limit=30', { headers: authHeaders() });
-      const d = await res.json();
-      if (!res.ok) return;
-      const trades = d.trades || [];
-      const me = (username || '').toLowerCase();
-      document.getElementById('tradesBody').innerHTML = trades.length
-        ? trades.map(tr => {
-            const tm = new Date(tr.time).toLocaleTimeString('fi-FI');
-            const side = tr.buyer === me ? 'BUY' : 'SELL';
-            return `<tr>
-              <td>${tm}</td>
-              <td class="${side==='BUY'?'buy-c':'sell-c'}">${side}</td>
-              <td>${fmt(tr.price,2)}</td>
-              <td>${fmt(tr.quantity,6)}</td>
-            </tr>`;
-          }).join('')
-        : '<tr><td colspan="4" style="color:var(--muted);">Ei tradeja</td></tr>';
-    } catch (_) {}
-  }
+    document.getElementById('stopBody').innerHTML = stops.length ? stops.map(o => `
+      <tr>
+        <td>${new Date(o.time).toLocaleTimeString()}</td>
+        <td class="${o.side==='BUY'?'c-buy':'c-sell'}">${o.side}</td>
+        <td>${o.type}</td>
+        <td>${fmt(o.stopPrice,2)}</td>
+        <td>${o.price != null ? fmt(o.price,2) : '–'}</td>
+        <td>${fmt(o.quantity,6)}</td>
+        <td><button class="link" onclick="cancelOrder('${o.id}')">Cancel</button></td>
+      </tr>`).join('') : '<tr><td colspan="7" style="color:var(--muted);padding:12px;">No stop orders</td></tr>';
 
-  async function submitOrder() {
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    try {
-      const body = {
-        side,
-        type: orderType,
-        symbol: 'BTCUSDT',
-        quantity: document.getElementById('qtyInput').value || undefined,
-        price: document.getElementById('limitPrice').value || undefined,
-        quoteOrderQty: document.getElementById('quoteInput').value || undefined
-      };
-      if (orderType === 'MARKET' && side === 'BUY' && body.quoteOrderQty) {
-        delete body.quantity;
-      }
-      const res = await fetch(BACKEND_URL + '/api/spot/order', {
-        method: 'POST', headers: authHeaders(), body: JSON.stringify(body)
-      });
-      const d = await res.json();
-      if (!res.ok) throw new Error(d.error || 'order failed');
-      toast(orderType + ' ' + side + ' ok', 'success');
-      document.getElementById('qtyInput').value = '';
-      document.getElementById('quoteInput').value = '';
-      await refreshAccount();
-      await refreshTrades();
-    } catch (e) {
-      toast(e.message, 'error');
-    } finally {
-      btn.disabled = false;
-    }
+    document.getElementById('balBody').innerHTML = `
+      <tr><td>USDT</td><td>${fmt(balances.USDT,2)}</td><td>${fmt(balances.USDT_LOCKED,2)}</td><td>${fmt((balances.USDT||0)+(balances.USDT_LOCKED||0),2)}</td></tr>
+      <tr><td>BTC</td><td>${fmt(balances.BTC,6)}</td><td>${fmt(balances.BTC_LOCKED,6)}</td><td>${fmt((balances.BTC||0)+(balances.BTC_LOCKED||0),6)}</td></tr>`;
+  } catch (e) {
+    toast('Account: ' + e.message, false);
   }
+}
 
-  async function cancelOrder(id) {
-    try {
-      const res = await fetch(BACKEND_URL + '/api/spot/order/' + id, {
-        method: 'DELETE', headers: authHeaders()
-      });
-      const d = await res.json();
-      if (!res.ok) throw new Error(d.error || 'cancel failed');
-      toast('Peruttu', 'success');
-      await refreshAccount();
-    } catch (e) { toast(e.message, 'error'); }
+async function refreshTrades() {
+  try {
+    const res = await fetch(BACKEND_URL + '/api/spot/trades?limit=40', { headers: auth() });
+    const d = await res.json();
+    if (!res.ok) return;
+    const me = (username || '').toLowerCase();
+    const rows = (d.trades || []).map(tr => {
+      const side = tr.buyer === me ? 'BUY' : (tr.seller === me ? 'SELL' : (tr.takerSide || ''));
+      const fee = side === 'BUY' ? tr.buyFee : tr.sellFee;
+      return `<tr>
+        <td>${new Date(tr.time).toLocaleTimeString()}</td>
+        <td class="${side==='BUY'?'c-buy':'c-sell'}">${side}</td>
+        <td>${fmt(tr.price,2)}</td>
+        <td>${fmt(tr.quantity,6)}</td>
+        <td>${fee != null ? fmt(fee,4) : '–'}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('histBody').innerHTML = rows || '<tr><td colspan="5" style="color:var(--muted);padding:12px;">No trades</td></tr>';
+
+    // market tape from recent public endpoint
+  } catch (_) {}
+  try {
+    const res = await fetch(BACKEND_URL + '/api/spot/recent-trades');
+    const d = await res.json();
+    const rows = (d.trades || []).slice(0, 30).map(tr => `
+      <tr>
+        <td>${new Date(tr.time).toLocaleTimeString()}</td>
+        <td class="${tr.takerSide==='BUY'?'c-buy':'c-sell'}">${fmt(tr.price,2)}</td>
+        <td>${fmt(tr.quantity,5)}</td>
+        <td class="${tr.takerSide==='BUY'?'c-buy':'c-sell'}">${tr.takerSide || ''}</td>
+      </tr>`).join('');
+    document.getElementById('mktTrades').innerHTML = rows || '<tr><td colspan="4" style="color:var(--muted);padding:12px;">No trades yet</td></tr>';
+  } catch (_) {}
+}
+
+async function submitOrder() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  try {
+    const body = {
+      side,
+      type: orderType,
+      quantity: document.getElementById('qty').value,
+      price: document.getElementById('limitPrice').value || undefined,
+      stopPrice: document.getElementById('stopPrice').value || undefined
+    };
+    const res = await fetch(BACKEND_URL + '/api/spot/order', {
+      method: 'POST', headers: auth(), body: JSON.stringify(body)
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || 'Order rejected');
+    toast((orderType + ' ' + side + ' · ' + (d.status || 'OK')), true);
+    document.getElementById('qty').value = '';
+    await refreshAccount();
+    await refreshDepth();
+    await refreshTrades();
+  } catch (e) {
+    toast(e.message, false);
+  } finally {
+    btn.disabled = false;
   }
+}
 
-  async function resetAccount() {
-    if (!confirm('Nollataanko spot-testisaldot oletuksiin?')) return;
-    try {
-      const res = await fetch(BACKEND_URL + '/api/spot/reset', {
-        method: 'POST', headers: authHeaders(), body: '{}'
-      });
-      const d = await res.json();
-      if (!res.ok) throw new Error(d.error || 'reset failed');
-      toast('Saldot nollattu', 'success');
-      await refreshAccount();
-      await refreshTrades();
-    } catch (e) { toast(e.message, 'error'); }
-  }
+async function cancelOrder(id) {
+  try {
+    const res = await fetch(BACKEND_URL + '/api/spot/order/' + id, { method: 'DELETE', headers: auth() });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || 'Cancel failed');
+    toast('Cancelled', true);
+    await refreshAccount();
+    await refreshDepth();
+  } catch (e) { toast(e.message, false); }
+}
 
-  setSide('BUY');
-  setType('MARKET');
-  refreshTicker();
-  refreshDepth();
-  refreshAccount();
-  refreshTrades();
-  setInterval(refreshTicker, 2000);
-  setInterval(refreshDepth, 3000);
-  setInterval(refreshAccount, 10000);
+setSide('BUY');
+setType('LIMIT');
+refreshTicker();
+refreshDepth();
+refreshAccount();
+refreshTrades();
+setInterval(refreshTicker, 2000);
+setInterval(refreshDepth, 2000);
+setInterval(refreshAccount, 8000);
+setInterval(refreshTrades, 5000);
 </script>
 </body>
 </html>
