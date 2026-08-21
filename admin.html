@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helion — Admin: Reward Pool</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
+    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
+    --danger: #E5484D; --success: #3DD68C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
+    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+  .display{ font-family:'Chakra Petch', sans-serif; }
+  .wrap{ max-width: 480px; margin: 0 auto; }
+  h1{ font-size: 20px; margin-bottom: 6px; }
+  .sub{ font-size: 12.5px; color: var(--muted); margin-bottom: 24px; }
+
+  .wallet-pill{
+    background: var(--panel); border: 1px solid var(--line); padding: 10px 16px; border-radius: 999px;
+    font-size: 13px; display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom: 24px; width:fit-content;
+  }
+  .wallet-pill .dot{ width:8px; height:8px; border-radius:50%; background: var(--muted); }
+  .wallet-pill.connected .dot{ background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+  .step-card{
+    background: var(--panel); border:1px solid var(--line); border-radius: 18px; padding: 20px; margin-bottom: 18px;
+  }
+  .step-card h2{ font-size: 15px; margin-bottom: 6px; }
+  .step-card .desc{ font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height:1.5; }
+
+  .input-row{
+    display:flex; align-items:center; background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 4px 4px 4px 14px; margin-bottom: 12px;
+  }
+  .input-row input{ background: transparent; border:none; outline:none; color: var(--text); font-family:'JetBrains Mono', monospace; font-size: 14px; width: 100%; padding: 12px 0; }
+  .input-row .unit{ color: var(--muted); font-size: 12px; padding: 0 10px; white-space:nowrap; }
+
+  .btn-block{
+    width:100%; border:none; padding: 14px; border-radius:12px; font-family:'Chakra Petch',sans-serif;
+    font-weight:700; font-size:13.5px; cursor:pointer; background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305;
+  }
+  .btn-block:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .status-line{ font-size: 11.5px; color: var(--muted); margin-top: 10px; min-height: 16px; }
+  .status-line.success{ color: var(--success); }
+  .status-line.error{ color: var(--danger); }
+
+  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
+  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .toast.success{ border-color: rgba(61,214,140,0.4); }
+  .toast.error{ border-color: rgba(229,72,77,0.4); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="display">Reward pool -hallinta</h1>
+  <div class="sub">Vain kontraktin omistajalle. Rahoita Staking- tai Miner-poolin palkkiot tästä.</div>
+
+  <div class="step-card" style="padding:14px 20px;">
+    <div style="display:flex; gap:8px;">
+      <button class="btn-block" id="targetStakingBtn" onclick="selectTarget('staking')" style="opacity:1;">🔒 Staking</button>
+      <button class="btn-block" id="targetMinerBtn" onclick="selectTarget('miner')" style="background:var(--panel-2); color:var(--muted);">⛏ Miner</button>
+    </div>
+  </div>
+
+  <div id="walletPill" class="wallet-pill" onclick="connectWallet()">
+    <div class="dot"></div><span id="walletPillText">Yhdistä lompakko</span>
+  </div>
+
+  <div class="step-card">
+    <h2 class="display">1. Approve HEL kohteelle</h2>
+    <div class="desc">Annat valitulle kontraktille luvan siirtää HEL-tokeneitasi. Tee tämä ensin, ennen vaihetta 2.</div>
+    <div class="input-row">
+      <input type="number" id="approveAmount" placeholder="10000">
+      <span class="unit">HEL</span>
+    </div>
+    <button class="btn-block" id="approveBtn" onclick="doApprove()">Approve</button>
+    <div class="status-line" id="approveStatus"></div>
+  </div>
+
+  <div class="step-card">
+    <h2 class="display">2. Rahoita reward-pool</h2>
+    <div class="desc">Siirtää HEL-tokenit valitun kontraktin reward-pooliin. Summa täytyy olla sama tai pienempi kuin vaiheessa 1 approvattu määrä.</div>
+    <div class="input-row">
+      <input type="number" id="fundAmount" placeholder="10000">
+      <span class="unit">HEL</span>
+    </div>
+    <button class="btn-block" id="fundBtn" onclick="doFund()">Fund reward pool</button>
+    <div class="status-line" id="fundStatus"></div>
+  </div>
+
+  <div class="step-card">
+    <h2 class="display">Nykyinen reward-pool</h2>
+    <div class="desc" id="currentPool">–</div>
+    <button class="btn-block" style="background:linear-gradient(180deg, var(--violet), #5b3fd6); color:#f4f1ff;" onclick="refreshPool()">Päivitä</button>
+  </div>
+
+  <div class="step-card" style="border-color: rgba(242,169,59,0.35);">
+    <h2 class="display">Grid-botti (HEL / tBNB)</h2>
+    <div class="desc">Erillinen automaattibotti. Ei käytä käyttäjien lompakoita. Vain admin voi käynnistää / sammuttaa.</div>
+
+    <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">Tila</div>
+    <div id="gridRunning" style="font-family:'JetBrains Mono',monospace; font-size:14px; margin-bottom:12px;">–</div>
+
+    <div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Bot-lompakko</div>
+    <div id="gridAddress" style="font-family:'JetBrains Mono',monospace; font-size:12px; word-break:break-all; margin-bottom:12px;">–</div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <div style="background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px;">
+        <div style="font-size:10px; color:var(--muted); text-transform:uppercase;">HEL</div>
+        <div id="gridHel" style="font-family:'JetBrains Mono',monospace; font-weight:600;">–</div>
+      </div>
+      <div style="background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px;">
+        <div style="font-size:10px; color:var(--muted); text-transform:uppercase;">tBNB</div>
+        <div id="gridBnb" style="font-family:'JetBrains Mono',monospace; font-weight:600;">–</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Pool-hinta (BNB / HEL)</div>
+    <div id="gridPrice" style="font-family:'JetBrains Mono',monospace; font-size:13px; margin-bottom:12px;">–</div>
+
+    <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">Avoimet grid-tasot</div>
+    <div id="gridOrders" style="font-size:11px; font-family:'JetBrains Mono',monospace; max-height:120px; overflow:auto; margin-bottom:12px; color:var(--muted);">–</div>
+
+    <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">Viimeisimmät tradet</div>
+    <div id="gridTrades" style="font-size:11px; font-family:'JetBrains Mono',monospace; max-height:120px; overflow:auto; margin-bottom:14px; color:var(--muted);">–</div>
+
+    <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">Asetukset (suuri väli %)</div>
+    <div class="input-row"><input type="number" id="gridSpacing" placeholder="8" value="8"><span class="unit">% spacing</span></div>
+    <div class="input-row"><input type="number" id="gridUp" placeholder="5" value="5"><span class="unit">grids up</span></div>
+    <div class="input-row"><input type="number" id="gridDown" placeholder="5" value="5"><span class="unit">grids down</span></div>
+    <div class="input-row"><input type="number" id="gridOrderBnb" placeholder="0.02" value="0.02"><span class="unit">tBNB / buy</span></div>
+    <div class="input-row"><input type="number" id="gridOrderHel" placeholder="50" value="50"><span class="unit">HEL / sell</span></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+      <button class="btn-block" onclick="gridStart()" id="gridStartBtn">▶ Käynnistä</button>
+      <button class="btn-block" style="background:linear-gradient(180deg,#c44,#a33); color:#fff;" onclick="gridStop()" id="gridStopBtn">■ Sammuta</button>
+    </div>
+    <button class="btn-block" style="margin-top:8px; background:linear-gradient(180deg, var(--violet), #5b3fd6); color:#f4f1ff;" onclick="gridSaveConfig()">Tallenna asetukset + rebuild</button>
+    <button class="btn-block" style="margin-top:8px; background:var(--panel-2); color:var(--text); border:1px solid var(--line);" onclick="refreshGrid()">Päivitä botin tila</button>
+    <div class="status-line" id="gridStatusLine"></div>
+    <div style="font-size:11px; color:var(--muted); margin-top:10px;">
+      API-avaimet (ohjaus): <code style="color:var(--gold);">/api/grid/start</code> · <code style="color:var(--gold);">/api/grid/stop</code> · <code style="color:var(--gold);">/api/grid/config</code> · <code style="color:var(--gold);">/api/grid/status</code>
+      <br>Yksityisavainta ei näytetä (vain palvelimen .env).
+    </div>
+  </div>
+
+</div>
+
+
+  <div class="step-card" style="border-color: rgba(124,92,252,0.4);">
+    <h2 class="display">Spot Market Maker</h2>
+    <div class="desc">Pitää BTC/USDT-orderbookin Binance-hinnan ympärillä (sisäinen matching). Käynnistä adminina.</div>
+    <div id="mmRunning" style="font-family:'JetBrains Mono',monospace; font-size:14px; margin-bottom:10px;">–</div>
+    <div style="font-size:12px; color:var(--muted);">Mid / Bid–Ask</div>
+    <div id="mmMid" style="font-family:'JetBrains Mono',monospace; margin-bottom:10px;">–</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+      <div style="background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:10px;">
+        <div style="font-size:10px; color:var(--muted);">MM USDT</div>
+        <div id="mmUsdt" style="font-family:'JetBrains Mono',monospace;">–</div>
+      </div>
+      <div style="background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:10px;">
+        <div style="font-size:10px; color:var(--muted);">MM BTC</div>
+        <div id="mmBtc" style="font-family:'JetBrains Mono',monospace;">–</div>
+      </div>
+    </div>
+    <div class="input-row"><input type="number" id="mmSpread" value="0.15" step="0.05"><span class="unit">spread %</span></div>
+    <div class="input-row"><input type="number" id="mmLevels" value="5"><span class="unit">levels</span></div>
+    <div class="input-row"><input type="number" id="mmSize" value="0.02" step="0.01"><span class="unit">BTC / level</span></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+      <button class="btn-block" onclick="mmStart()">▶ MM Start</button>
+      <button class="btn-block" style="background:linear-gradient(180deg,#c44,#a33); color:#fff;" onclick="mmStop()">■ MM Stop</button>
+    </div>
+    <button class="btn-block" style="margin-top:8px; background:linear-gradient(180deg, var(--violet), #5b3fd6); color:#f4f1ff;" onclick="mmSave()">Tallenna + rebuild</button>
+    <button class="btn-block" style="margin-top:8px; background:var(--panel-2); color:var(--text); border:1px solid var(--line);" onclick="refreshMm()">Päivitä MM</button>
+    <div class="status-line" id="mmLine"></div>
+  </div>
+
+<div id="toastHost"></div>
+
+<script>
+  const HEL_ADDRESS = "0xE4BCF45d177Cea1DFB6Fb8fCD2F32Bc9Dc79814B";
+  const STAKING_ADDRESS = "0x44eD13BD90dCAf748F80e8faC8bbcd4dc498f5dd";
+  // ⚠️ Täytä tämä deployatun HelionMinerV3.sol-kontraktin osoitteella:
+  const MINER_ADDRESS = "0xF66c8cb898d6A75B14F56cd9e4990460E9636c83";
+
+  let currentTarget = 'staking'; // 'staking' | 'miner'
+  function targetAddress() { return currentTarget === 'staking' ? STAKING_ADDRESS : MINER_ADDRESS; }
+
+  function selectTarget(target) {
+    currentTarget = target;
+    const stakingBtn = document.getElementById('targetStakingBtn');
+    const minerBtn = document.getElementById('targetMinerBtn');
+    if (target === 'staking') {
+      stakingBtn.style.opacity = '1'; stakingBtn.style.background = 'linear-gradient(180deg, var(--gold), #d68f26)'; stakingBtn.style.color = '#1a1305';
+      minerBtn.style.background = 'var(--panel-2)'; minerBtn.style.color = 'var(--muted)';
+    } else {
+      minerBtn.style.opacity = '1'; minerBtn.style.background = 'linear-gradient(180deg, var(--gold), #d68f26)'; minerBtn.style.color = '#1a1305';
+      stakingBtn.style.background = 'var(--panel-2)'; stakingBtn.style.color = 'var(--muted)';
+      if (MINER_ADDRESS === "0x0000000000000000000000000000000000000000") {
+        toast("Huom: MINER_ADDRESS ei ole vielä asetettu tässä tiedostossa.", "error");
+      }
+    }
+    refreshPool();
+  }
+
+  const TOKEN_ABI = [
+    "function approve(address,uint256) returns (bool)",
+    "function allowance(address,address) view returns (uint256)"
+  ];
+  // Sama rajapinta molemmissa kontrakteissa (fundRewards/rewardPool/owner)
+  const REWARD_ABI = [
+    "function fundRewards(uint256 amount)",
+    "function rewardPool() view returns (uint256)",
+    "function owner() view returns (address)"
+  ];
+
+  let signer = null, account = null, provider = null;
+
+  function toast(message, type = 'default') {
+    const host = document.getElementById('toastHost');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    host.appendChild(el);
+    setTimeout(() => el.remove(), 5000);
+  }
+
+  async function connectWallet() {
+    try {
+      if (!window.ethereum) { toast("MetaMask ei löytynyt.", "error"); return; }
+      provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = await provider.getSigner();
+      account = await signer.getAddress();
+
+      document.getElementById('walletPillText').textContent = `${account.slice(0,6)}...${account.slice(-4)}`;
+      document.getElementById('walletPill').classList.add('connected');
+
+      const rewardContract = new ethers.Contract(targetAddress(), REWARD_ABI, provider);
+      const owner = await rewardContract.owner();
+      if (owner.toLowerCase() !== account.toLowerCase()) {
+        toast("Huom: tämä lompakko ei ole kontraktin omistaja — fundRewards kaatuu.", "error");
+      } else {
+        toast("Yhdistetty omistaja-lompakolla.", "success");
+      }
+
+      await refreshPool();
+    } catch (e) {
+      toast("Yhdistäminen epäonnistui: " + e.message, "error");
+    }
+  }
+
+  async function doApprove() {
+    if (!signer) { toast("Yhdistä lompakko ensin.", "error"); return; }
+    const val = document.getElementById('approveAmount').value;
+    const statusEl = document.getElementById('approveStatus');
+    if (!val || parseFloat(val) <= 0) { toast("Syötä kelvollinen määrä.", "error"); return; }
+
+    const btn = document.getElementById('approveBtn');
+    btn.disabled = true; btn.textContent = "Vahvistetaan…";
+    statusEl.textContent = "";
+    try {
+      const amount = ethers.parseUnits(val, 18);
+      const token = new ethers.Contract(HEL_ADDRESS, TOKEN_ABI, signer);
+      const tx = await token.approve(targetAddress(), amount);
+      statusEl.textContent = "Odotetaan vahvistusta lohkoketjulta…";
+      await tx.wait();
+      statusEl.textContent = `Approve onnistui: ${val} HEL. Voit nyt jatkaa vaiheeseen 2.`;
+      statusEl.className = "status-line success";
+      toast("Approve onnistui!", "success");
+    } catch (e) {
+      statusEl.textContent = "Virhe: " + (e.reason || e.message);
+      statusEl.className = "status-line error";
+      toast("Approve epäonnistui.", "error");
+    } finally {
+      btn.disabled = false; btn.textContent = "Approve";
+    }
+  }
+
+  async function doFund() {
+    if (!signer) { toast("Yhdistä lompakko ensin.", "error"); return; }
+    const val = document.getElementById('fundAmount').value;
+    const statusEl = document.getElementById('fundStatus');
+    if (!val || parseFloat(val) <= 0) { toast("Syötä kelvollinen määrä.", "error"); return; }
+
+    const btn = document.getElementById('fundBtn');
+    btn.disabled = true; btn.textContent = "Vahvistetaan…";
+    statusEl.textContent = "";
+    try {
+      const amount = ethers.parseUnits(val, 18);
+
+      const token = new ethers.Contract(HEL_ADDRESS, TOKEN_ABI, signer);
+      const allowance = await token.allowance(account, targetAddress());
+      if (allowance < amount) {
+        statusEl.textContent = "Allowance ei riitä — tee ensin vaihe 1 (Approve) vähintään tällä summalla.";
+        statusEl.className = "status-line error";
+        toast("Approve puuttuu tai on liian pieni.", "error");
+        return;
+      }
+
+      const rewardContract = new ethers.Contract(targetAddress(), REWARD_ABI, signer);
+      const tx = await rewardContract.fundRewards(amount);
+      statusEl.textContent = "Odotetaan vahvistusta lohkoketjulta…";
+      await tx.wait();
+      statusEl.textContent = `Reward-pool rahoitettu: +${val} HEL.`;
+      statusEl.className = "status-line success";
+      toast("Reward-pool rahoitettu!", "success");
+      await refreshPool();
+    } catch (e) {
+      statusEl.textContent = "Virhe: " + (e.reason || e.message);
+      statusEl.className = "status-line error";
+      toast("Fund epäonnistui.", "error");
+    } finally {
+      btn.disabled = false; btn.textContent = "Fund reward pool";
+    }
+  }
+
+  async function refreshPool() {
+    try {
+      const readProvider = provider || new ethers.BrowserProvider(window.ethereum);
+      const rewardContract = new ethers.Contract(targetAddress(), REWARD_ABI, readProvider);
+      const pool = await rewardContract.rewardPool();
+      document.getElementById('currentPool').textContent =
+        parseFloat(ethers.formatUnits(pool, 18)).toLocaleString('fi-FI', {maximumFractionDigits: 2}) + ' HEL jäljellä poolissa';
+    } catch (e) {
+      document.getElementById('currentPool').textContent = 'Haku epäonnistui: ' + e.message;
+    }
+  }
+
+  
+  // ---------- Grid bot (admin JWT) ----------
+  const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')   ? 'http://localhost:3001'   : 'https://testnetworkserver.onrender.com';
+
+  function adminAuthHeaders() {
+    const token = localStorage.getItem('helion_token');
+    return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token || '') };
+  }
+
+  function renderGrid(s) {
+    if (!s) return;
+    const runEl = document.getElementById('gridRunning');
+    if (s.running) {
+      runEl.textContent = '● KÄYNNISSÄ';
+      runEl.style.color = 'var(--success)';
+    } else if (s.available === false) {
+      runEl.textContent = '○ EI KONFIGUROITU';
+      runEl.style.color = 'var(--danger)';
+    } else {
+      runEl.textContent = '○ PYSAYTETTY';
+      runEl.style.color = 'var(--muted)';
+    }
+    document.getElementById('gridAddress').textContent = s.address || '–';
+    document.getElementById('gridHel').textContent = s.helBalance != null ? Number(s.helBalance).toLocaleString('fi-FI', {maximumFractionDigits: 4}) : '–';
+    document.getElementById('gridBnb').textContent = s.bnbBalance != null ? Number(s.bnbBalance).toLocaleString('fi-FI', {maximumFractionDigits: 6}) : '–';
+    document.getElementById('gridPrice').textContent = s.currentPrice != null
+      ? Number(s.currentPrice).toPrecision(6) + ' BNB/HEL'
+      : '–';
+    if (s.config) {
+      document.getElementById('gridSpacing').value = s.config.spacingPct;
+      document.getElementById('gridUp').value = s.config.gridsUp;
+      document.getElementById('gridDown').value = s.config.gridsDown;
+      document.getElementById('gridOrderBnb').value = s.config.orderBnb;
+      document.getElementById('gridOrderHel').value = s.config.orderHel;
+    }
+    const orders = (s.openOrders || []).map(o =>
+      (o.side === 'buy' ? 'BUY ' : 'SELL') + ' @ ' + Number(o.price).toPrecision(5)
+    ).join(String.fromCharCode(10));
+    document.getElementById('gridOrders').textContent = orders || 'ei tasoja';
+    const trades = (s.trades || []).slice().reverse().map(tr =>
+      (tr.time || '').slice(11, 19) + ' ' + tr.side + (tr.txHash ? ' ' + tr.txHash.slice(0, 10) + '…' : '')
+    ).join(String.fromCharCode(10));
+    document.getElementById('gridTrades').textContent = trades || 'ei tradeja';
+    const line = document.getElementById('gridStatusLine');
+    if (s.lastError) {
+      line.textContent = 'Viimeisin virhe: ' + s.lastError;
+      line.className = 'status-line error';
+    } else {
+      line.textContent = s.lastTickAt ? 'Viimeisin tick: ' + new Date(s.lastTickAt).toLocaleTimeString('fi-FI') : '';
+      line.className = 'status-line';
+    }
+  }
+
+  async function refreshGrid() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/grid/status', { headers: adminAuthHeaders() });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'status failed');
+      renderGrid(data);
+    } catch (e) {
+      document.getElementById('gridStatusLine').textContent = 'Grid-status: ' + e.message + ' (kirjaudu adminina Helioniin)';
+      document.getElementById('gridStatusLine').className = 'status-line error';
+    }
+  }
+
+  async function gridStart() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/grid/start', { method: 'POST', headers: adminAuthHeaders(), body: '{}' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'start failed');
+      renderGrid(data);
+      toast('Grid-botti käynnistetty', 'success');
+    } catch (e) { toast('Start: ' + e.message, 'error'); }
+  }
+
+  async function gridStop() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/grid/stop', { method: 'POST', headers: adminAuthHeaders(), body: '{}' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'stop failed');
+      renderGrid(data);
+      toast('Grid-botti sammutettu', 'success');
+    } catch (e) { toast('Stop: ' + e.message, 'error'); }
+  }
+
+  async function gridSaveConfig() {
+    try {
+      const body = {
+        spacingPct: Number(document.getElementById('gridSpacing').value),
+        gridsUp: Number(document.getElementById('gridUp').value),
+        gridsDown: Number(document.getElementById('gridDown').value),
+        orderBnb: Number(document.getElementById('gridOrderBnb').value),
+        orderHel: Number(document.getElementById('gridOrderHel').value),
+        rebuild: true
+      };
+      const res = await fetch(BACKEND_URL + '/api/grid/config', {
+        method: 'POST', headers: adminAuthHeaders(), body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'config failed');
+      renderGrid(data);
+      toast('Asetukset tallennettu', 'success');
+    } catch (e) { toast('Config: ' + e.message, 'error'); }
+  }
+
+  setInterval(refreshGrid, 15000);
+  refreshGrid();
+  
+  async function refreshMm() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/spot/mm/status', { headers: adminAuthHeaders() });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'mm status');
+      const el = document.getElementById('mmRunning');
+      el.textContent = d.running ? '● MM KÄYNNISSÄ' : '○ MM PYSAYTETTY';
+      el.style.color = d.running ? 'var(--success)' : 'var(--muted)';
+      document.getElementById('mmMid').textContent =
+        (d.lastMid != null ? Number(d.lastMid).toFixed(2) : '–') +
+        ' | book ' + (d.bookTop?.bestBid ?? '–') + ' / ' + (d.bookTop?.bestAsk ?? '–') +
+        ' | orders ' + (d.openOrderCount ?? 0);
+      document.getElementById('mmUsdt').textContent = d.balances ? Number(d.balances.USDT).toFixed(0) : '–';
+      document.getElementById('mmBtc').textContent = d.balances ? Number(d.balances.BTC).toFixed(4) : '–';
+      if (d.config) {
+        document.getElementById('mmSpread').value = d.config.spreadPct;
+        document.getElementById('mmLevels').value = d.config.levels;
+        document.getElementById('mmSize').value = d.config.orderSizeBtc;
+      }
+      document.getElementById('mmLine').textContent = d.lastError ? ('Virhe: ' + d.lastError) : (d.lastTickAt ? 'Tick ' + new Date(d.lastTickAt).toLocaleTimeString('fi-FI') : '');
+      document.getElementById('mmLine').className = d.lastError ? 'status-line error' : 'status-line';
+    } catch (e) {
+      document.getElementById('mmLine').textContent = e.message;
+      document.getElementById('mmLine').className = 'status-line error';
+    }
+  }
+  async function mmStart() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/spot/mm/start', { method:'POST', headers: adminAuthHeaders(), body:'{}' });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'start');
+      toast('Spot MM käynnissä', 'success');
+      refreshMm();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+  async function mmStop() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/spot/mm/stop', { method:'POST', headers: adminAuthHeaders(), body:'{}' });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'stop');
+      toast('Spot MM stop', 'success');
+      refreshMm();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+  async function mmSave() {
+    try {
+      const body = {
+        spreadPct: Number(document.getElementById('mmSpread').value),
+        levels: Number(document.getElementById('mmLevels').value),
+        orderSizeBtc: Number(document.getElementById('mmSize').value),
+        rebuild: true
+      };
+      const res = await fetch(BACKEND_URL + '/api/spot/mm/config', { method:'POST', headers: adminAuthHeaders(), body: JSON.stringify(body) });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'config');
+      toast('MM config OK', 'success');
+      refreshMm();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+  setInterval(refreshMm, 10000);
+  refreshMm();
+
+
+  refreshPool();
+
+  (async function tryAutoConnect() {
+    if (!window.ethereum) return;
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accounts && accounts.length > 0) connectWallet();
+    } catch (e) { /* ei haittaa, käyttäjä yhdistää manuaalisesti */ }
+  })();
+</script>
+</body>
+</html>
