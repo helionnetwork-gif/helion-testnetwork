@@ -82,7 +82,8 @@
   <nav class="site-nav">
     <a href="miner.html" class="nav-item">⛏ Miner</a>
     <a href="staking.html" class="nav-item">🔒 Staking</a>
-    <a href="helion-trading.html" class="nav-item">🔄 Trading</a>
+    <a href="helion-trading.html" class="nav-item">🔄 Swap</a>
+    <a href="spot.html" class="nav-item">📈 Spot</a>
     <a href="wallet.html" class="nav-item active">💼 Wallet</a>
     <a href="leaderboard.html" class="nav-item">🏆 Leaderboard</a>
     <a href="guide.html" class="nav-item">📖 Ohjeet</a>
@@ -121,7 +122,7 @@
 <div id="toastHost"></div>
 
 <script>
-  const BACKEND_URL = "https://testnetworkserver.onrender.com";
+  const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')   ? 'http://localhost:3001'   : 'https://testnetworkserver.onrender.com';
 
   const token = localStorage.getItem('helion_token');
   const username = localStorage.getItem('helion_username');
