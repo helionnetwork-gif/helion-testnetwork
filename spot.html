@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helion Spot — Binance Testnet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0C10; --panel:#14171D; --panel-2:#1B1F27; --line:#262B35;
+    --gold:#F2A93B; --violet:#7C5CFC; --text:#F5F3EE; --muted:#8B8F98;
+    --danger:#E5484D; --success:#3DD68C; --buy:#3DD68C; --sell:#E5484D;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:radial-gradient(circle at 50% -10%,#1a1408 0%,var(--bg) 45%);
+    color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:28px 16px 80px;
+  }
+  .display{font-family:'Chakra Petch',sans-serif;}
+  .wrap{max-width:960px;margin:0 auto;}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:12px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-logo{height:34px;width:34px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);}
+  .brand h1{font-size:19px;}
+  .brand .tag{font-size:10.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+  .user-pill{background:var(--panel);border:1px solid var(--line);padding:9px 14px;border-radius:999px;font-size:12.5px;display:flex;align-items:center;gap:8px;}
+  .user-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);}
+  .user-pill button{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;}
+  .site-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;}
+  .site-nav .nav-item{flex:1;text-align:center;padding:10px 6px;border-radius:10px;font-size:11px;font-weight:600;font-family:'Chakra Petch',sans-serif;color:var(--muted);text-decoration:none;white-space:nowrap;}
+  .site-nav .nav-item.active{background:rgba(242,169,59,0.12);color:var(--gold);}
+  .banner{background:rgba(124,92,252,0.1);border:1px solid rgba(124,92,252,0.35);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.45;}
+  .banner strong{color:var(--violet);}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:800px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;}
+  .card h2{font-size:14px;margin-bottom:12px;}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+  .stat{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .stat .l{font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+  .stat .v{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;}
+  .price-big{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;margin:4px 0 2px;}
+  .price-sub{font-size:12px;color:var(--muted);margin-bottom:12px;}
+  .side-tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .side-tabs button{flex:1;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);padding:10px;border-radius:10px;font-family:'Chakra Petch',sans-serif;font-weight:700;cursor:pointer;}
+  .side-tabs button.buy.active{background:rgba(61,214,140,0.15);color:var(--buy);border-color:rgba(61,214,140,0.4);}
+  .side-tabs button.sell.active{background:rgba(229,72,77,0.15);color:var(--sell);border-color:rgba(229,72,77,0.4);}
+  .type-tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .type-tabs button{flex:1;border:none;background:transparent;color:var(--muted);padding:8px;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;}
+  .type-tabs button.active{color:var(--gold);border-bottom-color:var(--gold);}
+  .field{margin-bottom:10px;}
+  .field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .field .row{display:flex;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:4px 4px 4px 12px;}
+  .field input{background:transparent;border:none;outline:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;width:100%;padding:10px 0;}
+  .field .unit{color:var(--muted);font-size:12px;padding:0 10px;white-space:nowrap;}
+  .btn{width:100%;border:none;padding:14px;border-radius:12px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:6px;}
+  .btn.buy{background:linear-gradient(180deg,#3dd68c,#1fa86a);color:#062016;}
+  .btn.sell{background:linear-gradient(180deg,#e5484d,#b83035);color:#fff;}
+  .btn.secondary{background:var(--panel-2);color:var(--text);border:1px solid var(--line);margin-top:10px;}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+  table{width:100%;border-collapse:collapse;font-size:11.5px;}
+  th{text-align:left;color:var(--muted);font-weight:500;padding:6px 4px;border-bottom:1px solid var(--line);}
+  td{padding:7px 4px;border-bottom:1px solid rgba(38,43,53,0.6);font-family:'JetBrains Mono',monospace;}
+  .buy-c{color:var(--buy);} .sell-c{color:var(--sell);}
+  .depth{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;font-family:'JetBrains Mono',monospace;}
+  .depth .ask{color:var(--sell);} .depth .bid{color:var(--buy);}
+  .depth div{display:flex;justify-content:space-between;padding:2px 0;}
+  #toastHost{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:10px;z-index:100;width:min(90vw,380px);}
+  .toast{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13px;}
+  .toast.success{border-color:rgba(61,214,140,0.4);} .toast.error{border-color:rgba(229,72,77,0.4);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="logo.jpg" alt="Helion" class="brand-logo">
+      <div>
+        <h1 class="display">Spot Trading</h1>
+        <div class="tag">Helion Matching Engine · BTC/USDT</div>
+      </div>
+    </div>
+    <div class="user-pill">
+      <div class="dot"></div>
+      <span id="usernameDisplay">–</span>
+      <button onclick="logout()">Kirjaudu ulos</button>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <a href="miner.html" class="nav-item">⛏ Miner</a>
+    <a href="staking.html" class="nav-item">🔒 Staking</a>
+    <a href="helion-trading.html" class="nav-item">🔄 Swap</a>
+    <a href="spot.html" class="nav-item active">📈 Spot</a>
+    <a href="wallet.html" class="nav-item">💼 Wallet</a>
+    <a href="leaderboard.html" class="nav-item">🏆 Board</a>
+    <a href="guide.html" class="nav-item">📖 Ohjeet</a>
+  </nav>
+
+  <div class="banner">
+    <strong>Helion Spot (matching engine):</strong> käyttäjät treidaavat <span style="color:var(--text)">toisiaan vastaan</span>.
+    Binance-hinta on vain viite (oracle). Sama malli testissä ja mainnetissä — mainnetissä deposit/withdraw ketjusta.
+    Maker fee 0.08% · Taker fee 0.1%. Ei käyttäjän API-avaimia.
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="l">USDT</div><div class="v" id="balUsdt">–</div></div>
+    <div class="stat"><div class="l">BTC</div><div class="v" id="balBtc">–</div></div>
+    <div class="stat"><div class="l">Equity</div><div class="v" id="balEquity">–</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2 class="display">BTC/USDT</h2>
+      <div class="price-big" id="lastPrice">–</div>
+      <div class="price-sub">Bid <span id="bidPrice">–</span> · Ask <span id="askPrice">–</span></div>
+      <div class="depth">
+        <div>
+          <div style="color:var(--muted);margin-bottom:4px;">Asks</div>
+          <div id="asksBox"></div>
+        </div>
+        <div>
+          <div style="color:var(--muted);margin-bottom:4px;">Bids</div>
+          <div id="bidsBox"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="display">Order</h2>
+      <div class="side-tabs">
+        <button class="buy active" id="tabBuy" onclick="setSide('BUY')">Buy</button>
+        <button class="sell" id="tabSell" onclick="setSide('SELL')">Sell</button>
+      </div>
+      <div class="type-tabs">
+        <button class="active" id="tabMarket" onclick="setType('MARKET')">Market</button>
+        <button id="tabLimit" onclick="setType('LIMIT')">Limit</button>
+      </div>
+      <div class="field" id="priceField" style="display:none;">
+        <label>Hinta</label>
+        <div class="row"><input type="number" id="limitPrice" placeholder="0.00"><span class="unit">USDT</span></div>
+      </div>
+      <div class="field" id="qtyField">
+        <label id="qtyLabel">Määrä (BTC)</label>
+        <div class="row"><input type="number" id="qtyInput" placeholder="0.001"><span class="unit" id="qtyUnit">BTC</span></div>
+      </div>
+      <div class="field" id="quoteField">
+        <label>Tai summa (USDT) — market buy</label>
+        <div class="row"><input type="number" id="quoteInput" placeholder="100"><span class="unit">USDT</span></div>
+      </div>
+      <button class="btn buy" id="submitBtn" onclick="submitOrder()">Buy BTC</button>
+      <button class="btn secondary" onclick="resetAccount()">Nollaa testisaldot</button>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:14px;">
+    <div class="card">
+      <h2 class="display">Open orders</h2>
+      <div style="overflow:auto;max-height:220px;">
+        <table>
+          <thead><tr><th>Side</th><th>Price</th><th>Qty</th><th></th></tr></thead>
+          <tbody id="ordersBody"><tr><td colspan="4" style="color:var(--muted);">Ei avoimia</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="display">Trade history</h2>
+      <div style="overflow:auto;max-height:220px;">
+        <table>
+          <thead><tr><th>Time</th><th>Side</th><th>Price</th><th>Qty</th></tr></thead>
+          <tbody id="tradesBody"><tr><td colspan="4" style="color:var(--muted);">Ei tradeja</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toastHost"></div>
+<script>
+  const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001'
+    
+
+  const token = localStorage.getItem('helion_token');
+  const username = localStorage.getItem('helion_username');
+  if (!token) location.href = 'index.html';
+
+  let side = 'BUY';
+  let orderType = 'MARKET';
+
+  function authHeaders() {
+    return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
+  }
+  function logout() {
+    localStorage.removeItem('helion_token');
+    localStorage.removeItem('helion_username');
+    location.href = 'index.html';
+  }
+  function toast(msg, type) {
+    const el = document.createElement('div');
+    el.className = 'toast ' + (type || '');
+    el.textContent = msg;
+    document.getElementById('toastHost').appendChild(el);
+    setTimeout(() => el.remove(), 4500);
+  }
+  function fmt(n, d) {
+    if (n == null || isNaN(n)) return '–';
+    return Number(n).toLocaleString('en-US', { maximumFractionDigits: d ?? 4 });
+  }
+
+  document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
+
+  function setSide(s) {
+    side = s;
+    document.getElementById('tabBuy').classList.toggle('active', s === 'BUY');
+    document.getElementById('tabSell').classList.toggle('active', s === 'SELL');
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = s === 'BUY' ? 'Buy BTC' : 'Sell BTC';
+    btn.className = 'btn ' + (s === 'BUY' ? 'buy' : 'sell');
+    document.getElementById('quoteField').style.display = (s === 'BUY' && orderType === 'MARKET') ? 'block' : 'none';
+  }
+  function setType(t) {
+    orderType = t;
+    document.getElementById('tabMarket').classList.toggle('active', t === 'MARKET');
+    document.getElementById('tabLimit').classList.toggle('active', t === 'LIMIT');
+    document.getElementById('priceField').style.display = t === 'LIMIT' ? 'block' : 'none';
+    document.getElementById('quoteField').style.display = (side === 'BUY' && t === 'MARKET') ? 'block' : 'none';
+  }
+
+  async function refreshTicker() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/spot/ticker?symbol=BTCUSDT');
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'ticker');
+      document.getElementById('lastPrice').textContent = fmt(d.price, 2);
+      document.getElementById('bidPrice').textContent = fmt(d.bid, 2);
+      document.getElementById('askPrice').textContent = fmt(d.ask, 2);
+    } catch (e) {
+      document.getElementById('lastPrice').textContent = '–';
+    }
+  }
+
+  async function refreshDepth() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/spot/depth?symbol=BTCUSDT&limit=8');
+      const d = await res.json();
+      if (!res.ok) return;
+      const asks = d.asks || [];
+      const bids = d.bids || [];
+      document.getElementById('asksBox').innerHTML = asks.slice(0, 8).reverse().map(
+        (o) => `<div class="ask"><span>${fmt(o.price,2)}</span><span>${fmt(o.quantity,5)}</span></div>`
+      ).join('') || '<div style="color:var(--muted)">tyhjä</div>';
+      document.getElementById('bidsBox').innerHTML = bids.slice(0, 8).map(
+        (o) => `<div class="bid"><span>${fmt(o.price,2)}</span><span>${fmt(o.quantity,5)}</span></div>`
+      ).join('') || '<div style="color:var(--muted)">tyhjä</div>';
+    } catch (_) {}
+  }
+
+  async function refreshAccount() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/spot/account', { headers: authHeaders() });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'account');
+      document.getElementById('balUsdt').textContent = fmt(d.balances.USDT, 2);
+      document.getElementById('balBtc').textContent = fmt(d.balances.BTC, 6);
+      document.getElementById('balEquity').textContent = '$' + fmt(d.equity, 2);
+      const orders = d.openOrders || [];
+      document.getElementById('ordersBody').innerHTML = orders.length
+        ? orders.map(o => `<tr>
+            <td class="${o.side==='BUY'?'buy-c':'sell-c'}">${o.side}</td>
+            <td>${fmt(o.price,2)}</td>
+            <td>${fmt(o.quantity,6)}</td>
+            <td><button style="background:none;border:none;color:var(--muted);cursor:pointer;text-decoration:underline;" onclick="cancelOrder('${o.id}')">Cancel</button></td>
+          </tr>`).join('')
+        : '<tr><td colspan="4" style="color:var(--muted);">Ei avoimia</td></tr>';
+    } catch (e) {
+      toast('Account: ' + e.message, 'error');
+    }
+  }
+
+  async function refreshTrades() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/spot/trades?limit=30', { headers: authHeaders() });
+      const d = await res.json();
+      if (!res.ok) return;
+      const trades = d.trades || [];
+      const me = (username || '').toLowerCase();
+      document.getElementById('tradesBody').innerHTML = trades.length
+        ? trades.map(tr => {
+            const tm = new Date(tr.time).toLocaleTimeString('fi-FI');
+            const side = tr.buyer === me ? 'BUY' : 'SELL';
+            return `<tr>
+              <td>${tm}</td>
+              <td class="${side==='BUY'?'buy-c':'sell-c'}">${side}</td>
+              <td>${fmt(tr.price,2)}</td>
+              <td>${fmt(tr.quantity,6)}</td>
+            </tr>`;
+          }).join('')
+        : '<tr><td colspan="4" style="color:var(--muted);">Ei tradeja</td></tr>';
+    } catch (_) {}
+  }
+
+  async function submitOrder() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    try {
+      const body = {
+        side,
+        type: orderType,
+        symbol: 'BTCUSDT',
+        quantity: document.getElementById('qtyInput').value || undefined,
+        price: document.getElementById('limitPrice').value || undefined,
+        quoteOrderQty: document.getElementById('quoteInput').value || undefined
+      };
+      if (orderType === 'MARKET' && side === 'BUY' && body.quoteOrderQty) {
+        delete body.quantity;
+      }
+      const res = await fetch(BACKEND_URL + '/api/spot/order', {
+        method: 'POST', headers: authHeaders(), body: JSON.stringify(body)
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'order failed');
+      toast(orderType + ' ' + side + ' ok', 'success');
+      document.getElementById('qtyInput').value = '';
+      document.getElementById('quoteInput').value = '';
+      await refreshAccount();
+      await refreshTrades();
+    } catch (e) {
+      toast(e.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function cancelOrder(id) {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/spot/order/' + id, {
+        method: 'DELETE', headers: authHeaders()
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'cancel failed');
+      toast('Peruttu', 'success');
+      await refreshAccount();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  async function resetAccount() {
+    if (!confirm('Nollataanko spot-testisaldot oletuksiin?')) return;
+    try {
+      const res = await fetch(BACKEND_URL + '/api/spot/reset', {
+        method: 'POST', headers: authHeaders(), body: '{}'
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'reset failed');
+      toast('Saldot nollattu', 'success');
+      await refreshAccount();
+      await refreshTrades();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  setSide('BUY');
+  setType('MARKET');
+  refreshTicker();
+  refreshDepth();
+  refreshAccount();
+  refreshTrades();
+  setInterval(refreshTicker, 2000);
+  setInterval(refreshDepth, 3000);
+  setInterval(refreshAccount, 10000);
+</script>
+</body>
+</html>
