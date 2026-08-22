@@ -65,6 +65,11 @@
   #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
   .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   .toast.error{ border-color: rgba(229,72,77,0.4); }
+
+.helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line,#262B35);border-radius:999px;padding:2px;background:var(--panel,#14171D);margin-left:8px;}
+.helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
+.helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
+
 </style>
 </head>
 <body>
@@ -82,13 +87,13 @@
   </header>
 
   <nav class="site-nav">
-    <a href="miner.html" class="nav-item">⛏ Miner</a>
-    <a href="staking.html" class="nav-item">🔒 Staking</a>
-    <a href="helion-trading.html" class="nav-item">🔄 Swap</a>
-    <a href="spot.html" class="nav-item">📈 Spot</a>
-    <a href="wallet.html" class="nav-item">💼 Wallet</a>
-    <a href="leaderboard.html" class="nav-item active">🏆 Leaderboard</a>
-    <a href="guide.html" class="nav-item">📖 Ohjeet</a>
+    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Miner</span></a>
+    <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
+    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Swap</span></a>
+    <a href="spot.html" class="nav-item"><span data-i18n="nav.spot">📈 Spot</span></a>
+    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Wallet</span></a>
+    <a href="leaderboard.html" class="nav-item active"><span data-i18n="nav.board">🏆 Board</span></a>
+    <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
   </nav>
 
   <div class="rules-card">
@@ -182,6 +187,17 @@
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
   loadMyScore();
   loadLeaderboard();
+</script>
+<script src="i18n.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.HelionI18n) {
+      var host = document.querySelector('.topbar') || document.querySelector('header') || document.querySelector('.nav') || document.querySelector('.site-nav') || document.body;
+      HelionI18n.mountLangSwitch(host);
+      HelionI18n.applyLang();
+    }
+  });
 </script>
 </body>
 </html>

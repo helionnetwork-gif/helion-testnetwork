@@ -106,6 +106,11 @@ a{color:inherit;text-decoration:none;}
 #toastHost{position:fixed;bottom:16px;right:16px;z-index:50;display:flex;flex-direction:column;gap:8px;width:min(360px,90vw);}
 .toast{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
 .toast.ok{border-color:rgba(14,203,129,0.4);} .toast.err{border-color:rgba(246,70,93,0.4);}
+
+.helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line,#262B35);border-radius:999px;padding:2px;background:var(--panel,#14171D);margin-left:8px;}
+.helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
+.helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
+
 </style>
 </head>
 <body>
@@ -124,23 +129,23 @@ a{color:inherit;text-decoration:none;}
     <div>Oracle <span class="mono" id="oraclePx" style="color:var(--muted)">–</span></div>
   </div>
   <nav class="nav">
-    <a href="miner.html">Miner</a>
-    <a href="staking.html">Staking</a>
-    <a href="helion-trading.html">Swap</a>
-    <a href="spot.html" class="active">Spot</a>
-    <a href="wallet.html">Wallet</a>
-    <a href="leaderboard.html">Board</a>
+    <a href="miner.html"><span data-i18n="nav.miner">⛏ Miner</span></a>
+    <a href="staking.html"><span data-i18n="nav.staking">🔒 Staking</span></a>
+    <a href="helion-trading.html"><span data-i18n="nav.swap">🔄 Swap</span></a>
+    <a href="spot.html" class="active"><span data-i18n="nav.spot">📈 Spot</span></a>
+    <a href="wallet.html"><span data-i18n="nav.wallet">💼 Wallet</span></a>
+    <a href="leaderboard.html"><span data-i18n="nav.board">🏆 Board</span></a>
     <a href="admin.html">Admin</a>
   </nav>
   <div class="user"><span id="userLabel">–</span><button onclick="logout()">Logout</button></div>
 </div>
 
-<div class="banner">Institutional test terminal · sisäinen matching · market maker seuraa markkinahintaa · maker 0.08% / taker 0.1% · ei oikeaa rahaa testnetissä</div>
+<div class="banner" data-i18n="spot.banner">Testnet terminal · internal matching · market maker · maker 0.08% / taker 0.1%</div>
 
 <div class="terminal">
   <!-- LEFT: vertical order book -->
   <div class="panel">
-    <div class="panel-h"><b>Order Book</b><span class="mono" id="spreadLbl">spread –</span></div>
+    <div class="panel-h"><b data-i18n="spot.orderBook">Order Book</b><span class="mono" id="spreadLbl">spread –</span></div>
     <div class="ob-head"><span>Price (USDT)</span><span>Size (BTC)</span><span>Total</span></div>
     <div class="ob">
       <div class="ob-asks" id="asksBox"></div>
@@ -160,7 +165,7 @@ a{color:inherit;text-decoration:none;}
       <div class="stat"><div class="l">Locked</div><div class="v" id="balLocked">–</div></div>
       <div class="stat"><div class="l">Equity</div><div class="v" id="balEq">–</div></div>
     </div>
-    <div class="panel-h"><b>Market Trades</b></div>
+    <div class="panel-h"><b data-i18n="spot.marketTrades">Market Trades</b></div>
     <div class="trades">
       <table>
         <thead><tr><th>Time</th><th>Price</th><th>Size</th><th>Side</th></tr></thead>
@@ -171,17 +176,17 @@ a{color:inherit;text-decoration:none;}
 
   <!-- RIGHT: order ticket -->
   <div class="panel">
-    <div class="panel-h"><b>Order Ticket</b><span>BTC/USDT</span></div>
+    <div class="panel-h"><b data-i18n="spot.orderTicket">Order Ticket</b><span>BTC/USDT</span></div>
     <div class="form">
       <div class="side-toggle">
-        <button class="buy on" id="btnBuy" onclick="setSide('BUY')">Buy</button>
-        <button class="sell" id="btnSell" onclick="setSide('SELL')">Sell</button>
+        <button class="buy on" id="btnBuy" onclick="setSide('BUY')" data-i18n="common.buy">Buy</button>
+        <button class="sell" id="btnSell" onclick="setSide('SELL')" data-i18n="common.sell">Sell</button>
       </div>
       <div class="type-row">
-        <button class="on" id="tLimit" onclick="setType('LIMIT')">Limit</button>
-        <button id="tMarket" onclick="setType('MARKET')">Market</button>
-        <button id="tStopLimit" onclick="setType('STOP_LIMIT')">Stop Limit</button>
-        <button id="tStopMarket" onclick="setType('STOP_MARKET')">Stop Market</button>
+        <button class="on" id="tLimit" onclick="setType('LIMIT')" data-i18n="spot.limit">Limit</button>
+        <button id="tMarket" onclick="setType('MARKET')" data-i18n="spot.market">Market</button>
+        <button id="tStopLimit" onclick="setType('STOP_LIMIT')" data-i18n="spot.stopLimit">Stop Limit</button>
+        <button id="tStopMarket" onclick="setType('STOP_MARKET')" data-i18n="spot.stopMarket">Stop Market</button>
       </div>
 
       <div class="field" id="fStop" style="display:none;">
@@ -206,7 +211,7 @@ a{color:inherit;text-decoration:none;}
         <label>Total (est.)</label>
         <div class="box"><input type="text" id="totalEst" readonly placeholder="–"><span class="u">USDT</span></div>
       </div>
-      <button class="submit buy" id="submitBtn" onclick="submitOrder()">Buy BTC</button>
+      <button class="submit buy" id="submitBtn" onclick="submitOrder()" data-i18n="spot.buyBtc">Buy BTC</button>
       <p class="hint" id="typeHint">Limit: order rests on the book until filled or cancelled.</p>
     </div>
   </div>
@@ -286,7 +291,7 @@ function setSide(s) {
   document.getElementById('btnBuy').classList.toggle('on', s === 'BUY');
   document.getElementById('btnSell').classList.toggle('on', s === 'SELL');
   const btn = document.getElementById('submitBtn');
-  btn.textContent = (s === 'BUY' ? 'Buy' : 'Sell') + ' BTC';
+  btn.textContent = (window.t ? t(s === 'BUY' ? 'spot.buyBtc' : 'spot.sellBtc') : ((s === 'BUY' ? 'Buy' : 'Sell') + ' BTC'));
   btn.className = 'submit ' + (s === 'BUY' ? 'buy' : 'sell');
   updateAvailLabels();
   calcTotal();
@@ -553,6 +558,17 @@ setInterval(refreshTicker, 2000);
 setInterval(refreshDepth, 2000);
 setInterval(refreshAccount, 8000);
 setInterval(refreshTrades, 5000);
+</script>
+<script src="i18n.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.HelionI18n) {
+      var host = document.querySelector('.topbar') || document.querySelector('header') || document.querySelector('.nav') || document.querySelector('.site-nav') || document.body;
+      HelionI18n.mountLangSwitch(host);
+      HelionI18n.applyLang();
+    }
+  });
 </script>
 </body>
 </html>
