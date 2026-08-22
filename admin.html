@@ -58,6 +58,11 @@
   .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   .toast.success{ border-color: rgba(61,214,140,0.4); }
   .toast.error{ border-color: rgba(229,72,77,0.4); }
+
+.helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line,#262B35);border-radius:999px;padding:2px;background:var(--panel,#14171D);margin-left:8px;}
+.helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
+.helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
+
 </style>
 </head>
 <body>
@@ -517,6 +522,17 @@
       if (accounts && accounts.length > 0) connectWallet();
     } catch (e) { /* ei haittaa, käyttäjä yhdistää manuaalisesti */ }
   })();
+</script>
+<script src="i18n.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.HelionI18n) {
+      var host = document.querySelector('.topbar') || document.querySelector('header') || document.querySelector('.nav') || document.querySelector('.site-nav') || document.body;
+      HelionI18n.mountLangSwitch(host);
+      HelionI18n.applyLang();
+    }
+  });
 </script>
 </body>
 </html>

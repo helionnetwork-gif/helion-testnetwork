@@ -104,16 +104,16 @@
   <div class="fee-banner" data-i18n="swap.notice"><strong>Huom:</strong> </div>
 
   <div class="pool-stats">
-    <div class="pool-stat"><div class="label">Pool HEL</div><div class="value" id="poolHel">–</div></div>
-    <div class="pool-stat"><div class="label">Pool tBNB</div><div class="value" id="poolBnb">–</div></div>
+    <div class="pool-stat"><div class="label" data-i18n="swap.poolHel">Pool HEL</div><div class="value" id="poolHel">–</div></div>
+    <div class="pool-stat"><div class="label" data-i18n="swap.poolBnb">Pool tBNB</div><div class="value" id="poolBnb">–</div></div>
   </div>
   <div class="pool-stats" style="margin-bottom:16px;">
-    <div class="pool-stat"><div class="label">HEL hinta</div><div class="value" id="priceHel" style="font-size:13px;">–</div></div>
-    <div class="pool-stat"><div class="label">tBNB hinta</div><div class="value" id="priceBnb" style="font-size:13px;">–</div></div>
+    <div class="pool-stat"><div class="label" data-i18n="swap.priceHel">HEL hinta</div><div class="value" id="priceHel" style="font-size:13px;">–</div></div>
+    <div class="pool-stat"><div class="label" data-i18n="swap.priceBnb">tBNB hinta</div><div class="value" id="priceBnb" style="font-size:13px;">–</div></div>
   </div>
 
   <div class="tabs">
-    <div class="tab active" id="tabSwap" onclick="switchTab('swap')">Swap</div>
+    <div class="tab active" id="tabSwap" onclick="switchTab('swap')" data-i18n="swap.tabSwap">Swap</div>
     <div class="tab" id="tabLiquidity" onclick="switchTab('liquidity')">Likviditeetti</div>
   </div>
 
@@ -124,7 +124,7 @@
     </div>
 
     <div class="swap-box">
-      <div class="row-top"><span>Maksat</span><button type="button" class="max-btn" onclick="setMaxFrom()">MAX</button></div>
+      <div class="row-top"><span data-i18n="swap.pay">Maksat</span><button type="button" class="max-btn" onclick="setMaxFrom()">MAX</button></div>
       <div class="row-input">
         <input type="number" id="fromAmount" placeholder="0.0" oninput="onFromAmountChange()">
         <div class="token-badge" id="fromTokenBadge"><span class="token-dot pair"></span>TBNB</div>
@@ -132,18 +132,18 @@
     </div>
     <div class="swap-divider"><div class="swap-flip" onclick="flipDirection()">⇅</div></div>
     <div class="swap-box">
-      <div class="row-top"><span>Saat (arvio)</span><span>&nbsp;</span></div>
+      <div class="row-top"><span data-i18n="swap.receive">Saat (arvio)</span><span>&nbsp;</span></div>
       <div class="row-input">
         <input type="text" id="toAmount" placeholder="0.0" readonly>
         <div class="token-badge" id="toTokenBadge"><span class="token-dot hel"></span>HEL</div>
       </div>
     </div>
 
-    <div class="info-row"><span>Platform-fee (1%)</span><span id="feeInfo">–</span></div>
-    <div class="info-row"><span>Fee USD</span><span id="feeUsd">–</span></div>
+    <div class="info-row"><span data-i18n="swap.fee">Platform-fee (1%)</span><span id="feeInfo">–</span></div>
+    <div class="info-row"><span data-i18n="swap.feeUsd">Fee USD</span><span id="feeUsd">–</span></div>
     <div class="info-row"><span>Saat arviolta (USD)</span><span id="outUsd">–</span></div>
-    <div class="info-row"><span>Reitti</span><span id="routeInfo">–</span></div>
-    <button class="btn-block" id="swapBtn" onclick="doSwap()">Swap</button>
+    <div class="info-row"><span data-i18n="swap.route">Reitti</span><span id="routeInfo">–</span></div>
+    <button class="btn-block" id="swapBtn" onclick="doSwap()" data-i18n="swap.button">Swap</button>
   </div>
 
   <div class="card hidden" id="liquidityPanel">

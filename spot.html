@@ -118,8 +118,8 @@ a{color:inherit;text-decoration:none;}
   <div class="brand">
     <img src="logo.jpg" alt="">
     <div>
-      <h1 class="display">Helion Spot</h1>
-      <span>BTC/USDT · Matching Engine</span>
+      <h1 class="display" data-i18n="spot.title">Helion Spot</h1>
+      <span data-i18n="spot.subtitle">BTC/USDT · Matching Engine</span>
     </div>
   </div>
   <div class="ticker-strip">
@@ -137,7 +137,7 @@ a{color:inherit;text-decoration:none;}
     <a href="leaderboard.html"><span data-i18n="nav.board">🏆 Board</span></a>
     <a href="admin.html">Admin</a>
   </nav>
-  <div class="user"><span id="userLabel">–</span><button onclick="logout()">Logout</button></div>
+  <div class="user"><span id="userLabel">–</span><button onclick="logout()" data-i18n="spot.logout">Logout</button></div>
 </div>
 
 <div class="banner" data-i18n="spot.banner">Testnet terminal · internal matching · market maker · maker 0.08% / taker 0.1%</div>
@@ -146,7 +146,7 @@ a{color:inherit;text-decoration:none;}
   <!-- LEFT: vertical order book -->
   <div class="panel">
     <div class="panel-h"><b data-i18n="spot.orderBook">Order Book</b><span class="mono" id="spreadLbl">spread –</span></div>
-    <div class="ob-head"><span>Price (USDT)</span><span>Size (BTC)</span><span>Total</span></div>
+    <div class="ob-head"><span data-i18n="spot.priceUsdt">Price (USDT)</span><span data-i18n="spot.sizeBtc">Size (BTC)</span><span data-i18n="spot.total">Total</span></div>
     <div class="ob">
       <div class="ob-asks" id="asksBox"></div>
       <div class="ob-mid">
@@ -160,10 +160,10 @@ a{color:inherit;text-decoration:none;}
   <!-- CENTER -->
   <div class="panel">
     <div class="center-top">
-      <div class="stat"><div class="l">USDT Available</div><div class="v" id="balUsdt">–</div></div>
-      <div class="stat"><div class="l">BTC Available</div><div class="v" id="balBtc">–</div></div>
-      <div class="stat"><div class="l">Locked</div><div class="v" id="balLocked">–</div></div>
-      <div class="stat"><div class="l">Equity</div><div class="v" id="balEq">–</div></div>
+      <div class="stat"><div class="l"><span data-i18n="spot.usdtAvail">USDT Available</span></div><div class="v" id="balUsdt">–</div></div>
+      <div class="stat"><div class="l"><span data-i18n="spot.btcAvail">BTC Available</span></div><div class="v" id="balBtc">–</div></div>
+      <div class="stat"><div class="l" data-i18n="spot.locked">Locked</div><div class="v" id="balLocked">–</div></div>
+      <div class="stat"><div class="l" data-i18n="spot.equity">Equity</div><div class="v" id="balEq">–</div></div>
     </div>
     <div class="panel-h"><b data-i18n="spot.marketTrades">Market Trades</b></div>
     <div class="trades">
@@ -190,15 +190,15 @@ a{color:inherit;text-decoration:none;}
       </div>
 
       <div class="field" id="fStop" style="display:none;">
-        <label>Stop Price <span id="availStop"></span></label>
+        <label data-i18n="spot.stopPrice">Stop Price <span id="availStop"></span></label>
         <div class="box"><input type="number" id="stopPrice" placeholder="0.00" step="0.01"><span class="u">USDT</span></div>
       </div>
       <div class="field" id="fPrice">
-        <label>Price <span id="availPrice"></span></label>
+        <label><span data-i18n="common.price">Price</span> <span id="availPrice"></span></label>
         <div class="box"><input type="number" id="limitPrice" placeholder="0.00" step="0.01"><span class="u">USDT</span></div>
       </div>
       <div class="field">
-        <label>Amount <span id="availAmt"></span></label>
+        <label><span data-i18n="spot.amount">Amount</span> <span id="availAmt"></span></label>
         <div class="box"><input type="number" id="qty" placeholder="0.0000" step="0.0001"><span class="u">BTC</span></div>
       </div>
       <div class="pcts">
@@ -208,7 +208,7 @@ a{color:inherit;text-decoration:none;}
         <button type="button" onclick="setPct(1)">100%</button>
       </div>
       <div class="field">
-        <label>Total (est.)</label>
+        <label data-i18n="spot.totalEst">Total (est.)</label>
         <div class="box"><input type="text" id="totalEst" readonly placeholder="–"><span class="u">USDT</span></div>
       </div>
       <button class="submit buy" id="submitBtn" onclick="submitOrder()" data-i18n="spot.buyBtc">Buy BTC</button>
@@ -219,21 +219,21 @@ a{color:inherit;text-decoration:none;}
   <!-- BOTTOM -->
   <div class="bottom">
     <div class="tabs">
-      <button class="on" data-tab="open" onclick="switchTab('open')">Open Orders</button>
-      <button data-tab="stops" onclick="switchTab('stops')">Stop Orders</button>
-      <button data-tab="history" onclick="switchTab('history')">Trade History</button>
-      <button data-tab="balances" onclick="switchTab('balances')">Balances</button>
+      <button class="on" data-tab="open" onclick="switchTab('open')" data-i18n="spot.openOrders">Open Orders</button>
+      <button data-tab="stops" onclick="switchTab('stops')" data-i18n="spot.stopOrders">Stop Orders</button>
+      <button data-tab="history" onclick="switchTab('history')" data-i18n="spot.tradeHistory">Trade History</button>
+      <button data-tab="balances" onclick="switchTab('balances')" data-i18n="spot.balances">Balances</button>
     </div>
     <div class="tab-body">
       <div id="tab-open">
         <table>
-          <thead><tr><th>Time</th><th>Side</th><th>Type</th><th>Price</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+          <thead><tr><th data-i18n="spot.time">Time</th><th data-i18n="spot.side">Side</th><th data-i18n="spot.type">Type</th><th data-i18n="spot.priceUsdt">Price</th><th data-i18n="spot.amount">Amount</th><th data-i18n="spot.status">Status</th><th></th></tr></thead>
           <tbody id="openBody"></tbody>
         </table>
       </div>
       <div id="tab-stops" style="display:none;">
         <table>
-          <thead><tr><th>Time</th><th>Side</th><th>Type</th><th>Stop</th><th>Limit</th><th>Amount</th><th></th></tr></thead>
+          <thead><tr><th data-i18n="spot.time">Time</th><th data-i18n="spot.side">Side</th><th data-i18n="spot.type">Type</th><th data-i18n="spot.stopPrice">Stop</th><th data-i18n="spot.limit">Limit</th><th data-i18n="spot.amount">Amount</th><th></th></tr></thead>
           <tbody id="stopBody"></tbody>
         </table>
       </div>

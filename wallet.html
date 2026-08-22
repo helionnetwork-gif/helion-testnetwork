@@ -75,12 +75,12 @@
   <header>
     <div class="brand">
       <img src="logo.jpg" alt="Helion" class="brand-logo">
-      <div><h1 class="display">Wallet</h1><div class="tag">Sisäänrakennettu lompakko</div></div>
+      <div><h1 class="display" data-i18n="wallet.title">Wallet</h1><div class="tag" data-i18n="wallet.tag">Sisäänrakennettu lompakko</div></div>
     </div>
     <div class="user-pill">
       <div class="dot"></div>
       <span id="usernameDisplay">–</span>
-      <button onclick="logout()">Kirjaudu ulos</button>
+      <button onclick="logout()"><span data-i18n="wallet.logout">Kirjaudu ulos</span></button>
     </div>
   </header>
 
@@ -95,29 +95,29 @@
   </nav>
 
   <div class="card">
-    <h2 class="display">Lompakkosi</h2>
+    <h2 class="display" data-i18n="wallet.heading">Lompakkosi</h2>
     <div class="addr-box" id="walletAddress">–</div>
-    <div class="balance-row"><span class="label">HEL</span><span class="value" id="helBalance">–</span></div>
+    <div class="balance-row"><span class="label" data-i18n="wallet.hel">HEL</span><span class="value" id="helBalance">–</span></div>
     <div class="balance-row" style="font-size:11.5px; color:var(--muted); margin-top:-4px; margin-bottom:10px;"><span></span><span id="helUsd">–</span></div>
-    <div class="balance-row"><span class="label">tBNB (gas)</span><span class="value" id="bnbBalance">–</span></div>
+    <div class="balance-row"><span class="label" data-i18n="wallet.tbnb">tBNB (gas)</span><span class="value" id="bnbBalance">–</span></div>
     <div class="balance-row" style="font-size:11.5px; color:var(--muted); margin-top:-4px; margin-bottom:10px;"><span></span><span id="bnbUsd">–</span></div>
     <div style="height:1px; background:var(--line); margin:12px 0;"></div>
-    <div class="balance-row" style="font-size:12px;"><span class="label">Token-hinnat</span><span></span></div>
+    <div class="balance-row" style="font-size:12px;"><span class="label" data-i18n="wallet.prices">Token-hinnat</span><span></span></div>
     <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>HEL</span><span id="priceHel">–</span></div>
     <div class="balance-row" style="font-size:11.5px; color:var(--muted);"><span>tBNB</span><span id="priceBnb">–</span></div>
-    <button class="btn-block secondary" style="margin-top:14px;" onclick="refreshWallet()">Päivitä</button>
+    <button class="btn-block secondary" style="margin-top:14px;" onclick="refreshWallet()" data-i18n="wallet.refresh">Päivitä</button>
   </div>
 
   <div class="card">
-    <h2 class="display">Lähetä HEL</h2>
+    <h2 class="display" data-i18n="wallet.sendTitle">Lähetä HEL</h2>
     <div class="input-row"><input type="text" id="recipientInput" placeholder="Käyttäjänimi tai 0x-osoite" oninput="onRecipientChange()"></div>
     <div class="input-row"><input type="number" id="amountInput" placeholder="Määrä"></div>
     <div id="feeNote" class="fee-note">Kirjoita vastaanottaja nähdäksesi sovelletaanko fee:tä.</div>
-    <button class="btn-block" style="margin-top:12px;" onclick="doTransfer()" id="transferBtn">Lähetä</button>
+    <button class="btn-block" style="margin-top:12px;" onclick="doTransfer()" id="transferBtn" data-i18n="wallet.send">Lähetä</button>
   </div>
 
   <div class="card">
-    <h2 class="display">Linkitä oma lompakko</h2>
+    <h2 class="display" data-i18n="wallet.linkTitle">Linkitä oma lompakko</h2>
     <div class="desc">Linkitä oma MetaMask-lompakkosi tähän tiliin allekirjoittamalla viesti — sen jälkeen voit kirjautua Helioniin ilman salasanaa suoraan lompakolla.</div>
     <button class="btn-block secondary" onclick="linkWallet()" id="linkWalletBtn">🦊 Linkitä MetaMask</button>
     <div class="linked-list" id="linkedList"></div>

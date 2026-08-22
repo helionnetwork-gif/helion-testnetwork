@@ -61,15 +61,15 @@
   </div>
 
   <div class="card">
-    <h2 class="display" id="authTitle">Kirjaudu sisään</h2>
-    <div class="input-row"><input type="text" id="authUsername" placeholder="Käyttäjänimi"></div>
-    <div class="input-row"><input type="password" id="authPassword" placeholder="Salasana"></div>
-    <button class="btn-block" onclick="doLogin()" id="loginBtn">Kirjaudu</button>
+    <h2 class="display" id="authTitle" data-i18n="index.authLogin">Kirjaudu sisään</h2>
+    <div class="input-row"><input type="text" id="authUsername" placeholder="Käyttäjänimi" data-i18n-placeholder="index.username"></div>
+    <div class="input-row"><input type="password" id="authPassword" placeholder="Salasana" data-i18n-placeholder="index.password"></div>
+    <button class="btn-block" onclick="doLogin()" id="loginBtn" data-i18n="index.loginBtn">Kirjaudu</button>
     <button class="link-btn" onclick="toggleAuthMode()" id="toggleAuthBtn">Ei tiliä? Rekisteröidy</button>
 
     <div class="divider">tai</div>
 
-    <button class="btn-block secondary" onclick="loginWithWallet()" id="walletLoginBtn">🦊 Kirjaudu lompakolla</button>
+    <button class="btn-block secondary" onclick="loginWithWallet()" id="walletLoginBtn">🦊 <span data-i18n="index.walletLogin">Kirjaudu lompakolla</span></button>
     <p style="font-size:11px; color:var(--muted); margin-top:8px; text-align:center;">Vaatii että olet aiemmin linkittänyt lompakon Wallet-osiossa.</p>
   </div>
 </div>
@@ -93,9 +93,9 @@
 
   function toggleAuthMode() {
     isRegisterMode = !isRegisterMode;
-    document.getElementById('authTitle').textContent = isRegisterMode ? 'Luo tili' : 'Kirjaudu sisään';
-    document.getElementById('loginBtn').textContent = isRegisterMode ? 'Rekisteröidy' : 'Kirjaudu';
-    document.getElementById('toggleAuthBtn').textContent = isRegisterMode ? 'Onko jo tili? Kirjaudu' : 'Ei tiliä? Rekisteröidy';
+    document.getElementById('authTitle').textContent = isRegisterMode ? t('index.authRegister') : t('index.authLogin');
+    document.getElementById('loginBtn').textContent = isRegisterMode ? t('index.registerBtn') : t('index.loginBtn');
+    document.getElementById('toggleAuthBtn').textContent = isRegisterMode ? t('index.toggleToLogin') : t('index.toggleToRegister');
   }
 
   function saveSessionAndRedirect(token, username) {
@@ -117,7 +117,7 @@
       });
       const data = await res.json();
       if (!res.ok) { toast(data.error || 'Virhe.', 'error'); return; }
-      toast(isRegisterMode ? 'Tili luotu!' : 'Kirjauduttu sisään!', 'success');
+      toast(isRegisterMode ? t('index.toastRegister') : t('index.toastLogin'), 'success');
       saveSessionAndRedirect(data.token, data.username);
     } catch (e) {
       toast('Yhteysvirhe: ' + e.message, 'error');
@@ -147,7 +147,7 @@
       const loginData = await loginRes.json();
       if (!loginRes.ok) { toast(loginData.error || 'Kirjautuminen epäonnistui.', 'error'); return; }
 
-      toast('Kirjauduttu lompakolla!', 'success');
+      toast(t('index.toastWallet'), 'success');
       saveSessionAndRedirect(loginData.token, loginData.username);
     } catch (e) {
       toast('Virhe: ' + (e.reason || e.message), 'error');
