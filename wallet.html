@@ -112,14 +112,14 @@
     <h2 class="display" data-i18n="wallet.sendTitle">Lähetä HEL</h2>
     <div class="input-row"><input type="text" id="recipientInput" placeholder="Käyttäjänimi tai 0x-osoite" oninput="onRecipientChange()"></div>
     <div class="input-row"><input type="number" id="amountInput" placeholder="Määrä"></div>
-    <div id="feeNote" class="fee-note">Kirjoita vastaanottaja nähdäksesi sovelletaanko fee:tä.</div>
+    <div id="feeNote" class="fee-note" data-i18n="wallet.feeNote">Kirjoita vastaanottaja nähdäksesi sovelletaanko fee:tä.</div>
     <button class="btn-block" style="margin-top:12px;" onclick="doTransfer()" id="transferBtn" data-i18n="wallet.send">Lähetä</button>
   </div>
 
   <div class="card">
     <h2 class="display" data-i18n="wallet.linkTitle">Linkitä oma lompakko</h2>
-    <div class="desc">Linkitä oma MetaMask-lompakkosi tähän tiliin allekirjoittamalla viesti — sen jälkeen voit kirjautua Helioniin ilman salasanaa suoraan lompakolla.</div>
-    <button class="btn-block secondary" onclick="linkWallet()" id="linkWalletBtn">🦊 Linkitä MetaMask</button>
+    <div class="desc" data-i18n="wallet.linkDesc">Linkitä oma MetaMask-lompakkosi tähän tiliin allekirjoittamalla viesti — sen jälkeen voit kirjautua Helioniin ilman salasanaa suoraan lompakolla.</div>
+    <button class="btn-block secondary" onclick="linkWallet()" id="linkWalletBtn">🦊 <span data-i18n="wallet.linkMeta">Linkitä MetaMask</span></button>
     <div class="linked-list" id="linkedList"></div>
   </div>
 </div>

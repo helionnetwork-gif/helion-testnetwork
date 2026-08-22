@@ -96,8 +96,8 @@
   </nav>
 
   <div class="grid">
-    <div class="card"><div class="sub">Lompakkosaldo</div><div class="value" id="walletBalance">– HEL</div><div style="font-size:11px; color:var(--muted); margin-top:4px;" id="walletUsd">–</div></div>
-    <div class="card"><div class="sub">Yhteensä louhittu</div><div class="value" id="totalMinedDisplay">– HEL</div><div style="font-size:11px; color:var(--muted); margin-top:4px;" id="minedUsd">–</div></div>
+    <div class="card"><div class="sub" data-i18n="miner.walletBal">Lompakkosaldo</div><div class="value" id="walletBalance">– HEL</div><div style="font-size:11px; color:var(--muted); margin-top:4px;" id="walletUsd">–</div></div>
+    <div class="card"><div class="sub" data-i18n="miner.totalMined">Yhteensä louhittu</div><div class="value" id="totalMinedDisplay">– HEL</div><div style="font-size:11px; color:var(--muted); margin-top:4px;" id="minedUsd">–</div></div>
   </div>
 
   <div class="reactor-card">
@@ -108,12 +108,12 @@
       </svg>
       <div class="gauge-center">
         <div class="time" id="gaugeTime">12:00:00</div>
-        <div class="label">Kaivos-aika jäljellä</div>
+        <div class="label" data-i18n="miner.timeLeft">Kaivos-aika jäljellä</div>
         <div class="status-badge" id="gaugeStatus">Ei aktiivinen</div>
       </div>
     </div>
     <div class="action-row">
-      <button class="btn-block" onclick="handleAction()" id="actionBtn">Aktivoi Kaivos (12h)</button>
+      <button class="btn-block" onclick="handleAction()" id="actionBtn" data-i18n="miner.activateBtn">Aktivoi Kaivos (12h)</button>
     </div>
   </div>
 </div>
@@ -185,7 +185,7 @@
       gaugeStatus.textContent = "Ei aktiivinen";
       gaugeStatus.className = "status-badge";
       actionBtn.disabled = false;
-      actionBtn.textContent = "Aktivoi Kaivos (12h)";
+      actionBtn.textContent = t("miner.activateBtn");
       actionBtn.dataset.mode = "activate";
       return;
     }
@@ -274,7 +274,7 @@
     if (mode === 'wait') return;
 
     btn.disabled = true;
-    btn.textContent = mode === 'claim' ? 'Lunastetaan…' : 'Aktivoidaan…';
+    btn.textContent = mode === 'claim' ? t('miner.claiming') : t('miner.activating');
     try {
       if (mode === 'claim') {
         await apiPost('/api/miner/claim');

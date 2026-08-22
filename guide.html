@@ -108,7 +108,7 @@
   <header>
     <img src="logo.jpg" alt="Helion" class="brand-logo">
     <div>
-      <h1 class="display">Ohjeet</h1>
+      <h1 class="display"><span data-i18n="guide.pageTitle">Ohjeet</span></h1>
       <div class="tag">Aloita tästä — BSC Testnet</div>
     </div>
   </header>
@@ -129,18 +129,18 @@
 
   <!-- STEP 1 -->
   <div class="step-section">
-    <div class="step-header"><div class="step-number">1</div><h2 class="display">Asenna MetaMask</h2></div>
+    <div class="step-header"><div class="step-number">1</div><h2 class="display" data-i18n="guide.s1">Asenna MetaMask</h2></div>
     <div class="step-card">
-      <p>MetaMask on selainlaajennus/lompakko jolla hoidat kaiken kaupankäynnin ja stakingin.</p>
-      <p>Lataa se osoitteesta <a href="https://metamask.io" target="_blank" rel="noopener">metamask.io</a> — valitse oma selaimesi (Chrome, Firefox, Brave, Edge) tai mobiilisovellus. Asennuksen jälkeen luo uusi lompakko ja <strong>tallenna siemenlause (seed phrase) turvallisesti</strong> — sitä ei voi palauttaa jos se katoaa.</p>
+      <p data-i18n="guide.s1p1">MetaMask on selainlaajennus/lompakko jolla hoidat kaiken kaupankäynnin ja stakingin.</p>
+      <p data-i18n="guide.s1p2">Lataa se osoitteesta <a href="https://metamask.io" target="_blank" rel="noopener">metamask.io</a> — valitse oma selaimesi (Chrome, Firefox, Brave, Edge) tai mobiilisovellus. Asennuksen jälkeen luo uusi lompakko ja <strong>tallenna siemenlause (seed phrase) turvallisesti</strong> — sitä ei voi palauttaa jos se katoaa.</p>
     </div>
   </div>
 
   <!-- STEP 2 -->
   <div class="step-section">
-    <div class="step-header"><div class="step-number">2</div><h2 class="display">Lisää BSC Testnet -verkko</h2></div>
+    <div class="step-header"><div class="step-number">2</div><h2 class="display" data-i18n="guide.s2">Lisää BSC Testnet -verkko</h2></div>
     <div class="step-card">
-      <p>Helion toimii BSC Testnetissä, ei Ethereumin pääverkossa tai BSC:n mainnetissä. MetaMask ei näytä sitä oletuksena, joten se täytyy lisätä erikseen.</p>
+      <p data-i18n="guide.s2p1">Helion toimii BSC Testnetissä, ei Ethereumin pääverkossa tai BSC:n mainnetissä. MetaMask ei näytä sitä oletuksena, joten se täytyy lisätä erikseen.</p>
 
       <button class="btn-gold" onclick="addNetwork()" id="addNetworkBtn">Lisää BSC Testnet MetaMaskiin automaattisesti</button>
 
@@ -157,9 +157,9 @@
 
   <!-- STEP 3 -->
   <div class="step-section">
-    <div class="step-header"><div class="step-number">3</div><h2 class="display">Hae testi-BNB (tBNB)</h2></div>
+    <div class="step-header"><div class="step-number">3</div><h2 class="display" data-i18n="guide.s3">Hae testi-BNB (tBNB)</h2></div>
     <div class="step-card">
-      <p>Tarvitset pienen määrän tBNB:tä maksaaksesi gas-kulut (transaktiomaksut) — ilman sitä mikään nappi ei toimi.</p>
+      <p data-i18n="guide.s3p1">Tarvitset pienen määrän tBNB:tä maksaaksesi gas-kulut (transaktiomaksut) — ilman sitä mikään nappi ei toimi.</p>
       <ol>
         <li>Mene <a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noopener">bnbchain.org/en/testnet-faucet</a></li>
         <li>Liitä lompakko-osoitteesi (kopioi se MetaMaskista)</li>
@@ -183,18 +183,18 @@
 
   <!-- STEP 4 -->
   <div class="step-section">
-    <div class="step-header"><div class="step-number">4</div><h2 class="display">Miten sivut toimivat</h2></div>
+    <div class="step-header"><div class="step-number">4</div><h2 class="display" data-i18n="guide.s4">Miten sivut toimivat</h2></div>
     <div class="step-card">
-      <p><strong>⛏ Miner</strong> — alkuperäinen 12h louhintasykli: aktivoi, odota, claimaa palkkio. Toimii MetaMaskilla samoin kuin muutkin sivut.</p>
-      <p><strong>🔒 Staking</strong> — valitse taso (7/30/90 vrk lukitus), stakettaa HEL, saa kiinteän tuoton lukitusajan päätyttyä. Voit nostaa pääoman pois kesken ajan, mutta menetät silloin tuoton.</p>
-      <p><strong>🔄 Trading</strong> — vaihda HEL ↔ TBNB PancakeSwapin testnet-routerin kautta oman sisäänrakennetun lompakkosi kautta (ei MetaMaskia). Jokaisesta swapista peritään 1% platform-fee. Voit myös lisätä likviditeettiä.</p>
+      <p data-i18n="guide.s4miner">⛏ Miner — alkuperäinen 12h louhintasykli: aktivoi, odota, claimaa palkkio. Toimii MetaMaskilla samoin kuin muutkin sivut.</p>
+      <p data-i18n="guide.s4stake">🔒 Staking — valitse taso (7/30/90 vrk lukitus), stakettaa HEL, saa kiinteän tuoton lukitusajan päätyttyä. Voit nostaa pääoman pois kesken ajan, mutta menetät silloin tuoton.</p>
+      <p data-i18n="guide.s4swap">🔄 Trading — vaihda HEL ↔ TBNB PancakeSwapin testnet-routerin kautta oman sisäänrakennetun lompakkosi kautta (ei MetaMaskia). Jokaisesta swapista peritään 1% platform-fee. Voit myös lisätä likviditeettiä.</p>
       <p style="font-size:11.5px; color:var(--muted);">Telegramissa on lisäksi erillinen kaivuri-botti jolla on oma sisäänrakennettu lompakko — ei vaadi MetaMaskia eikä gas-maksuja. Sama botti sisältää myös kutsujakilpailun ja leaderboardin.</p>
     </div>
   </div>
 
   <!-- CONTRACTS -->
   <div class="step-section">
-    <div class="step-header"><div class="step-number">📋</div><h2 class="display">Kontraktiosoitteet (läpinäkyvyyden vuoksi)</h2></div>
+    <div class="step-header"><div class="step-number">📋</div><h2 class="display" data-i18n="guide.s5">Kontraktiosoitteet (läpinäkyvyyden vuoksi)</h2></div>
     <div class="step-card">
       <table class="contracts-table">
         <tr><td>HEL Token</td><td>0xE4BCF45d177Cea1DFB6Fb8fCD2F32Bc9Dc79814B</td></tr>

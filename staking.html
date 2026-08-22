@@ -109,13 +109,13 @@
   </nav>
 
   <div class="balance-card">
-    <div class="label">Lompakkosaldo</div>
+    <div class="label" data-i18n="staking.walletBal">Lompakkosaldo</div>
     <div class="value" id="walletBalance">– HEL</div>
     <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="walletUsd">–</div>
     <div class="addr" id="walletAddress"></div>
   </div>
 
-  <h2 class="section-title display">Valitse taso</h2>
+  <h2 class="section-title display" data-i18n="staking.chooseTier">Valitse taso</h2>
   <div class="tiers-grid" id="tiersGrid"><div class="empty-note">Ladataan…</div></div>
 
   <div class="stake-box">
@@ -124,9 +124,9 @@
       <span class="unit">HEL</span>
     </div>
     <div style="font-size:11.5px; color:var(--muted); margin-bottom:12px;" id="selectedTierInfo">
-      Valitse taso yllä ennen staketusta.
+      <span data-i18n="staking.chooseFirst">Valitse taso yllä ennen staketusta.</span>
     </div>
-    <button class="btn-block" id="stakeBtn" onclick="doStake()" disabled>Valitse taso ensin</button>
+    <button class="btn-block" id="stakeBtn" onclick="doStake()" disabled data-i18n="staking.chooseBtn">Valitse taso ensin</button>
   </div>
 
   <h2 class="section-title display">Omat stake-positiot</h2>
@@ -226,8 +226,8 @@
       card.onclick = () => selectTier(t.id);
       card.innerHTML = `
         <div class="name">${t.name}</div>
-        <div class="duration">${t.lockDurationDays} vrk</div>
-        <div class="reward">+${t.rewardPct.toFixed(2)}% tuotto</div>
+        <div class="duration">${t.lockDurationDays} ${(window.t&&window.t('staking.days'))||'vrk'}</div>
+        <div class="reward">+${t.rewardPct.toFixed(2)}% ${(window.t&&window.t('staking.reward'))||'tuotto'}</div>
         <div class="min">Min. ${parseFloat(t.minStake).toLocaleString('fi-FI')} HEL</div>
       `;
       grid.appendChild(card);
@@ -261,7 +261,7 @@
     } catch (e) {
       toast('Virhe: ' + e.message, 'error');
     } finally {
-      btn.disabled = false; btn.textContent = 'Stake';
+      btn.disabled = false; btn.textContent = t('staking.stake');
     }
   }
 
@@ -286,18 +286,18 @@
             <div class="position-tag ${p.ready ? 'ready' : 'locked'}">${p.ready ? 'Valmis' : 'Lukossa'}</div>
           </div>
           <div style="font-size:11.5px; color:var(--muted); margin-bottom:14px;">
-            ${p.ready ? 'Lukitusaika päättynyt' : fmtDuration(remaining) + ' jäljellä'} · tuotto ${p.rewardPct.toFixed(2)}%
+            ${p.ready ? t('staking.lockEnded') : fmtDuration(remaining) + ' ' + t('staking.left')} · ${t('staking.reward')} ${p.rewardPct.toFixed(2)}%
           </div>
           <div class="position-actions">
             ${p.ready
-              ? `<button class="btn-withdraw" onclick="handleWithdraw(${p.index})">Nosta</button>`
-              : `<button class="btn-early" onclick="handleEarlyWithdraw(${p.index})">Nosta aikaisin (menetä tuotto)</button>`}
+              ? `<button class="btn-withdraw" onclick="handleWithdraw(${p.index})">${t("staking.withdraw")}</button>`
+              : `<button class="btn-early" onclick="handleEarlyWithdraw(${p.index})">${t("staking.earlyWithdraw")}</button>`}
           </div>
         `;
         listEl.appendChild(card);
       });
     } catch (e) {
-      listEl.innerHTML = '<div class="empty-note">Positioiden haku epäonnistui.</div>';
+      listEl.innerHTML = '<div class="empty-note">' + t('staking.positionsFail') + '</div>';
     }
   }
 
@@ -316,7 +316,7 @@
     if (!confirm('Menetät tämän position tuoton kokonaan. Jatketaanko?')) return;
     try {
       await apiPost('/api/staking/early-withdraw', { stakeIndex: index });
-      toast('Pääoma nostettu (ilman tuottoa).', 'success');
+      toast(t('staking.earlyOk'), 'success');
       await refreshWallet();
       await loadPositions();
     } catch (e) {
