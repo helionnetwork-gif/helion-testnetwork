@@ -182,7 +182,7 @@
       gaugeTime.textContent = "12:00:00";
       gaugeFill.style.strokeDashoffset = GAUGE_CIRCUMFERENCE;
       gaugeFill.classList.add('idle');
-      gaugeStatus.textContent = "Ei aktiivinen";
+      gaugeStatus.textContent = t("miner.inactive");
       gaugeStatus.className = "status-badge";
       actionBtn.disabled = false;
       actionBtn.textContent = t("miner.activateBtn");
@@ -196,7 +196,7 @@
       gaugeTime.textContent = "00:00:00";
       gaugeFill.style.strokeDashoffset = 0;
       gaugeFill.classList.remove('idle');
-      gaugeStatus.textContent = "Valmis lunastettavaksi";
+      gaugeStatus.textContent = t("miner.ready");
       gaugeStatus.className = "status-badge ready";
       actionBtn.disabled = false;
       actionBtn.textContent = `Claim ${rewardPerCycleDisplay} HEL`.trim();

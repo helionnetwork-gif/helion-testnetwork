@@ -479,6 +479,13 @@
     }
   };
 
+  
+  // Full overrides for guide + miner status (complete EN/FI)
+  const GUIDE_FI = {'guide.intro': '<strong>Helion</strong> on testnet-projekti BSC Testnetissä (BNB Smart Chain Testnet, Chain ID 97). Kaikki tässä liikkuva raha on <strong>testi-tokeneita ilman oikeaa rahallista arvoa</strong> — täydellinen paikka kokeilla DeFi-toimintoja (staking, swap, likviditeetti) ilman riskiä. Tällä sivulla käydään läpi kaikki mitä tarvitset päästäksesi alkuun.', 'guide.s1p1': 'MetaMask on selainlaajennus/lompakko jolla hoidat kaiken kaupankäynnin ja stakingin.', 'guide.s1p2': 'Lataa se osoitteesta <a href="https://metamask.io" target="_blank" rel="noopener">metamask.io</a> — valitse oma selaimesi (Chrome, Firefox, Brave, Edge) tai mobiilisovellus. Asennuksen jälkeen luo uusi lompakko ja <strong>tallenna siemenlause (seed phrase) turvallisesti</strong> — sitä ei voi palauttaa jos se katoaa.', 'guide.s2p1': 'Helion toimii BSC Testnetissä, ei Ethereumin pääverkossa tai BSC:n mainnetissä. MetaMask ei näytä sitä oletuksena, joten se täytyy lisätä erikseen.', 'guide.manualNet': 'Tai lisää manuaalisesti (MetaMask → Asetukset → Verkot → Lisää verkko):', 'guide.netName': 'Verkon nimi', 'guide.rpc': 'RPC URL', 'guide.chainId': 'Chain ID', 'guide.symbol': 'Valuuttasymboli', 'guide.explorer': 'Block explorer', 'guide.s3p1': 'Tarvitset pienen määrän tBNB:tä maksaaksesi gas-kulut (transaktiomaksut) — ilman sitä mikään nappi ei toimi.', 'guide.faucetNote': 'Huom: virallinen faucet voi vaatia pienen (0.002 BNB) saldon BSC:n mainnetissä bottien torjuntaa varten.', 'guide.s4miner': '⛏ Miner — 12h louhintasykli: aktivoi, odota, claimaa palkkio.', 'guide.s4stake': '🔒 Staking — valitse taso (7/30/90 vrk lukitus), stakettaa HEL, saa kiinteän tuoton lukitusajan päätyttyä. Voit nostaa pääoman pois kesken ajan, mutta menetät silloin tuoton.', 'guide.s4swap': '🔄 Swap — vaihda HEL ↔ tBNB PancakeSwap-testnetin kautta. Jokaisesta swapista 1% platform-fee. Voit myös lisätä likviditeettiä.', 'guide.s4spot': '📈 Spot — sisäinen BTC/USDT order book (limit / market / stop) ja market maker.', 'guide.telegram': 'Telegramissa on lisäksi erillinen kaivuri-botti jolla on oma sisäänrakennettu lompakko — ei vaadi MetaMaskia eikä gas-maksuja.', 'guide.contractsNote': 'Voit tarkistaa minkä tahansa osoitteen ja transaktion suoraan <a href="https://testnet.bscscan.com" target="_blank" rel="noopener">testnet.bscscan.com</a>:sta.', 'miner.inactive': 'Ei aktiivinen', 'miner.ready': 'Valmis lunastettavaksi'};
+  const GUIDE_EN = {'guide.intro': '<strong>Helion</strong> is a testnet project on BSC Testnet (BNB Smart Chain Testnet, Chain ID 97). All value here is <strong>test tokens with no real monetary value</strong> — a safe place to try DeFi (staking, swap, liquidity) without risk. This page covers everything you need to get started.', 'guide.s1p1': 'MetaMask is a browser extension/wallet used for on-chain actions when you choose an external wallet.', 'guide.s1p2': 'Download it from <a href="https://metamask.io" target="_blank" rel="noopener">metamask.io</a> — pick your browser (Chrome, Firefox, Brave, Edge) or mobile app. After install, create a wallet and <strong>store the seed phrase safely</strong> — it cannot be recovered if lost.', 'guide.s2p1': 'Helion runs on BSC Testnet, not Ethereum mainnet or BSC mainnet. MetaMask does not show it by default, so you need to add the network.', 'guide.manualNet': 'Or add manually (MetaMask → Settings → Networks → Add network):', 'guide.netName': 'Network name', 'guide.rpc': 'RPC URL', 'guide.chainId': 'Chain ID', 'guide.symbol': 'Currency symbol', 'guide.explorer': 'Block explorer', 'guide.s3p1': 'You need a small amount of tBNB to pay gas (transaction fees) — without it, on-chain actions will not work.', 'guide.faucetNote': 'Note: the official faucet may require a small (0.002 BNB) BSC mainnet balance for bot protection.', 'guide.s4miner': '⛏ Miner — 12h mining cycle: activate, wait, claim reward.', 'guide.s4stake': '🔒 Staking — choose a tier (7/30/90 day lock), stake HEL, earn fixed yield after the lock ends. You can withdraw principal early but then forfeit the reward.', 'guide.s4swap': '🔄 Swap — trade HEL ↔ tBNB via PancakeSwap testnet. 1% platform fee per swap. You can also add liquidity.', 'guide.s4spot': '📈 Spot — internal BTC/USDT order book (limit / market / stop) with a market maker.', 'guide.telegram': 'Telegram also has a separate miner bot with its own built-in wallet — no MetaMask or gas fees required.', 'guide.contractsNote': 'You can verify any address or transaction on <a href="https://testnet.bscscan.com" target="_blank" rel="noopener">testnet.bscscan.com</a>.', 'miner.inactive': 'Inactive', 'miner.ready': 'Ready to claim'};
+  Object.assign(STRINGS.fi, GUIDE_FI);
+  Object.assign(STRINGS.en, GUIDE_EN);
+
   function getLang() {
     const saved = localStorage.getItem('helion_lang');
     if (saved === 'en' || saved === 'fi') return saved;
@@ -507,6 +514,13 @@
       const val = t(key, lang);
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return;
       el.textContent = val;
+    });
+
+    // HTML-safe strings (links etc.) — does not strip markup
+    document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-html');
+      if (!key) return;
+      el.innerHTML = t(key, lang);
     });
 
     document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
