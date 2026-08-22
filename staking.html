@@ -145,6 +145,13 @@
   let selectedTierId = null;
   let tiersCache = [];
 
+  function tierLabel(name) {
+    const map = { Pika: 'tier.quick', Perus: 'tier.standard', 'Pitkä': 'tier.long', Extra: 'tier.extra' };
+    const key = map[name];
+    return (key && window.t) ? t(key) : name;
+  }
+
+
   function authHeaders() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
 
   function logout() {
@@ -225,7 +232,7 @@
       card.className = 'tier-card' + (selectedTierId === t.id ? ' selected' : '');
       card.onclick = () => selectTier(t.id);
       card.innerHTML = `
-        <div class="name">${t.name}</div>
+        <div class="name">${tierLabel(t.name)}</div>
         <div class="duration">${t.lockDurationDays} ${(window.t&&window.t('staking.days'))||'vrk'}</div>
         <div class="reward">+${t.rewardPct.toFixed(2)}% ${(window.t&&window.t('staking.reward'))||'tuotto'}</div>
         <div class="min">Min. ${parseFloat(t.minStake).toLocaleString('fi-FI')} HEL</div>
@@ -237,24 +244,25 @@
   function selectTier(tierId) {
     selectedTierId = tierId;
     renderTiers();
-    const t = tiersCache.find(x => x.id === tierId);
+    const tier = tiersCache.find(x => x.id === tierId);
+    const tt = window.t || ((k)=>k);
     document.getElementById('selectedTierInfo').textContent =
-      `Valittu: ${t.lockDurationDays} vrk lukitus, minimi ${parseFloat(t.minStake).toLocaleString('fi-FI')} HEL, tuotto ${t.rewardPct.toFixed(2)}%`;
+      `${tt('staking.selected')}: ${tierLabel(tier.name)} · ${tier.lockDurationDays} ${tt('staking.days')} · min ${parseFloat(tier.minStake).toLocaleString()} HEL · ${tt('staking.reward')} ${tier.rewardPct.toFixed(2)}%`;
     const btn = document.getElementById('stakeBtn');
     btn.disabled = false;
-    btn.textContent = 'Stake';
+    btn.textContent = tt('staking.stake');
   }
 
   async function doStake() {
-    if (selectedTierId === null) { toast('Valitse taso ensin.', 'error'); return; }
+    if (selectedTierId === null) { toast(t('staking.chooseBtn'), 'error'); return; }
     const val = document.getElementById('stakeAmount').value;
     if (!val || parseFloat(val) <= 0) { toast(t('staking.enterAmount'), 'error'); return; }
 
     const btn = document.getElementById('stakeBtn');
-    btn.disabled = true; btn.textContent = 'Vahvistetaan…';
+    btn.disabled = true; btn.textContent = (window.t && t('common.loading')) || '…';
     try {
       await apiPost('/api/staking/stake', { tierId: selectedTierId, amount: val });
-      toast('Stake onnistui!', 'success');
+      toast((window.t && t('common.success')) || 'OK', 'success');
       document.getElementById('stakeAmount').value = '';
       await refreshWallet();
       await loadPositions();
@@ -283,7 +291,7 @@
         card.innerHTML = `
           <div class="position-top">
             <div class="position-amount">${parseFloat(p.amount).toLocaleString('fi-FI',{maximumFractionDigits:2})} HEL</div>
-            <div class="position-tag ${p.ready ? 'ready' : 'locked'}">${p.ready ? 'Valmis' : 'Lukossa'}</div>
+            <div class="position-tag ${p.ready ? 'ready' : 'locked'}">${p.ready ? t('staking.readyTag') : t('staking.locked')}</div>
           </div>
           <div style="font-size:11.5px; color:var(--muted); margin-bottom:14px;">
             ${p.ready ? t('staking.lockEnded') : fmtDuration(remaining) + ' ' + t('staking.left')} · ${t('staking.reward')} ${p.rewardPct.toFixed(2)}%

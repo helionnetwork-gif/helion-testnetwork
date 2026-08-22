@@ -486,6 +486,26 @@
   Object.assign(STRINGS.fi, GUIDE_FI);
   Object.assign(STRINGS.en, GUIDE_EN);
 
+  Object.assign(STRINGS.fi, {
+    'tier.quick': 'Pika',
+    'tier.standard': 'Perus',
+    'tier.long': 'Pitkä',
+    'tier.extra': 'Extra',
+    'staking.locked': 'Lukossa',
+    'staking.readyTag': 'Valmis',
+    'staking.selected': 'Valittu'
+  });
+  Object.assign(STRINGS.en, {
+    'tier.quick': 'Quick',
+    'tier.standard': 'Standard',
+    'tier.long': 'Long',
+    'tier.extra': 'Extra',
+    'staking.locked': 'Locked',
+    'staking.readyTag': 'Ready',
+    'staking.selected': 'Selected'
+  });
+
+
   function getLang() {
     const saved = localStorage.getItem('helion_lang');
     if (saved === 'en' || saved === 'fi') return saved;
