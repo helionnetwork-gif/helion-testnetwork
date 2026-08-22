@@ -65,7 +65,7 @@
     <div class="input-row"><input type="text" id="authUsername" placeholder="Käyttäjänimi" data-i18n-placeholder="index.username"></div>
     <div class="input-row"><input type="password" id="authPassword" placeholder="Salasana" data-i18n-placeholder="index.password"></div>
     <button class="btn-block" onclick="doLogin()" id="loginBtn" data-i18n="index.loginBtn">Kirjaudu</button>
-    <button class="link-btn" onclick="toggleAuthMode()" id="toggleAuthBtn">Ei tiliä? Rekisteröidy</button>
+    <button class="link-btn" onclick="toggleAuthMode()" id="toggleAuthBtn" data-i18n="index.toggleAuth">Ei tiliä? Rekisteröidy</button>
 
     <div class="divider">tai</div>
 
@@ -107,7 +107,7 @@
   async function doLogin() {
     const username = document.getElementById('authUsername').value.trim();
     const password = document.getElementById('authPassword').value;
-    if (!username || !password) { toast('Täytä molemmat kentät.', 'error'); return; }
+    if (!username || !password) { toast(t('index.fillBoth'), 'error'); return; }
 
     const endpoint = isRegisterMode ? '/api/register' : '/api/login';
     try {
@@ -125,7 +125,7 @@
   }
 
   async function loginWithWallet() {
-    if (!window.ethereum) { toast('MetaMask ei löytynyt.', 'error'); return; }
+    if (!window.ethereum) { toast(t('index.noMetamask'), 'error'); return; }
     const btn = document.getElementById('walletLoginBtn');
     btn.disabled = true; btn.textContent = 'Odotetaan MetaMaskia…';
     try {

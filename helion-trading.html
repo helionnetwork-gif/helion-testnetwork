@@ -86,7 +86,7 @@
     <div class="user-pill">
       <div class="dot"></div>
       <span id="usernameDisplay">–</span>
-      <button onclick="logout()">Kirjaudu ulos</button>
+      <button onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
     </div>
   </header>
 
@@ -100,7 +100,7 @@
     <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
   </nav>
 
-  <div class="powered-by">Kaupankäynti <b>PancakeSwap</b>-routerin kautta · vain <b>HEL ↔ tBNB</b></div>
+  <div class="powered-by"><span data-i18n="swap.powered">Trading via PancakeSwap router · HEL ↔ tBNB only</span></div>
   <div class="fee-banner" data-i18n="swap.notice"><strong>Huom:</strong> </div>
 
   <div class="pool-stats">
@@ -114,7 +114,7 @@
 
   <div class="tabs">
     <div class="tab active" id="tabSwap" onclick="switchTab('swap')" data-i18n="swap.tabSwap">Swap</div>
-    <div class="tab" id="tabLiquidity" onclick="switchTab('liquidity')">Likviditeetti</div>
+    <div class="tab" id="tabLiquidity" onclick="switchTab('liquidity')" data-i18n="swap.tabLiq">Likviditeetti</div>
   </div>
 
   <div class="card" id="swapPanel">
@@ -141,7 +141,7 @@
 
     <div class="info-row"><span data-i18n="swap.fee">Platform-fee (1%)</span><span id="feeInfo">–</span></div>
     <div class="info-row"><span data-i18n="swap.feeUsd">Fee USD</span><span id="feeUsd">–</span></div>
-    <div class="info-row"><span>Saat arviolta (USD)</span><span id="outUsd">–</span></div>
+    <div class="info-row"><span data-i18n="swap.outUsd">Saat arviolta (USD)</span><span id="outUsd">–</span></div>
     <div class="info-row"><span data-i18n="swap.route">Reitti</span><span id="routeInfo">–</span></div>
     <button class="btn-block" id="swapBtn" onclick="doSwap()" data-i18n="swap.button">Swap</button>
   </div>
@@ -149,7 +149,7 @@
   <div class="card hidden" id="liquidityPanel">
     <div class="lp-input-row"><input type="number" id="lpHelAmount" placeholder="0.0"><span class="unit">HEL</span></div>
     <div class="lp-input-row"><input type="number" id="lpBnbAmount" placeholder="0.0"><span class="unit">TBNB</span></div>
-    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn">Lisää likviditeettiä (HEL/tBNB)</button>
+    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn" data-i18n="swap.addLiq">Lisää likviditeettiä (HEL/tBNB)</button>
     <div style="height:1px; background:var(--line); margin:20px 0;"></div>
     <div class="info-row" style="margin-top:0;"><span>LP-tokenisi</span><span id="lpBalanceInfo">–</span></div>
     <div class="lp-input-row" style="margin-top:10px;"><input type="number" id="lpRemoveAmount" placeholder="0.0"><span class="unit">LP</span></div>
@@ -296,7 +296,7 @@
         document.getElementById('outUsd').textContent = fmtUsd(outUsd);
       } catch (e) {
         document.getElementById('toAmount').value = '';
-        document.getElementById('feeInfo').textContent = 'Ei likviditeettiä';
+        document.getElementById('feeInfo').textContent = t('swap.noLiq');
         document.getElementById('feeUsd').textContent = '–';
         document.getElementById('outUsd').textContent = '–';
       }
@@ -304,7 +304,7 @@
   }
   async function doSwap() {
     const val = document.getElementById('fromAmount').value;
-    if (!val || parseFloat(val) <= 0) { toast('Syötä kelvollinen määrä.', 'error'); return; }
+    if (!val || parseFloat(val) <= 0) { toast(t('swap.enterAmount'), 'error'); return; }
     const btn = document.getElementById('swapBtn');
     btn.disabled = true; btn.textContent = 'Vahvistetaan…';
     try {
@@ -331,22 +331,22 @@
     const helVal = document.getElementById('lpHelAmount').value;
     const bnbVal = document.getElementById('lpBnbAmount').value;
     if (!helVal || !bnbVal || parseFloat(helVal) <= 0 || parseFloat(bnbVal) <= 0) {
-      toast('Syötä molemmat määrät.', 'error'); return;
+      toast(t('swap.enterBoth'), 'error'); return;
     }
     const btn = document.getElementById('addLiqBtn');
-    btn.disabled = true; btn.textContent = 'Lisätään…';
+    btn.disabled = true; btn.textContent = t('swap.adding');
     try {
       await apiPost('/api/trading/add-liquidity', { helAmount: helVal, bnbAmount: bnbVal });
-      toast('Likviditeetti lisätty!', 'success');
+      toast(t('swap.addedOk'), 'success');
       document.getElementById('lpHelAmount').value = '';
       document.getElementById('lpBnbAmount').value = '';
       await refreshPool(); await refreshLpBalance(); await refreshBalances(); await refreshPrices();
     } catch (e) { toast('Virhe: ' + e.message, 'error'); }
-    finally { btn.disabled = false; btn.textContent = 'Lisää likviditeettiä (HEL/tBNB)'; }
+    finally { btn.disabled = false; btn.textContent = t('swap.addLiq'); }
   }
   async function removeLiquidity() {
     const val = document.getElementById('lpRemoveAmount').value;
-    if (!val || parseFloat(val) <= 0) { toast('Syötä poistettava määrä.', 'error'); return; }
+    if (!val || parseFloat(val) <= 0) { toast(t('swap.removeAmount'), 'error'); return; }
     const btn = document.getElementById('removeLiqBtn');
     btn.disabled = true; btn.textContent = 'Poistetaan…';
     try {

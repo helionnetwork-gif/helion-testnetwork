@@ -82,7 +82,7 @@
     <div class="user-pill">
       <div class="dot"></div>
       <span id="usernameDisplay">–</span>
-      <button onclick="logout()">Kirjaudu ulos</button>
+      <button onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
     </div>
   </header>
 
@@ -97,8 +97,8 @@
   </nav>
 
   <div class="rules-card">
-    <strong>Pisteytys:</strong> +1 piste / 100 HEL stakettu · +1 piste / tehty kauppa · +0.1 piste / lähetys · +5 pistettä / kaivauksen aktivointi
-  </div>
+    <span data-i18n="board.scoring">Pisteytys: +1 piste / 100 HEL stakettu · +1 piste / tehty kauppa · +0.1 piste / lähetys · +5 pistettä / kaivauksen aktivointi
+  </span></div>
 
   <div class="my-score-card">
     <div>
@@ -108,7 +108,7 @@
     <div class="score" id="myScore">–</div>
   </div>
 
-  <div class="board-list" id="boardList"><div class="empty-note">Ladataan…</div></div>
+  <div class="board-list" id="boardList"><div class="empty-note" data-i18n="staking.loading">Ladataan…</div></div>
 </div>
 
 <div id="toastHost"></div>
@@ -146,7 +146,7 @@
       document.getElementById('myBreakdown').textContent =
         `${Math.floor(data.stakeVolume/100)} staking · ${data.tradeCount} kauppaa · ${data.sendCount} lähetystä · ${data.mineCount} kaivausta`;
     } catch (e) {
-      toast('Pisteiden haku epäonnistui: ' + e.message, 'error');
+      toast(t('board.balanceFail') + ': ' + e.message, 'error');
     }
   }
 
@@ -158,7 +158,7 @@
       if (!res.ok) throw new Error(data.error || 'Virhe');
 
       if (data.leaderboard.length === 0) {
-        listEl.innerHTML = '<div class="empty-note">Ei vielä dataa leaderboardille.</div>';
+        listEl.innerHTML = '<div class="empty-note">' + t('board.empty') + '</div>';
         return;
       }
 
@@ -171,16 +171,16 @@
         row.className = `board-row ${rowRankClass} ${isYou ? 'you' : ''}`;
         row.innerHTML = `
           <div class="rank-badge ${rankClass}">${i + 1}</div>
-          <div class="row-name">@${entry.username}${isYou ? ' (sinä)' : ''}</div>
+          <div class="row-name">@${entry.username}${isYou ? ' ' + t('board.you') : ''}</div>
           <div class="row-value">
-            <div class="main">${entry.score} pistettä</div>
+            <div class="main">${entry.score} ${t('board.points')}</div>
             <div class="sub">${Math.floor(entry.stakeVolume/100)}·${entry.tradeCount}·${entry.sendCount}·${entry.mineCount}</div>
           </div>
         `;
         listEl.appendChild(row);
       });
     } catch (e) {
-      listEl.innerHTML = '<div class="empty-note">Leaderboardin haku epäonnistui.</div>';
+      listEl.innerHTML = '<div class="empty-note">' + t('board.fail') + '</div>';
     }
   }
 

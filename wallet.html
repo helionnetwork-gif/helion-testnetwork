@@ -110,8 +110,8 @@
 
   <div class="card">
     <h2 class="display" data-i18n="wallet.sendTitle">Lähetä HEL</h2>
-    <div class="input-row"><input type="text" id="recipientInput" placeholder="Käyttäjänimi tai 0x-osoite" oninput="onRecipientChange()"></div>
-    <div class="input-row"><input type="number" id="amountInput" placeholder="Määrä"></div>
+    <div class="input-row"><input type="text" id="recipientInput" placeholder="Käyttäjänimi tai 0x-osoite" data-i18n-placeholder="wallet.recipientPh" oninput="onRecipientChange()"></div>
+    <div class="input-row"><input type="number" id="amountInput" placeholder="Määrä" data-i18n-placeholder="wallet.amount"></div>
     <div id="feeNote" class="fee-note" data-i18n="wallet.feeNote">Kirjoita vastaanottaja nähdäksesi sovelletaanko fee:tä.</div>
     <button class="btn-block" style="margin-top:12px;" onclick="doTransfer()" id="transferBtn" data-i18n="wallet.send">Lähetä</button>
   </div>
@@ -202,15 +202,15 @@
     const val = document.getElementById('recipientInput').value.trim();
     const note = document.getElementById('feeNote');
     if (!val) {
-      note.textContent = 'Kirjoita vastaanottaja nähdäksesi sovelletaanko fee:tä.';
+      note.textContent = t('wallet.feeNote');
       note.className = 'fee-note';
       return;
     }
     if (val.startsWith('0x') && val.length === 42) {
-      note.textContent = 'Osoite — jos se ei kuulu järjestelmän käyttäjälle, 1% fee sovelletaan lähetettäessä.';
+      note.textContent = t('wallet.feeExternal');
       note.className = 'fee-note external';
     } else {
-      note.textContent = 'Käyttäjänimi — sisäinen siirto toiselle Helion-käyttäjälle on ilmainen.';
+      note.textContent = t('wallet.feeInternal');
       note.className = 'fee-note internal';
     }
   }
@@ -218,17 +218,17 @@
   async function doTransfer() {
     const recipient = document.getElementById('recipientInput').value.trim();
     const amount = document.getElementById('amountInput').value;
-    if (!recipient || !amount || parseFloat(amount) <= 0) { toast('Täytä vastaanottaja ja määrä.', 'error'); return; }
+    if (!recipient || !amount || parseFloat(amount) <= 0) { toast(t('wallet.fillRecipient'), 'error'); return; }
 
     const btn = document.getElementById('transferBtn');
-    btn.disabled = true; btn.textContent = 'Lähetetään…';
+    btn.disabled = true; btn.textContent = t('wallet.sending');
     try {
       const res = await fetch(BACKEND_URL + '/api/transfer', {
         method: 'POST', headers: authHeaders(),
         body: JSON.stringify({ recipient, amount })
       });
       const data = await res.json();
-      if (!res.ok) { toast(data.error || 'Siirto epäonnistui.', 'error'); return; }
+      if (!res.ok) { toast(data.error || t('wallet.transferFail'), 'error'); return; }
 
       const feeText = parseFloat(data.fee) > 0 ? ` (fee: ${data.fee} HEL)` : ' (sisäinen, ei fee:tä)';
       toast(`✅ Lähetetty ${data.sentAmount} HEL → ${data.recipient}${feeText}`, 'success');
@@ -238,12 +238,12 @@
     } catch (e) {
       toast('Yhteysvirhe: ' + e.message, 'error');
     } finally {
-      btn.disabled = false; btn.textContent = 'Lähetä';
+      btn.disabled = false; btn.textContent = t('wallet.send');
     }
   }
 
   async function linkWallet() {
-    if (!window.ethereum) { toast('MetaMask ei löytynyt.', 'error'); return; }
+    if (!window.ethereum) { toast(t('index.noMetamask'), 'error'); return; }
     const btn = document.getElementById('linkWalletBtn');
     btn.disabled = true; btn.textContent = 'Odotetaan MetaMaskia…';
     try {
@@ -263,14 +263,14 @@
         body: JSON.stringify({ address, message: nonceData.message, signature })
       });
       const linkData = await linkRes.json();
-      if (!linkRes.ok) { toast(linkData.error || 'Linkitys epäonnistui.', 'error'); return; }
+      if (!linkRes.ok) { toast(linkData.error || t('wallet.linkFail'), 'error'); return; }
 
-      toast('Lompakko linkitetty! Voit nyt kirjautua sillä ilman salasanaa.', 'success');
+      toast(t('wallet.linkedOk'), 'success');
       loadLinkedWallets();
     } catch (e) {
       toast('Virhe: ' + (e.reason || e.message), 'error');
     } finally {
-      btn.disabled = false; btn.textContent = '🦊 Linkitä MetaMask';
+      btn.disabled = false; btn.textContent = '🦊 ' + t('wallet.linkMeta');
     }
   }
 

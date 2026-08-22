@@ -78,7 +78,7 @@
   </div>
 
   <div id="walletPill" class="wallet-pill" onclick="connectWallet()">
-    <div class="dot"></div><span id="walletPillText">Yhdistä lompakko</span>
+    <div class="dot"></div><span id="walletPillText" data-i18n="admin.connectWallet">Yhdistä lompakko</span>
   </div>
 
   <div class="step-card">
@@ -111,12 +111,12 @@
 
   <div class="step-card" style="border-color: rgba(242,169,59,0.35);">
     <h2 class="display">Grid-botti (HEL / tBNB)</h2>
-    <div class="desc">Erillinen automaattibotti. Ei käytä käyttäjien lompakoita. Vain admin voi käynnistää / sammuttaa.</div>
+    <div class="desc"><span data-i18n="admin.gridDesc">Erillinen automaattibotti. Ei käytä käyttäjien lompakoita. Vain admin voi käynnistää / sammuttaa.</span></div>
 
     <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">Tila</div>
     <div id="gridRunning" style="font-family:'JetBrains Mono',monospace; font-size:14px; margin-bottom:12px;">–</div>
 
-    <div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Bot-lompakko</div>
+    <div style="font-size:12px; color:var(--muted); margin-bottom:4px;" data-i18n="admin.botWallet">Bot-lompakko</div>
     <div id="gridAddress" style="font-family:'JetBrains Mono',monospace; font-size:12px; word-break:break-all; margin-bottom:12px;">–</div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
@@ -133,7 +133,7 @@
     <div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Pool-hinta (BNB / HEL)</div>
     <div id="gridPrice" style="font-family:'JetBrains Mono',monospace; font-size:13px; margin-bottom:12px;">–</div>
 
-    <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">Avoimet grid-tasot</div>
+    <div style="font-size:12px; color:var(--muted); margin-bottom:6px;" data-i18n="admin.openLevels">Avoimet grid-tasot</div>
     <div id="gridOrders" style="font-size:11px; font-family:'JetBrains Mono',monospace; max-height:120px; overflow:auto; margin-bottom:12px; color:var(--muted);">–</div>
 
     <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">Viimeisimmät tradet</div>
@@ -164,7 +164,7 @@
 
   <div class="step-card" style="border-color: rgba(124,92,252,0.4);">
     <h2 class="display">Spot Market Maker</h2>
-    <div class="desc">Pitää BTC/USDT-orderbookin Binance-hinnan ympärillä (sisäinen matching). Käynnistä adminina.</div>
+    <div class="desc"><span data-i18n="admin.mmDesc">Pitää BTC/USDT-orderbookin markkinahinnan ympärillä (sisäinen matching). Käynnistä adminina.</span></div>
     <div id="mmRunning" style="font-family:'JetBrains Mono',monospace; font-size:14px; margin-bottom:10px;">–</div>
     <div style="font-size:12px; color:var(--muted);">Mid / Bid–Ask</div>
     <div id="mmMid" style="font-family:'JetBrains Mono',monospace; margin-bottom:10px;">–</div>

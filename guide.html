@@ -109,7 +109,7 @@
     <img src="logo.jpg" alt="Helion" class="brand-logo">
     <div>
       <h1 class="display"><span data-i18n="guide.pageTitle">Ohjeet</span></h1>
-      <div class="tag">Aloita tästä — BSC Testnet</div>
+      <div class="tag"><span data-i18n="guide.tag">Start here — BSC Testnet</span></div>
     </div>
   </header>
 
@@ -124,7 +124,7 @@
   </nav>
 
   <div class="intro-card">
-    <strong>Helion</strong> on testnet-projekti BSC Testnetissä (BNB Smart Chain Testnet, Chain ID 97). Kaikki tässä liikkuva raha on <strong>testi-tokeneita ilman oikeaa rahallista arvoa</strong> — täydellinen paikka kokeilla DeFi-toimintoja (staking, swap, likviditeetti) ilman riskiä. Tällä sivulla käydään läpi kaikki mitä tarvitset päästäksesi alkuun.
+    <span data-i18n="guide.intro"><strong>Helion</strong> on testnet-projekti BSC Testnetissä (BNB Smart Chain Testnet, Chain ID 97). Kaikki tässä liikkuva raha on </span><strong>testi-tokeneita ilman oikeaa rahallista arvoa</strong> — täydellinen paikka kokeilla DeFi-toimintoja (staking, swap, likviditeetti) ilman riskiä. Tällä sivulla käydään läpi kaikki mitä tarvitset päästäksesi alkuun.
   </div>
 
   <!-- STEP 1 -->
@@ -142,7 +142,7 @@
     <div class="step-card">
       <p data-i18n="guide.s2p1">Helion toimii BSC Testnetissä, ei Ethereumin pääverkossa tai BSC:n mainnetissä. MetaMask ei näytä sitä oletuksena, joten se täytyy lisätä erikseen.</p>
 
-      <button class="btn-gold" onclick="addNetwork()" id="addNetworkBtn">Lisää BSC Testnet MetaMaskiin automaattisesti</button>
+      <button class="btn-gold" onclick="addNetwork()" id="addNetworkBtn"><span data-i18n="guide.addNetBtn">Add BSC Testnet to MetaMask automatically</span></button>
 
       <p style="margin-top:16px; font-size:12px; color:var(--muted);">Tai lisää manuaalisesti (MetaMask → Asetukset → Verkot → Lisää verkko):</p>
       <table class="param-table">
@@ -162,8 +162,8 @@
       <p data-i18n="guide.s3p1">Tarvitset pienen määrän tBNB:tä maksaaksesi gas-kulut (transaktiomaksut) — ilman sitä mikään nappi ei toimi.</p>
       <ol>
         <li>Mene <a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noopener">bnbchain.org/en/testnet-faucet</a></li>
-        <li>Liitä lompakko-osoitteesi (kopioi se MetaMaskista)</li>
-        <li>Pyydä tBNB:tä — saat yleensä 0.1–0.3 tBNB kerran 24h:ssa</li>
+        <li data-i18n="guide.faucet1">Liitä lompakko-osoitteesi (kopioi se MetaMaskista)</li>
+        <li data-i18n="guide.faucet2">Pyydä tBNB:tä — saat yleensä 0.1–0.3 tBNB kerran 24h:ssa</li>
       </ol>
       <div class="warn-note">
         <strong>Huom:</strong> virallinen faucet vaatii pienen (0.002 BNB) saldon BSC:n <em>mainnetissä</em> bottien torjuntaa varten. Jos sinulla ei ole mainnet-BNB:tä, kokeile vaihtoehtoisia faucetteja alla.
@@ -171,11 +171,11 @@
       <div class="link-grid">
         <a href="https://faucets.chain.link/bnb-chain-testnet" target="_blank" rel="noopener" class="link-card">
           <div class="name">Chainlink Faucet</div>
-          <div class="desc">Ei vaadi mainnet-saldoa</div>
+          <div class="desc" data-i18n="guide.noMainnet">Ei vaadi mainnet-saldoa</div>
         </a>
         <a href="https://faucet.quicknode.com/binance-smart-chain/bnb-testnet" target="_blank" rel="noopener" class="link-card">
           <div class="name">QuickNode Faucet</div>
-          <div class="desc">Vaihtoehtoinen lähde</div>
+          <div class="desc"><span data-i18n="guide.altSource">Alternative source</span></div>
         </a>
       </div>
     </div>
@@ -221,7 +221,7 @@
   }
 
   async function addNetwork() {
-    if (!window.ethereum) { toast("MetaMask ei löytynyt selaimesta.", "error"); return; }
+    if (!window.ethereum) { toast(t("guide.noMetamask"), "error"); return; }
     try {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
@@ -233,7 +233,7 @@
           blockExplorerUrls: ['https://testnet.bscscan.com']
         }]
       });
-      toast("BSC Testnet lisätty MetaMaskiin!", "success");
+      toast(t("guide.netAdded"), "success");
     } catch (e) {
       toast("Verkon lisäys epäonnistui: " + e.message, "error");
     }

@@ -94,7 +94,7 @@
     <div class="user-pill">
       <div class="dot"></div>
       <span id="usernameDisplay">–</span>
-      <button onclick="logout()">Kirjaudu ulos</button>
+      <button onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
     </div>
   </header>
 
@@ -116,7 +116,7 @@
   </div>
 
   <h2 class="section-title display" data-i18n="staking.chooseTier">Valitse taso</h2>
-  <div class="tiers-grid" id="tiersGrid"><div class="empty-note">Ladataan…</div></div>
+  <div class="tiers-grid" id="tiersGrid"><div class="empty-note" data-i18n="staking.loading">Ladataan…</div></div>
 
   <div class="stake-box">
     <div class="input-row">
@@ -129,8 +129,8 @@
     <button class="btn-block" id="stakeBtn" onclick="doStake()" disabled data-i18n="staking.chooseBtn">Valitse taso ensin</button>
   </div>
 
-  <h2 class="section-title display">Omat stake-positiot</h2>
-  <div class="positions-list" id="positionsList"><div class="empty-note">Ladataan…</div></div>
+  <h2 class="section-title display" data-i18n="staking.myPositions">Omat stake-positiot</h2>
+  <div class="positions-list" id="positionsList"><div class="empty-note" data-i18n="staking.loading">Ladataan…</div></div>
 </div>
 
 <div id="toastHost"></div>
@@ -202,7 +202,7 @@
         }
       } catch (_) {}
     } catch (e) {
-      toast('Saldon haku epäonnistui: ' + e.message, 'error');
+      toast(t('staking.balanceFail') + ': ' + e.message, 'error');
     }
   }
 
@@ -213,7 +213,7 @@
       tiersCache = data.tiers.filter(t => t.active);
       renderTiers();
     } catch (e) {
-      document.getElementById('tiersGrid').innerHTML = '<div class="empty-note">Tasojen haku epäonnistui.</div>';
+      document.getElementById('tiersGrid').innerHTML = '<div class="empty-note">' + t('staking.tiersFail') + '</div>';
     }
   }
 
@@ -248,7 +248,7 @@
   async function doStake() {
     if (selectedTierId === null) { toast('Valitse taso ensin.', 'error'); return; }
     const val = document.getElementById('stakeAmount').value;
-    if (!val || parseFloat(val) <= 0) { toast('Syötä kelvollinen määrä.', 'error'); return; }
+    if (!val || parseFloat(val) <= 0) { toast(t('staking.enterAmount'), 'error'); return; }
 
     const btn = document.getElementById('stakeBtn');
     btn.disabled = true; btn.textContent = 'Vahvistetaan…';
@@ -271,7 +271,7 @@
       const data = await apiGet('/api/staking/positions');
       const active = data.positions.filter(p => !p.withdrawn);
       if (active.length === 0) {
-        listEl.innerHTML = '<div class="empty-note">Ei vielä aktiivisia stake-positioita.</div>';
+        listEl.innerHTML = '<div class="empty-note">' + t('staking.noActive') + '</div>';
         return;
       }
       const now = Math.floor(Date.now() / 1000);
@@ -313,7 +313,7 @@
   }
 
   async function handleEarlyWithdraw(index) {
-    if (!confirm('Menetät tämän position tuoton kokonaan. Jatketaanko?')) return;
+    if (!confirm(t('staking.confirmEarly'))) return;
     try {
       await apiPost('/api/staking/early-withdraw', { stakeIndex: index });
       toast(t('staking.earlyOk'), 'success');

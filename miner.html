@@ -81,7 +81,7 @@
     <div class="user-pill">
       <div class="dot"></div>
       <span id="usernameDisplay">–</span>
-      <button onclick="logout()">Kirjaudu ulos</button>
+      <button onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
     </div>
   </header>
 
@@ -209,10 +209,10 @@
     const progress = 1 - (remaining / MINING_DURATION_MS);
     gaugeFill.style.strokeDashoffset = GAUGE_CIRCUMFERENCE * (1 - progress);
     gaugeFill.classList.remove('idle');
-    gaugeStatus.textContent = "Louhinta käynnissä";
+    gaugeStatus.textContent = t("miner.running");
     gaugeStatus.className = "status-badge active";
     actionBtn.disabled = true;
-    actionBtn.textContent = "Louhinta käynnissä…";
+    actionBtn.textContent = t("miner.runningBtn");
     actionBtn.dataset.mode = "wait";
   }
 
@@ -248,7 +248,7 @@
       await fetchHelPrice();
       document.getElementById('walletUsd').textContent = fmtUsdAmt(helAmt, lastHelPrice);
     } catch (e) {
-      toast('Saldon haku epäonnistui: ' + e.message, 'error');
+      toast(t('miner.balanceFail') + ': ' + e.message, 'error');
     }
   }
 
@@ -263,7 +263,7 @@
       await fetchHelPrice();
       document.getElementById('minedUsd').textContent = fmtUsdAmt(mined, lastHelPrice);
     } catch (e) {
-      toast('Kaivostilan haku epäonnistui: ' + e.message, 'error');
+      toast(t('miner.statusFail') + ': ' + e.message, 'error');
     }
     startGaugeClock();
   }
