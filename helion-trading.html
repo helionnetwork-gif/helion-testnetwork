@@ -286,6 +286,12 @@
       try {
         const data = await apiGet(`/api/trading/quote?direction=${direction}&amount=${val}`, false);
         document.getElementById('toAmount').value = data.amountOut;
+        const ri = document.getElementById('routeInfo');
+        if (ri) {
+          const v = data.venue || '–';
+          const alt = (data.routes || []).filter(r => r.ok).map(r => r.venue + ': ' + r.amountOut).join(' · ');
+          ri.textContent = (v === 'helion' ? 'Helion pool' : v === 'pancake' ? 'Pancake (varalla)' : v) + (alt ? ' | ' + alt : '');
+        }
         const feeNum = parseFloat(data.fee) || 0;
         const outNum = parseFloat(data.amountOut) || 0;
         const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
@@ -297,6 +303,7 @@
       } catch (e) {
         document.getElementById('toAmount').value = '';
         document.getElementById('feeInfo').textContent = t('swap.noLiq');
+        const ri = document.getElementById('routeInfo'); if (ri) ri.textContent = '–';
         document.getElementById('feeUsd').textContent = '–';
         document.getElementById('outUsd').textContent = '–';
       }
