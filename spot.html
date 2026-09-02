@@ -119,14 +119,14 @@ a{color:inherit;text-decoration:none;}
     <img src="logo.jpg" alt="">
     <div>
       <h1 class="display" data-i18n="spot.title">Helion Spot</h1>
-      <span data-i18n="spot.subtitle">BTC/USDT · Matching Engine</span>
+      <span data-i18n="spot.subtitle">HEL/BNB · Pool + book</span>
     </div>
   </div>
   <div class="ticker-strip">
     <div><span class="muted" style="color:var(--muted)">Last</span> <span class="px" id="lastPx">–</span></div>
     <div>Bid <span class="mono c-buy" id="bidPx">–</span></div>
     <div>Ask <span class="mono c-sell" id="askPx">–</span></div>
-    <div>Oracle <span class="mono" id="oraclePx" style="color:var(--muted)">–</span></div>
+    <div>Pool <span class="mono" id="oraclePx" style="color:var(--muted)">–</span></div>
   </div>
   <nav class="nav">
     <a href="miner.html"><span data-i18n="nav.miner">⛏ Miner</span></a>
@@ -140,13 +140,13 @@ a{color:inherit;text-decoration:none;}
   <div class="user"><span id="userLabel">–</span><button onclick="logout()" data-i18n="spot.logout">Logout</button></div>
 </div>
 
-<div class="banner" data-i18n="spot.banner">Testnet terminal · internal matching · market maker · maker 0.08% / taker 0.1%</div>
+<div class="banner" data-i18n="spot.banner">HEL/BNB · book matches first, leftover market fills the Helion AMM pool</div>
 
 <div class="terminal">
   <!-- LEFT: vertical order book -->
   <div class="panel">
     <div class="panel-h"><b data-i18n="spot.orderBook">Order Book</b><span class="mono" id="spreadLbl">spread –</span></div>
-    <div class="ob-head"><span data-i18n="spot.priceUsdt">Price (USDT)</span><span data-i18n="spot.sizeBtc">Size (BTC)</span><span data-i18n="spot.total">Total</span></div>
+    <div class="ob-head"><span data-i18n="spot.priceUsdt">Price (BNB)</span><span data-i18n="spot.sizeBtc">Size (HEL)</span><span data-i18n="spot.total">Total</span></div>
     <div class="ob">
       <div class="ob-asks" id="asksBox"></div>
       <div class="ob-mid">
@@ -160,8 +160,8 @@ a{color:inherit;text-decoration:none;}
   <!-- CENTER -->
   <div class="panel">
     <div class="center-top">
-      <div class="stat"><div class="l"><span data-i18n="spot.usdtAvail">USDT Available</span></div><div class="v" id="balUsdt">–</div></div>
-      <div class="stat"><div class="l"><span data-i18n="spot.btcAvail">BTC Available</span></div><div class="v" id="balBtc">–</div></div>
+      <div class="stat"><div class="l"><span data-i18n="spot.usdtAvail">BNB Available</span></div><div class="v" id="balUsdt">–</div></div>
+      <div class="stat"><div class="l"><span data-i18n="spot.btcAvail">HEL Available</span></div><div class="v" id="balBtc">–</div></div>
       <div class="stat"><div class="l" data-i18n="spot.locked">Locked</div><div class="v" id="balLocked">–</div></div>
       <div class="stat"><div class="l" data-i18n="spot.equity">Equity</div><div class="v" id="balEq">–</div></div>
     </div>
@@ -176,7 +176,7 @@ a{color:inherit;text-decoration:none;}
 
   <!-- RIGHT: order ticket -->
   <div class="panel">
-    <div class="panel-h"><b data-i18n="spot.orderTicket">Order Ticket</b><span>BTC/USDT</span></div>
+    <div class="panel-h"><b data-i18n="spot.orderTicket">Order Ticket</b><span>HEL/BNB</span></div>
     <div class="form">
       <div class="side-toggle">
         <button class="buy on" id="btnBuy" onclick="setSide('BUY')" data-i18n="common.buy">Buy</button>
@@ -191,15 +191,15 @@ a{color:inherit;text-decoration:none;}
 
       <div class="field" id="fStop" style="display:none;">
         <label data-i18n="spot.stopPrice">Stop Price <span id="availStop"></span></label>
-        <div class="box"><input type="number" id="stopPrice" placeholder="0.00" step="0.01"><span class="u">USDT</span></div>
+        <div class="box"><input type="number" id="stopPrice" placeholder="0.00" step="0.01"><span class="u">BNB</span></div>
       </div>
       <div class="field" id="fPrice">
         <label><span data-i18n="common.price">Price</span> <span id="availPrice"></span></label>
-        <div class="box"><input type="number" id="limitPrice" placeholder="0.00" step="0.01"><span class="u">USDT</span></div>
+        <div class="box"><input type="number" id="limitPrice" placeholder="0.00" step="0.01"><span class="u">BNB</span></div>
       </div>
       <div class="field">
         <label><span data-i18n="spot.amount">Amount</span> <span id="availAmt"></span></label>
-        <div class="box"><input type="number" id="qty" placeholder="0.0000" step="0.0001"><span class="u">BTC</span></div>
+        <div class="box"><input type="number" id="qty" placeholder="0.0000" step="0.0001"><span class="u">HEL</span></div>
       </div>
       <div class="pcts">
         <button type="button" onclick="setPct(0.25)">25%</button>
@@ -209,9 +209,9 @@ a{color:inherit;text-decoration:none;}
       </div>
       <div class="field">
         <label data-i18n="spot.totalEst">Total (est.)</label>
-        <div class="box"><input type="text" id="totalEst" readonly placeholder="–"><span class="u">USDT</span></div>
+        <div class="box"><input type="text" id="totalEst" readonly placeholder="–"><span class="u">BNB</span></div>
       </div>
-      <button class="submit buy" id="submitBtn" onclick="submitOrder()" data-i18n="spot.buyBtc">Buy BTC</button>
+      <button class="submit buy" id="submitBtn" onclick="submitOrder()" data-i18n="spot.buyBtc">Buy HEL</button>
       <p class="hint" id="typeHint">Limit: order rests on the book until filled or cancelled.</p>
     </div>
   </div>
@@ -265,7 +265,7 @@ document.getElementById('userLabel').textContent = '@' + (username || '–');
 
 let side = 'BUY';
 let orderType = 'LIMIT';
-let balances = { USDT: 0, BTC: 0, USDT_LOCKED: 0, BTC_LOCKED: 0 };
+let balances = { BNB: 0, HEL: 0, BNB_LOCKED: 0, HEL_LOCKED: 0 };
 let lastPrice = 0;
 
 function auth() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
@@ -291,7 +291,7 @@ function setSide(s) {
   document.getElementById('btnBuy').classList.toggle('on', s === 'BUY');
   document.getElementById('btnSell').classList.toggle('on', s === 'SELL');
   const btn = document.getElementById('submitBtn');
-  btn.textContent = (window.t ? t(s === 'BUY' ? 'spot.buyBtc' : 'spot.sellBtc') : ((s === 'BUY' ? 'Buy' : 'Sell') + ' BTC'));
+  btn.textContent = (s === 'BUY' ? 'Buy HEL' : 'Sell HEL');
   btn.className = 'submit ' + (s === 'BUY' ? 'buy' : 'sell');
   updateAvailLabels();
   calcTotal();
@@ -316,7 +316,7 @@ function setType(t) {
 
   const hints = {
     LIMIT: 'Limit: rests on the book until filled or cancelled.',
-    MARKET: 'Market: fills immediately against the best opposite orders.',
+    MARKET: 'Market: fills the book first, leftover against the Helion HEL/BNB pool.',
     STOP_LIMIT: 'Stop Limit: when stop triggers, a limit order is placed.',
     STOP_MARKET: 'Stop Market: when stop triggers, a market order is sent.'
   };
@@ -326,17 +326,17 @@ function setType(t) {
 
 function updateAvailLabels() {
   document.getElementById('availAmt').textContent =
-    side === 'SELL' ? ('Avail ' + fmt(balances.BTC, 6) + ' BTC') : '';
+    side === 'SELL' ? ('Avail ' + fmt(balances.HEL, 4) + ' HEL') : '';
   document.getElementById('availPrice').textContent =
-    side === 'BUY' ? ('Avail ' + fmt(balances.USDT, 2) + ' USDT') : '';
+    side === 'BUY' ? ('Avail ' + fmt(balances.BNB, 6) + ' BNB') : '';
 }
 
 function setPct(p) {
   if (side === 'SELL') {
-    document.getElementById('qty').value = (balances.BTC * p).toFixed(6);
+    document.getElementById('qty').value = (balances.HEL * p).toFixed(4);
   } else {
     const px = Number(document.getElementById('limitPrice').value) || lastPrice;
-    if (px > 0) document.getElementById('qty').value = ((balances.USDT * p) / px).toFixed(6);
+    if (px > 0) document.getElementById('qty').value = ((balances.BNB * p) / px).toFixed(4);
   }
   calcTotal();
 }
@@ -345,7 +345,7 @@ function calcTotal() {
   const qty = Number(document.getElementById('qty').value) || 0;
   let px = Number(document.getElementById('limitPrice').value) || lastPrice;
   if (orderType === 'MARKET') px = lastPrice;
-  document.getElementById('totalEst').value = px && qty ? fmt(px * qty, 2) : '';
+  document.getElementById('totalEst').value = px && qty ? fmt(px * qty, 6) : '';
 }
 document.getElementById('qty').addEventListener('input', calcTotal);
 document.getElementById('limitPrice').addEventListener('input', calcTotal);
@@ -367,7 +367,7 @@ function renderBook(book) {
     const pct = (o.quantity / maxQ) * 100;
     return `<div class="ob-row ask" onclick="clickPrice(${o.price})">
       <div class="bar" style="width:${pct}%"></div>
-      <span class="p">${fmt(o.price,2)}</span>
+      <span class="p">${fmt(o.price,8)}</span>
       <span>${fmt(o.quantity,5)}</span>
       <span>${fmt(o.price*o.quantity,2)}</span>
     </div>`;
@@ -378,7 +378,7 @@ function renderBook(book) {
     const pct = (o.quantity / maxQ) * 100;
     return `<div class="ob-row bid" onclick="clickPrice(${o.price})">
       <div class="bar" style="width:${pct}%"></div>
-      <span class="p">${fmt(o.price,2)}</span>
+      <span class="p">${fmt(o.price,8)}</span>
       <span>${fmt(o.quantity,5)}</span>
       <span>${fmt(o.price*o.quantity,2)}</span>
     </div>`;
@@ -390,10 +390,10 @@ function renderBook(book) {
   if (bestBid && bestAsk) {
     const mid = (bestBid + bestAsk) / 2;
     lastPrice = mid;
-    document.getElementById('midPx').textContent = fmt(mid, 2);
-    document.getElementById('lastPx').textContent = fmt(mid, 2);
-    document.getElementById('bidPx').textContent = fmt(bestBid, 2);
-    document.getElementById('askPx').textContent = fmt(bestAsk, 2);
+    document.getElementById('midPx').textContent = fmt(mid, 8);
+    document.getElementById('lastPx').textContent = fmt(mid, 8);
+    document.getElementById('bidPx').textContent = fmt(bestBid, 8);
+    document.getElementById('askPx').textContent = fmt(bestAsk, 8);
     const spr = ((bestAsk - bestBid) / mid * 100);
     document.getElementById('spreadLbl').textContent = 'spread ' + spr.toFixed(3) + '%';
   }
@@ -417,15 +417,15 @@ async function refreshTicker() {
     const res = await fetch(BACKEND_URL + '/api/spot/ticker');
     const d = await res.json();
     if (!res.ok) return;
-    if (d.oracle?.price) document.getElementById('oraclePx').textContent = fmt(d.oracle.price, 2);
-    else if (d.price) document.getElementById('oraclePx').textContent = fmt(d.price, 2);
+    if (d.oracle?.price) document.getElementById('oraclePx').textContent = fmt(d.oracle.price, 8);
+    else if (d.price) document.getElementById('oraclePx').textContent = fmt(d.price, 8);
     if (d.price) {
       lastPrice = d.price;
-      document.getElementById('lastPx').textContent = fmt(d.price, 2);
-      document.getElementById('midPx').textContent = fmt(d.price, 2);
+      document.getElementById('lastPx').textContent = fmt(d.price, 8);
+      document.getElementById('midPx').textContent = fmt(d.price, 8);
     }
-    if (d.bid) document.getElementById('bidPx').textContent = fmt(d.bid, 2);
-    if (d.ask) document.getElementById('askPx').textContent = fmt(d.ask, 2);
+    if (d.bid) document.getElementById('bidPx').textContent = fmt(d.bid, 8);
+    if (d.ask) document.getElementById('askPx').textContent = fmt(d.ask, 8);
   } catch (_) {}
 }
 
@@ -435,11 +435,11 @@ async function refreshAccount() {
     const d = await res.json();
     if (!res.ok) throw new Error(d.error || 'account');
     balances = d.balances || balances;
-    document.getElementById('balUsdt').textContent = fmt(balances.USDT, 2);
-    document.getElementById('balBtc').textContent = fmt(balances.BTC, 6);
+    document.getElementById('balUsdt').textContent = fmt(balances.BNB, 6);
+    document.getElementById('balBtc').textContent = fmt(balances.HEL, 4);
     document.getElementById('balLocked').textContent =
-      fmt(balances.USDT_LOCKED, 2) + ' U / ' + fmt(balances.BTC_LOCKED, 5) + ' B';
-    document.getElementById('balEq').textContent = '$' + fmt(d.equity, 2);
+      fmt(balances.BNB_LOCKED, 6) + ' BNB / ' + fmt(balances.HEL_LOCKED, 4) + ' HEL';
+    document.getElementById('balEq').textContent = fmt(d.equity, 6) + ' BNB';
     updateAvailLabels();
 
     const open = (d.openOrders || []).filter(o => o.type === 'LIMIT' || !o.type || o.status === 'NEW');
@@ -449,7 +449,7 @@ async function refreshAccount() {
         <td>${new Date(o.time).toLocaleTimeString()}</td>
         <td class="${o.side==='BUY'?'c-buy':'c-sell'}">${o.side}</td>
         <td>${o.type || 'LIMIT'}</td>
-        <td>${fmt(o.price,2)}</td>
+        <td>${fmt(o.price,8)}</td>
         <td>${fmt(o.quantity || o.remaining,6)}</td>
         <td>${o.status || 'NEW'}</td>
         <td><button class="link" onclick="cancelOrder('${o.id}')">Cancel</button></td>
@@ -460,15 +460,15 @@ async function refreshAccount() {
         <td>${new Date(o.time).toLocaleTimeString()}</td>
         <td class="${o.side==='BUY'?'c-buy':'c-sell'}">${o.side}</td>
         <td>${o.type}</td>
-        <td>${fmt(o.stopPrice,2)}</td>
-        <td>${o.price != null ? fmt(o.price,2) : '–'}</td>
+        <td>${fmt(o.stopPrice,8)}</td>
+        <td>${o.price != null ? fmt(o.price,8) : '–'}</td>
         <td>${fmt(o.quantity,6)}</td>
         <td><button class="link" onclick="cancelOrder('${o.id}')">Cancel</button></td>
       </tr>`).join('') : '<tr><td colspan="7" style="color:var(--muted);padding:12px;">No stop orders</td></tr>';
 
     document.getElementById('balBody').innerHTML = `
-      <tr><td>USDT</td><td>${fmt(balances.USDT,2)}</td><td>${fmt(balances.USDT_LOCKED,2)}</td><td>${fmt((balances.USDT||0)+(balances.USDT_LOCKED||0),2)}</td></tr>
-      <tr><td>BTC</td><td>${fmt(balances.BTC,6)}</td><td>${fmt(balances.BTC_LOCKED,6)}</td><td>${fmt((balances.BTC||0)+(balances.BTC_LOCKED||0),6)}</td></tr>`;
+      <tr><td>BNB</td><td>${fmt(balances.BNB,6)}</td><td>${fmt(balances.BNB_LOCKED,6)}</td><td>${fmt((balances.BNB||0)+(balances.BNB_LOCKED||0),6)}</td></tr>
+      <tr><td>HEL</td><td>${fmt(balances.HEL,4)}</td><td>${fmt(balances.HEL_LOCKED,4)}</td><td>${fmt((balances.HEL||0)+(balances.HEL_LOCKED||0),4)}</td></tr>`;
   } catch (e) {
     toast('Account: ' + e.message, false);
   }
@@ -486,7 +486,7 @@ async function refreshTrades() {
       return `<tr>
         <td>${new Date(tr.time).toLocaleTimeString()}</td>
         <td class="${side==='BUY'?'c-buy':'c-sell'}">${side}</td>
-        <td>${fmt(tr.price,2)}</td>
+        <td>${fmt(tr.price,8)}</td>
         <td>${fmt(tr.quantity,6)}</td>
         <td>${fee != null ? fmt(fee,4) : '–'}</td>
       </tr>`;
@@ -501,7 +501,7 @@ async function refreshTrades() {
     const rows = (d.trades || []).slice(0, 30).map(tr => `
       <tr>
         <td>${new Date(tr.time).toLocaleTimeString()}</td>
-        <td class="${tr.takerSide==='BUY'?'c-buy':'c-sell'}">${fmt(tr.price,2)}</td>
+        <td class="${tr.takerSide==='BUY'?'c-buy':'c-sell'}">${fmt(tr.price,8)}</td>
         <td>${fmt(tr.quantity,5)}</td>
         <td class="${tr.takerSide==='BUY'?'c-buy':'c-sell'}">${tr.takerSide || ''}</td>
       </tr>`).join('');
@@ -525,7 +525,7 @@ async function submitOrder() {
     });
     const d = await res.json();
     if (!res.ok) throw new Error(d.error || 'Order rejected');
-    toast((orderType + ' ' + side + ' · ' + (d.status || 'OK')), true);
+    toast((orderType + ' ' + side + ' · ' + (d.status || 'OK') + (d.poolFill ? ' · pool' : '')), true);
     document.getElementById('qty').value = '';
     await refreshAccount();
     await refreshDepth();
