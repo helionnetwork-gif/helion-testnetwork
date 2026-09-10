@@ -99,12 +99,12 @@
   </header>
 
   <nav class="site-nav">
-    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Miner</span></a>
+    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
     <a href="staking.html" class="nav-item active"><span data-i18n="nav.staking">🔒 Staking</span></a>
-    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Swap</span></a>
+    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
     <a href="spot.html" class="nav-item"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Wallet</span></a>
-    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Board</span></a>
+    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
+    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Ranking</span></a>
     <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
   </nav>
 
@@ -267,7 +267,7 @@
       await refreshWallet();
       await loadPositions();
     } catch (e) {
-      toast('Virhe: ' + e.message, 'error');
+      toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error');
     } finally {
       btn.disabled = false; btn.textContent = t('staking.stake');
     }
@@ -316,7 +316,7 @@
       await refreshWallet();
       await loadPositions();
     } catch (e) {
-      toast('Virhe: ' + e.message, 'error');
+      toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error');
     }
   }
 
@@ -328,7 +328,7 @@
       await refreshWallet();
       await loadPositions();
     } catch (e) {
-      toast('Virhe: ' + e.message, 'error');
+      toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error');
     }
   }
 

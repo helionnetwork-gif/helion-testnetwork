@@ -20,7 +20,7 @@
     padding: 32px 20px 80px;
   }
   .display{ font-family:'Chakra Petch', sans-serif; }
-  .wrap{ max-width: 460px; margin: 0 auto; }
+  .wrap{ max-width: 760px; margin: 0 auto; }
 
   header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
   .brand{ display:flex; align-items:center; gap: 10px; }
@@ -85,12 +85,12 @@
   </header>
 
   <nav class="site-nav">
-    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Miner</span></a>
+    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
     <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
-    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Swap</span></a>
+    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
     <a href="spot.html" class="nav-item"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html" class="nav-item active"><span data-i18n="nav.wallet">💼 Wallet</span></a>
-    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Board</span></a>
+    <a href="wallet.html" class="nav-item active"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
+    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Ranking</span></a>
     <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
   </nav>
 
@@ -173,7 +173,7 @@
       try {
         const priceRes = await fetch(BACKEND_URL + '/api/prices');
         const prices = await priceRes.json();
-        if (!priceRes.ok) throw new Error(prices.error || 'Hinnat epäonnistui');
+        if (!priceRes.ok) throw new Error(prices.error || (typeof t==='function'?t('wallet.pricesFail'):'prices failed'));
 
         document.getElementById('priceBnb').textContent = fmtUsd(prices.bnbUsd);
         if (prices.poolExists && prices.helUsd > 0) {
@@ -194,7 +194,7 @@
         document.getElementById('bnbUsd').textContent = '–';
       }
     } catch (e) {
-      toast('Saldon haku epäonnistui: ' + e.message, 'error');
+      toast((typeof t==='function'?t('wallet.balanceFail'):'Balance failed') + ': ' + e.message, 'error');
     }
   }
 
@@ -230,13 +230,13 @@
       const data = await res.json();
       if (!res.ok) { toast(data.error || t('wallet.transferFail'), 'error'); return; }
 
-      const feeText = parseFloat(data.fee) > 0 ? ` (fee: ${data.fee} HEL)` : ' (sisäinen, ei fee:tä)';
-      toast(`✅ Lähetetty ${data.sentAmount} HEL → ${data.recipient}${feeText}`, 'success');
+      const feeText = parseFloat(data.fee) > 0 ? ` (fee: ${data.fee} HEL)` : ' (' + (typeof t==='function'?t('wallet.feeInternalNote'):'internal') + ')';
+      toast('✅ ' + (typeof t==='function'?t('wallet.sentOk'):'Sent') + ` ${data.sentAmount} HEL → ${data.recipient}${feeText}`, 'success');
       document.getElementById('recipientInput').value = '';
       document.getElementById('amountInput').value = '';
       refreshWallet();
     } catch (e) {
-      toast('Yhteysvirhe: ' + e.message, 'error');
+      toast((typeof t==='function'?t('common.connectionError'):'Connection error') + ': ' + e.message, 'error');
     } finally {
       btn.disabled = false; btn.textContent = t('wallet.send');
     }
@@ -245,7 +245,7 @@
   async function linkWallet() {
     if (!window.ethereum) { toast(t('index.noMetamask'), 'error'); return; }
     const btn = document.getElementById('linkWalletBtn');
-    btn.disabled = true; btn.textContent = 'Odotetaan MetaMaskia…';
+    btn.disabled = true; btn.textContent = (typeof t==='function'?t('common.waitingMetamask'):'Waiting…');
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send('eth_requestAccounts', []);
@@ -268,7 +268,7 @@
       toast(t('wallet.linkedOk'), 'success');
       loadLinkedWallets();
     } catch (e) {
-      toast('Virhe: ' + (e.reason || e.message), 'error');
+      toast((typeof t==='function'?t('common.error'):'Error') + ': ' + (e.reason || e.message), 'error');
     } finally {
       btn.disabled = false; btn.textContent = '🦊 ' + t('wallet.linkMeta');
     }

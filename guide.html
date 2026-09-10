@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Helion — Ohjeet</title>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -17,239 +16,374 @@
   body{
     background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
     color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
-    padding: 32px 20px 80px;
+    padding: 32px 20px 80px; line-height: 1.5;
   }
-  .mono{ font-family:'JetBrains Mono', monospace; }
   .display{ font-family:'Chakra Petch', sans-serif; }
-  .wrap{ max-width: 680px; margin: 0 auto; }
-
-  header{ display:flex; align-items:center; gap: 12px; margin-bottom: 20px; }
+  .wrap{ max-width: 760px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+  [data-lang-only]{ width: 100%; max-width: 100%; }
+  .section, .intro{ max-width: 100%; box-sizing: border-box; }
+  header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
+  .brand{ display:flex; align-items:center; gap: 12px; }
+  .brand h1{ font-size: 22px; }
+  .brand .tag{ font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;}
   .brand-logo{ height: 40px; width: 40px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 16px rgba(242,169,59,0.35); }
-  header h1{ font-size: 21px; }
-  header .tag{ font-size: 11px; color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase; margin-top:2px; }
-
-  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:28px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
-  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; transition: all .15s ease; min-width:70px; }
-  .site-nav .nav-item:hover{ color: var(--text); }
+  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
+  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
   .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
-
-  .intro-card{
-    background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 22px;
-    margin-bottom: 28px; font-size: 13.5px; color: var(--muted); line-height: 1.7;
+  .intro{
+    background: var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px;
+    font-size: 13px; color: var(--muted);
   }
-  .intro-card strong{ color: var(--text); }
-
-  .step-section{ margin-bottom: 30px; }
-  .step-header{ display:flex; align-items:center; gap:12px; margin-bottom: 14px; }
-  .step-number{
-    width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(180deg, var(--gold), #d68f26);
-    color:#1a1305; display:flex; align-items:center; justify-content:center; font-family:'Chakra Petch',sans-serif;
-    font-weight:700; font-size:14px; flex-shrink:0;
+  .intro strong{ color: var(--text); }
+  .toc{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .toc a{
+    font-size:11px; padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+    background: var(--panel-2); color: var(--gold); text-decoration:none; font-weight:600;
   }
-  .step-header h2{ font-size: 16px; }
-
-  .step-card{
-    background: var(--panel); border:1px solid var(--line); border-radius: 18px; padding: 20px 22px;
-    margin-left: 42px; font-size: 13.5px; line-height: 1.7; color: var(--text);
+  .section{
+    background: var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin-bottom:12px;
   }
-  .step-card p{ margin-bottom: 10px; }
-  .step-card p:last-child{ margin-bottom: 0; }
-  .step-card a{ color: var(--gold); }
-  .step-card ol, .step-card ul{ margin: 10px 0 10px 20px; color: var(--muted); }
-  .step-card li{ margin-bottom: 6px; }
-  .step-card li strong{ color: var(--text); }
-
-  .param-table{ width:100%; border-collapse: collapse; margin: 12px 0; font-size: 12.5px; }
-  .param-table td{ padding: 8px 10px; border-bottom: 1px solid var(--line); }
-  .param-table td:first-child{ color: var(--muted); width: 40%; }
-  .param-table td:last-child{ font-family:'JetBrains Mono',monospace; color: var(--gold); word-break: break-all; }
-
-  .btn-gold{
-    background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; border:none;
-    padding: 12px 20px; border-radius: 12px; font-family:'Chakra Petch',sans-serif; font-weight:700;
-    font-size: 13px; cursor:pointer; margin-top: 8px;
+  .section h2{
+    font-family:'Chakra Petch',sans-serif; font-size:15px; color: var(--gold); margin-bottom:8px;
   }
-  .btn-gold:hover{ opacity: 0.92; }
-  .btn-gold:disabled{ opacity:0.5; cursor:not-allowed; }
-
-  .warn-note{
-    background: rgba(242,169,59,0.08); border:1px solid var(--gold); border-radius: 10px;
-    padding: 10px 14px; font-size: 11.5px; color: var(--muted); margin-top: 10px; line-height:1.5;
+  .section h3{ font-size:13px; margin:12px 0 6px; color: var(--text); }
+  .section p, .section li{ font-size:12.5px; color: var(--muted); margin-bottom:6px; }
+  .section ol, .section ul{ padding-left: 1.25rem; margin-bottom: 10px; }
+  .section a{ color: var(--gold); }
+  .callout{
+    background: rgba(242,169,59,0.08); border:1px solid rgba(242,169,59,0.25);
+    border-radius:10px; padding:10px 12px; margin:10px 0; font-size:12.5px; color: var(--text);
   }
-  .warn-note strong{ color: var(--gold); }
-
-  .link-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-  @media (max-width: 500px){ .link-grid{ grid-template-columns: 1fr; } }
-  .link-card{
-    background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px;
-    text-decoration:none; color: var(--text); display:block;
+  .callout.warn{
+    background: rgba(229,72,77,0.08); border-color: rgba(229,72,77,0.35);
   }
-  .link-card .name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size: 13px; color: var(--gold); margin-bottom:4px; }
-  .link-card .desc{ font-size: 11.5px; color: var(--muted); }
-
-  .contracts-table{ width:100%; border-collapse: collapse; font-size: 11.5px; }
-  .contracts-table td{ padding: 9px 8px; border-bottom: 1px solid var(--line); }
-  .contracts-table td:first-child{ color: var(--muted); white-space:nowrap; }
-  .contracts-table td:last-child{ font-family:'JetBrains Mono',monospace; color: var(--text); word-break: break-all; font-size:11px; }
-
-  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
-  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; display:flex; gap:10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-  .toast.success{ border-color: rgba(61,214,140,0.4); }
-  .toast.error{ border-color: rgba(229,72,77,0.4); }
-
-.helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line,#262B35);border-radius:999px;padding:2px;background:var(--panel,#14171D);margin-left:8px;}
-.helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
-.helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
-
+  code, .mono{
+    font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--panel-2);
+    padding:2px 6px; border-radius:6px; color: var(--text);
+  }
+  .btn{
+    display:inline-block; margin-top:8px; margin-right:8px; padding:10px 16px; border-radius:12px;
+    background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; font-weight:700;
+    font-family:'Chakra Petch',sans-serif; font-size:13px; text-decoration:none; border:none; cursor:pointer;
+  }
+  .btn.secondary{
+    background: #1B1F27;
+    color: #F5F3EE !important;
+    border: 1px solid #F2A93B;
+  }
+  .btn.secondary:hover{
+    background: rgba(242,169,59,0.15);
+    color: #F2A93B !important;
+  }
+  table{ width:100%; border-collapse:collapse; font-size:12.5px; margin:10px 0; }
+  th, td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); color: var(--muted); }
+  th{ color: var(--text); font-weight:600; }
+  .helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--panel);margin-left:8px;}
+  .helion-lang-switch button{border:none;background:transparent;color:var(--muted);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
+  .helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold);}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <img src="logo.jpg" alt="Helion" class="brand-logo">
-    <div>
-      <h1 class="display"><span data-i18n="guide.pageTitle">Ohjeet</span></h1>
-      <div class="tag"><span data-i18n="guide.tag">Start here — BSC Testnet</span></div>
+    <div class="brand">
+      <img src="logo.jpg" alt="Helion" class="brand-logo">
+      <div>
+        <h1 class="display" data-i18n="guide.pageTitle">Ohjeet</h1>
+        <div class="tag" data-i18n="guide.tag">Aloita tästä — BSC Testnet</div>
+      </div>
     </div>
   </header>
 
   <nav class="site-nav">
-    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Miner</span></a>
+    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
     <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
-    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Swap</span></a>
+    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
     <a href="spot.html" class="nav-item"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Wallet</span></a>
-    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Board</span></a>
+    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
+    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Ranking</span></a>
     <a href="guide.html" class="nav-item active"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
   </nav>
 
-  <div class="intro-card" data-i18n-html="guide.intro">
-    <strong>Helion</strong> on testnet-projekti BSC Testnetissä (BNB Smart Chain Testnet, Chain ID 97). Kaikki tässä liikkuva raha on <strong>testi-tokeneita ilman oikeaa rahallista arvoa</strong> — täydellinen paikka kokeilla DeFi-toimintoja (staking, swap, likviditeetti) ilman riskiä. Tällä sivulla käydään läpi kaikki mitä tarvitset päästäksesi alkuun.
+    <div data-lang-only="fi">
+<div class="intro">
+    <strong>Helion</strong> on BSC Testnet -projekti (Chain ID <span class="mono">97</span>).
+    Kaikki tokenit ovat <strong>testiarvoa</strong> — ei oikeaa rahaa.
+    Helion luo sinulle <strong>custodial-lompakon</strong> (palvelin allekirjoittaa ketjutapahtumat).
+    Ketjutoiminnot (miner, stake, swap) tarvitsevat pienen määrän <strong>tBNB</strong>:tä gas-maksuihin kyseisessä lompakossa.
   </div>
 
-  <!-- STEP 1 -->
-  <div class="step-section">
-    <div class="step-header"><div class="step-number">1</div><h2 class="display" data-i18n="guide.s1">Asenna MetaMask</h2></div>
-    <div class="step-card">
-      <p data-i18n-html="guide.s1p1">MetaMask on selainlaajennus/lompakko jolla hoidat kaiken kaupankäynnin ja stakingin.</p>
-      <p data-i18n-html="guide.s1p2">Lataa se osoitteesta <a href="https://metamask.io" target="_blank" rel="noopener">metamask.io</a> — valitse oma selaimesi (Chrome, Firefox, Brave, Edge) tai mobiilisovellus. Asennuksen jälkeen luo uusi lompakko ja <strong>tallenna siemenlause (seed phrase) turvallisesti</strong> — sitä ei voi palauttaa jos se katoaa.</p>
+  <div class="toc">
+    <a href="#start">1. Tili</a>
+    <a href="#wallet">2. Lompakko</a>
+    <a href="#tbnb">3. tBNB (gas)</a>
+    <a href="#features">4. Ominaisuudet</a>
+    <a href="#network">5. MetaMask / verkko</a>
+    <a href="#faq">6. FAQ</a>
+  </div>
+
+  <section class="section" id="start">
+    <h2>1. Luo tili ja kirjaudu</h2>
+    <ol>
+      <li>Avaa <a href="index.html">kirjautumissivu</a>.</li>
+      <li>Valitse <strong>Rekisteröidy</strong>, anna käyttäjänimi ja salasana.</li>
+      <li>Rekisteröityessä Helion luo sinulle automaattisesti BSC-lompakon (custodial).</li>
+      <li>Kirjautumisen jälkeen pääset Wallet-, Miner-, Staking-, Swap- ja Spot-sivuille.</li>
+    </ol>
+    <p>Voit myöhemmin linkittää MetaMask-osoitteen Wallet-sivulla (valinnainen kirjautuminen allekirjoituksella).</p>
+  </section>
+
+  <section class="section" id="wallet">
+    <h2>2. Helion-lompakko (custodial)</h2>
+    <p>Avaa <a href="wallet.html">Wallet</a>. Näet:</p>
+    <ul>
+      <li><strong>Osoitteesi</strong> (0x…) — tämä on se lompakko, jolla miner / stake / swap toimivat</li>
+      <li><strong>HEL</strong>- ja <strong>tBNB</strong>-saldot ketjussa</li>
+      <li>Siirrot toiselle Helion-käyttäjälle (ilmainen) tai ulkoiseen 0x-osoitteeseen (fee)</li>
+    </ul>
+    <div class="callout">
+      Kopioi Wallet-sivulta <strong>oma Helion-osoitteesi</strong>. Siihen siirrät faucetista saadun tBNB:n.
+      Ilman tBNB:tä lompakossa näet virheen “tBNB-varat vähissä” kun aktivoit kaivoksen tai teet muita ketjutapahtumia.
     </div>
-  </div>
+  </section>
 
-  <!-- STEP 2 -->
-  <div class="step-section">
-    <div class="step-header"><div class="step-number">2</div><h2 class="display" data-i18n="guide.s2">Lisää BSC Testnet -verkko</h2></div>
-    <div class="step-card">
-      <p data-i18n-html="guide.s2p1">Helion toimii BSC Testnetissä, ei Ethereumin pääverkossa tai BSC:n mainnetissä. MetaMask ei näytä sitä oletuksena, joten se täytyy lisätä erikseen.</p>
+  <section class="section" id="tbnb">
+    <h2>3. Hae tBNB ja siirrä Helion-lompakkoon</h2>
+    <p>Gas maksetaan <strong>testnet-BNB:llä (tBNB)</strong>. Sitä ei osteta pörssistä — se haetaan faucetista.</p>
 
-      <button class="btn-gold" onclick="addNetwork()" id="addNetworkBtn"><span data-i18n="guide.addNetBtn">Add BSC Testnet to MetaMask automatically</span></button>
+    <h3>Vaihe A — Hae tBNB faucetista</h3>
+    <ol>
+      <li>Asenna <a href="https://metamask.io" target="_blank" rel="noopener">MetaMask</a> ja lisää <strong>BSC Testnet</strong> (ohje alla §5).</li>
+      <li>Kopioi MetaMask-osoitteesi (tai suoraan Helion-osoite, jos faucet hyväksyy sen).</li>
+      <li>Avaa faucet, liitä osoite ja pyydä tBNB:tä (usein 0.05–0.3 tBNB / 24h).</li>
+    </ol>
+    <p>
+      <a class="btn" href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noopener">BNB Chain virallinen faucet</a>
+      <a class="btn secondary" href="https://faucet.quicknode.com/binance-smart-chain/bnb-testnet" target="_blank" rel="noopener">QuickNode faucet (vaihtoehto)</a>
+      <a class="btn secondary" href="https://testnet.bscscan.com" target="_blank" rel="noopener">BscScan Testnet</a>
+    </p>
+    <p class="callout warn">
+      Jotkut faucetit vaativat pienen saldon BSC <em>mainnetissä</em> bottien torjuntaan. Jos faucet estää, kokeile toista linkkiä tai odota cooldown.
+    </p>
 
-      <p style="margin-top:16px; font-size:12px; color:var(--muted);" data-i18n="guide.manualNet">Tai lisää manuaalisesti (MetaMask → Asetukset → Verkot → Lisää verkko):</p>
-      <table class="param-table">
-        <tr><td data-i18n="guide.netName">Verkon nimi</td><td>BNB Smart Chain Testnet</td></tr>
-        <tr><td data-i18n="guide.rpc">RPC URL</td><td>https://data-seed-prebsc-1-s1.bnbchain.org:8545</td></tr>
-        <tr><td data-i18n="guide.chainId">Chain ID</td><td>97</td></tr>
-        <tr><td data-i18n="guide.symbol">Valuuttasymboli</td><td>tBNB</td></tr>
-        <tr><td data-i18n="guide.explorer">Block explorer</td><td>https://testnet.bscscan.com</td></tr>
-      </table>
+    <h3>Vaihe B — Siirrä tBNB Helion-custodial-lompakkoon</h3>
+    <ol>
+      <li>Avaa <a href="wallet.html">Wallet</a> → kopioi <strong>Helion-osoitteesi</strong> (0x…).</li>
+      <li>MetaMaskissa: verkko = <strong>BSC Testnet</strong>.</li>
+      <li>Send → liitä Helion-osoite → määrä esim. <span class="mono">0.05</span> tBNB → Confirm.</li>
+      <li>Odota vahvistus (testnet.bscscan.com). Päivitä Wallet-sivu — tBNB-saldon pitäisi näkyä.</li>
+    </ol>
+    <div class="callout">
+      <strong>Tärkeää:</strong> Jos tBNB jää vain MetaMaskiin eikä Helion-osoitteeseen, miner/stake/swap eivät toimi,
+      koska tapahtumat allekirjoitetaan custodial-avaimella.
     </div>
-  </div>
+  </section>
 
-  <!-- STEP 3 -->
-  <div class="step-section">
-    <div class="step-header"><div class="step-number">3</div><h2 class="display" data-i18n="guide.s3">Hae testi-BNB (tBNB)</h2></div>
-    <div class="step-card">
-      <p data-i18n-html="guide.s3p1">Tarvitset pienen määrän tBNB:tä maksaaksesi gas-kulut (transaktiomaksut) — ilman sitä mikään nappi ei toimi.</p>
-      <ol>
-        <li>Mene <a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noopener">bnbchain.org/en/testnet-faucet</a></li>
-        <li data-i18n="guide.faucet1">Liitä lompakko-osoitteesi (kopioi se MetaMaskista)</li>
-        <li data-i18n="guide.faucet2">Pyydä tBNB:tä — saat yleensä 0.1–0.3 tBNB kerran 24h:ssa</li>
-      </ol>
-      <div class="warn-note">
-        <strong>Huom:</strong> virallinen faucet vaatii pienen (0.002 BNB) saldon BSC:n <em>mainnetissä</em> bottien torjuntaa varten. Jos sinulla ei ole mainnet-BNB:tä, kokeile vaihtoehtoisia faucetteja alla.
-      </div>
-      <div class="link-grid">
-        <a href="https://faucets.chain.link/bnb-chain-testnet" target="_blank" rel="noopener" class="link-card">
-          <div class="name">Chainlink Faucet</div>
-          <div class="desc" data-i18n="guide.noMainnet">Ei vaadi mainnet-saldoa</div>
-        </a>
-        <a href="https://faucet.quicknode.com/binance-smart-chain/bnb-testnet" target="_blank" rel="noopener" class="link-card">
-          <div class="name">QuickNode Faucet</div>
-          <div class="desc"><span data-i18n="guide.altSource">Alternative source</span></div>
-        </a>
-      </div>
+  <section class="section" id="features">
+    <h2>4. Ominaisuudet — mitä tehdä missä</h2>
+
+    <h3>⛏ Miner</h3>
+    <ol>
+      <li>Varmista että Helion-lompakossa on tBNB:tä (gas).</li>
+      <li><a href="miner.html">Miner</a> → <strong>Aktivoi kaivos (12h)</strong>.</li>
+      <li>Odota syklin loppuun → <strong>Claim</strong> palkkio HEL:inä lompakkoon.</li>
+    </ol>
+
+    <h3>🔒 Staking</h3>
+    <ol>
+      <li>Tarvitset HEL-saldoa (esim. minerista tai swapista) + tBNB gasiksi.</li>
+      <li><a href="staking.html">Staking</a> → valitse taso (lukitusaika) → stake.</li>
+      <li>Lukituksen jälkeen nosta; aikainen nosto menettää tuoton.</li>
+    </ol>
+
+    <h3>🔄 Swap / likviditeetti</h3>
+    <ol>
+      <li><a href="helion-trading.html">Swap</a>: HEL ↔ tBNB (testnet).</li>
+      <li>Gas maksetaan tBNB:llä custodial-lompakosta.</li>
+      <li>Voit myös lisätä/poistaa likviditeettiä pooliin.</li>
+    </ol>
+
+    <h3>📈 Spot (HEL/BNB)</h3>
+    <ol>
+      <li><a href="spot.html">Spot</a> on sisäinen order book (ei erillistä MetaMask-signia joka tradeen).</li>
+      <li>Talleta HEL/BNB spot-tilille (deposit) Wallet/ketjusaldoista → aseta limit/market → nosta (withdraw) tarvittaessa.</li>
+      <li>Deposit/withdraw voivat vaatia ketjutapahtuman ja siis tBNB:tä.</li>
+    </ol>
+
+    <h3>💼 Wallet &amp; 🏆 Board</h3>
+    <ul>
+      <li>Wallet: saldot, osoite, siirrot, MetaMask-linkitys.</li>
+      <li>Leaderboard: pisteitä stakeista, kaupoista, louhinnasta ja lähetyksistä.</li>
+    </ul>
+  </section>
+
+  <section class="section" id="network">
+    <h2>5. MetaMask — BSC Testnet</h2>
+    <p>Tarvitaan faucet-siirtoihin ja jos linkität oman lompakon.</p>
+    <button type="button" class="btn" id="addNetBtn" class="addNetBtn">Lisää BSC Testnet MetaMaskiin</button>
+    <h3>Manuaalisesti</h3>
+    <table>
+      <tr><th>Kenttä</th><th>Arvo</th></tr>
+      <tr><td>Network name</td><td>BSC Testnet</td></tr>
+      <tr><td>RPC URL</td><td class="mono">https://data-seed-prebsc-1-s1.bnbchain.org:8545</td></tr>
+      <tr><td>Chain ID</td><td class="mono">97</td></tr>
+      <tr><td>Currency</td><td>tBNB</td></tr>
+      <tr><td>Explorer</td><td class="mono">https://testnet.bscscan.com</td></tr>
+    </table>
+  </section>
+
+  <section class="section" id="faq">
+    <h2>6. Usein kysyttyä</h2>
+    <h3>”tBNB-varat vähissä” / insufficient funds</h3>
+    <p>Custodial-lompakossa on 0 (tai liian vähän) tBNB:tä. Hae faucetista ja <strong>siirrä Helion-osoitteeseen</strong> (§3).</p>
+    <h3>Rekisteröidyin mutta en näe tBNB:tä</h3>
+    <p>Uusi lompakko on tyhjä. Faucet → siirto Helion-osoitteeseen.</p>
+    <h3>Miner ei aktivoidu vaikka MetaMaskissa on tBNB</h3>
+    <p>MetaMask ≠ Helion-custodial. Varat pitää olla Helion-osoitteessa (Wallet-sivu).</p>
+    <h3>Data katoaa restartissa</h3>
+    <p>Tuotannossa tarvitaan Upstash Redis (persist=upstash). Paikallisesti data voi olla tiedostoissa.</p>
+  </section>
+  </div><!-- /data-lang-only fi -->
+
+  <div data-lang-only="en">
+  <div class="intro">
+    <strong>Helion</strong> is a BSC Testnet project (Chain ID <span class="mono">97</span>).
+    All tokens are <strong>test value only</strong> — not real money.
+    Helion creates a <strong>custodial wallet</strong> for you (the server signs on-chain txs).
+    On-chain actions (miner, stake, swap) need a small amount of <strong>tBNB</strong> for gas in that wallet.
+  </div>
+  <div class="toc">
+    <a href="#start-en">1. Account</a>
+    <a href="#wallet-en">2. Wallet</a>
+    <a href="#tbnb-en">3. tBNB (gas)</a>
+    <a href="#features-en">4. Features</a>
+    <a href="#network-en">5. MetaMask / network</a>
+    <a href="#faq-en">6. FAQ</a>
+  </div>
+  <section class="section" id="start-en">
+    <h2>1. Create account &amp; sign in</h2>
+    <ol>
+      <li>Open the <a href="index.html">login page</a>.</li>
+      <li>Choose <strong>Register</strong>, enter username and password.</li>
+      <li>Helion automatically creates a BSC custodial wallet for you.</li>
+      <li>After login you can use Wallet, Miner, Staking, Swap and Spot.</li>
+    </ol>
+    <p>You can later link a MetaMask address on the Wallet page (optional).</p>
+  </section>
+  <section class="section" id="wallet-en">
+    <h2>2. Helion wallet (custodial)</h2>
+    <p>Open <a href="wallet.html">Wallet</a>. You will see:</p>
+    <ul>
+      <li>Your <strong>address</strong> (0x…) — used for miner / stake / swap</li>
+      <li><strong>HEL</strong> and <strong>tBNB</strong> on-chain balances</li>
+      <li>Transfers to another Helion user (free) or external 0x (fee)</li>
+    </ul>
+    <div class="callout">
+      Copy your <strong>Helion address</strong> from Wallet. Send faucet tBNB there.
+      Without tBNB in this wallet you will see “Low tBNB” when activating mining or other chain txs.
     </div>
-  </div>
-
-  <!-- STEP 4 -->
-  <div class="step-section">
-    <div class="step-header"><div class="step-number">4</div><h2 class="display" data-i18n="guide.s4">Miten sivut toimivat</h2></div>
-    <div class="step-card">
-      <p data-i18n-html="guide.s4miner">⛏ Miner — alkuperäinen 12h louhintasykli: aktivoi, odota, claimaa palkkio. Toimii MetaMaskilla samoin kuin muutkin sivut.</p>
-      <p data-i18n-html="guide.s4stake">🔒 Staking — valitse taso (7/30/90 vrk lukitus), stakettaa HEL, saa kiinteän tuoton lukitusajan päätyttyä. Voit nostaa pääoman pois kesken ajan, mutta menetät silloin tuoton.</p>
-      <p data-i18n-html="guide.s4swap">🔄 Trading — vaihda HEL ↔ TBNB PancakeSwapin testnet-routerin kautta oman sisäänrakennetun lompakkosi kautta (ei MetaMaskia). Jokaisesta swapista peritään 1% platform-fee. Voit myös lisätä likviditeettiä.</p>
-      <p data-i18n-html="guide.s4spot">📈 Spot — sisäinen BTC/USDT order book.</p>
-      <p style="font-size:11.5px; color:var(--muted);" data-i18n="guide.telegram">Telegramissa on lisäksi erillinen kaivuri-botti jolla on oma sisäänrakennettu lompakko — ei vaadi MetaMaskia eikä gas-maksuja.</p>
+  </section>
+  <section class="section" id="tbnb-en">
+    <h2>3. Get tBNB and send it to Helion</h2>
+    <p>Gas is paid in <strong>testnet BNB (tBNB)</strong> from a faucet — not from a CEX.</p>
+    <h3>Step A — Faucet</h3>
+    <ol>
+      <li>Install <a href="https://metamask.io" target="_blank" rel="noopener">MetaMask</a> and add <strong>BSC Testnet</strong> (§5).</li>
+      <li>Copy your MetaMask address (or Helion address if the faucet allows it).</li>
+      <li>Open a faucet, paste the address, request tBNB (often 0.05–0.3 / 24h).</li>
+    </ol>
+    <p>
+      <a class="btn" href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noopener">BNB Chain official faucet</a>
+      <a class="btn secondary" href="https://faucet.quicknode.com/binance-smart-chain/bnb-testnet" target="_blank" rel="noopener">QuickNode faucet (alternative)</a>
+    </p>
+    <p class="callout warn">Some faucets require a small BSC <em>mainnet</em> balance for anti-bot checks.</p>
+    <h3>Step B — Send tBNB to Helion custodial wallet</h3>
+    <ol>
+      <li>Open <a href="wallet.html">Wallet</a> → copy your <strong>Helion address</strong>.</li>
+      <li>In MetaMask set network to <strong>BSC Testnet</strong>.</li>
+      <li>Send → paste Helion address → amount e.g. <span class="mono">0.05</span> tBNB → Confirm.</li>
+      <li>Wait for confirmation, refresh Wallet — tBNB should appear.</li>
+    </ol>
+    <div class="callout">
+      <strong>Important:</strong> tBNB only in MetaMask is not enough. Miner/stake/swap use the Helion custodial key.
     </div>
-  </div>
-
-  <!-- CONTRACTS -->
-  <div class="step-section">
-    <div class="step-header"><div class="step-number">📋</div><h2 class="display" data-i18n="guide.s5">Kontraktiosoitteet (läpinäkyvyyden vuoksi)</h2></div>
-    <div class="step-card">
-      <table class="contracts-table">
-        <tr><td>HEL Token</td><td>0xE4BCF45d177Cea1DFB6Fb8fCD2F32Bc9Dc79814B</td></tr>
-        <tr><td>HelionStaking</td><td>0x44eD13BD90dCAf748F80e8faC8bbcd4dc498f5dd</td></tr>
-        <tr><td>HelionMiner (alkuperäinen)</td><td>0x04c09909619Ca3CDe42bb100ab8AC43dFF3BB93b</td></tr>
-        <tr><td>PancakeSwap Router (v2)</td><td>0xD99D1c33F9fC3444f8101754aBC46c52416550D1</td></tr>
-        <tr><td>PancakeSwap Factory (v2)</td><td>0x6725F303b657a9451d8BA641348b6761A6CC7a17</td></tr>
-      </table>
-      <p style="margin-top:12px; font-size:11.5px; color:var(--muted);" data-i18n-html="guide.contractsNote">Voit tarkistaa minkä tahansa osoitteen testnet.bscscan.com:sta.</p>
-    </div>
-  </div>
-</div>
-
-<div id="toastHost"></div>
-
+  </section>
+  <section class="section" id="features-en">
+    <h2>4. Features</h2>
+    <h3>⛏ Miner</h3>
+    <ol>
+      <li>Ensure Helion wallet has tBNB for gas.</li>
+      <li><a href="miner.html">Miner</a> → <strong>Activate mining (12h)</strong>.</li>
+      <li>When the cycle ends → <strong>Claim</strong> HEL rewards.</li>
+    </ol>
+    <h3>🔒 Staking</h3>
+    <ol>
+      <li>Need HEL + tBNB for gas.</li>
+      <li><a href="staking.html">Staking</a> → pick tier → stake.</li>
+      <li>Withdraw after lock; early exit forfeits yield.</li>
+    </ol>
+    <h3>🔄 Swap / liquidity</h3>
+    <ol>
+      <li><a href="helion-trading.html">Swap</a>: HEL ↔ tBNB on testnet.</li>
+      <li>Gas paid in tBNB from custodial wallet.</li>
+    </ol>
+    <h3>📈 Spot (HEL/BNB)</h3>
+    <ol>
+      <li><a href="spot.html">Spot</a> internal order book.</li>
+      <li>Deposit HEL/BNB → place orders → withdraw when needed.</li>
+      <li>Deposit/withdraw may require on-chain txs and tBNB.</li>
+    </ol>
+  </section>
+  <section class="section" id="network-en">
+    <h2>5. MetaMask — BSC Testnet</h2>
+    <p>Needed for faucet transfers and optional wallet linking.</p>
+    <button type="button" class="btn addNetBtn">Add BSC Testnet to MetaMask</button>
+    <h3>Manual</h3>
+    <table>
+      <tr><th>Field</th><th>Value</th></tr>
+      <tr><td>Network name</td><td>BSC Testnet</td></tr>
+      <tr><td>RPC URL</td><td class="mono">https://data-seed-prebsc-1-s1.bnbchain.org:8545</td></tr>
+      <tr><td>Chain ID</td><td class="mono">97</td></tr>
+      <tr><td>Currency</td><td>tBNB</td></tr>
+      <tr><td>Explorer</td><td class="mono">https://testnet.bscscan.com</td></tr>
+    </table>
+  </section>
+  <section class="section" id="faq-en">
+    <h2>6. FAQ</h2>
+    <h3>“Low tBNB” / insufficient funds</h3>
+    <p>Custodial wallet has too little tBNB. Use a faucet and <strong>send to Helion address</strong> (§3).</p>
+    <h3>I registered but see no tBNB</h3>
+    <p>New wallets are empty. Faucet → transfer to Helion.</p>
+    <h3>Miner fails even though MetaMask has tBNB</h3>
+    <p>MetaMask ≠ Helion custodial. Funds must be on the Helion address (Wallet page).</p>
+  </section>
+  </div><!-- /data-lang-only en -->
+</div><!-- /wrap -->
 <script>
-  function toast(message, type = 'default') {
-    const host = document.getElementById('toastHost');
-    const el = document.createElement('div');
-    el.className = `toast ${type}`;
-    el.innerHTML = `<span>${message}</span>`;
-    host.appendChild(el);
-    setTimeout(() => el.remove(), 5000);
-  }
-
-  async function addNetwork() {
-    if (!window.ethereum) { toast(t("guide.noMetamask"), "error"); return; }
-    try {
-      await window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          chainId: '0x61', // 97 desimaalina
-          chainName: 'BNB Smart Chain Testnet',
-          nativeCurrency: { name: 'tBNB', symbol: 'tBNB', decimals: 18 },
-          rpcUrls: ['https://data-seed-prebsc-1-s1.bnbchain.org:8545'],
-          blockExplorerUrls: ['https://testnet.bscscan.com']
-        }]
-      });
-      toast(t("guide.netAdded"), "success");
-    } catch (e) {
-      toast("Verkon lisäys epäonnistui: " + e.message, "error");
-    }
-  }
-</script>
-<script src="i18n.js"></script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    if (window.HelionI18n) {
-      var host = document.querySelector('.topbar') || document.querySelector('header') || document.querySelector('.nav') || document.querySelector('.site-nav') || document.body;
-      HelionI18n.mountLangSwitch(host);
-      HelionI18n.applyLang();
-    }
+  document.querySelectorAll('.addNetBtn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!window.ethereum) {
+        alert(typeof t === 'function' ? t('guide.noMetamask') : 'MetaMask not found');
+        return;
+      }
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0x61',
+            chainName: 'BSC Testnet',
+            nativeCurrency: { name: 'tBNB', symbol: 'tBNB', decimals: 18 },
+            rpcUrls: ['https://data-seed-prebsc-1-s1.bnbchain.org:8545'],
+            blockExplorerUrls: ['https://testnet.bscscan.com']
+          }]
+        });
+        alert(typeof t === 'function' ? t('guide.netAdded') : 'Network added');
+      } catch (e) {
+        alert((typeof t === 'function' ? t('guide.netFail') : 'Failed') + ': ' + (e.message || e));
+      }
+    });
   });
 </script>
+<script src="i18n.js"></script>
 </body>
 </html>

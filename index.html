@@ -67,10 +67,10 @@
     <button class="btn-block" onclick="doLogin()" id="loginBtn" data-i18n="index.loginBtn">Kirjaudu</button>
     <button class="link-btn" onclick="toggleAuthMode()" id="toggleAuthBtn" data-i18n="index.toggleAuth">Ei tiliä? Rekisteröidy</button>
 
-    <div class="divider">tai</div>
+    <div class="divider" data-i18n="index.or">tai</div>
 
     <button class="btn-block secondary" onclick="loginWithWallet()" id="walletLoginBtn">🦊 <span data-i18n="index.walletLogin">Kirjaudu lompakolla</span></button>
-    <p style="font-size:11px; color:var(--muted); margin-top:8px; text-align:center;">Vaatii että olet aiemmin linkittänyt lompakon Wallet-osiossa.</p>
+    <p style="font-size:11px; color:var(--muted); margin-top:8px; text-align:center;" data-i18n="index.walletHintStatic">Vaatii että olet aiemmin linkittänyt lompakon Wallet-osiossa.</p>
   </div>
 </div>
 
@@ -116,18 +116,18 @@
         body: JSON.stringify({ username, password })
       });
       const data = await res.json();
-      if (!res.ok) { toast(data.error || 'Virhe.', 'error'); return; }
+      if (!res.ok) { toast((typeof apiMsg === 'function' ? apiMsg(data) : (data.error || t('common.error'))), 'error'); return; }
       toast(isRegisterMode ? t('index.toastRegister') : t('index.toastLogin'), 'success');
       saveSessionAndRedirect(data.token, data.username);
     } catch (e) {
-      toast('Yhteysvirhe: ' + e.message, 'error');
+      toast(t('common.connectionError') + ': ' + e.message, 'error');
     }
   }
 
   async function loginWithWallet() {
     if (!window.ethereum) { toast(t('index.noMetamask'), 'error'); return; }
     const btn = document.getElementById('walletLoginBtn');
-    btn.disabled = true; btn.textContent = 'Odotetaan MetaMaskia…';
+    btn.disabled = true; btn.textContent = t('common.waitingMetamask');
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send('eth_requestAccounts', []);
@@ -136,7 +136,7 @@
 
       const nonceRes = await fetch(BACKEND_URL + '/api/auth/nonce?address=' + address);
       const nonceData = await nonceRes.json();
-      if (!nonceRes.ok) { toast(nonceData.error || 'Virhe.', 'error'); return; }
+      if (!nonceRes.ok) { toast((typeof apiMsg === 'function' ? apiMsg(nonceData) : (nonceData.error || t('common.error'))), 'error'); return; }
 
       const signature = await signer.signMessage(nonceData.message);
 
@@ -145,14 +145,15 @@
         body: JSON.stringify({ address, message: nonceData.message, signature })
       });
       const loginData = await loginRes.json();
-      if (!loginRes.ok) { toast(loginData.error || 'Kirjautuminen epäonnistui.', 'error'); return; }
+      if (!loginRes.ok) { toast((typeof apiMsg === 'function' ? apiMsg(loginData) : (loginData.error || t('index.loginFailed'))), 'error'); return; }
 
       toast(t('index.toastWallet'), 'success');
       saveSessionAndRedirect(loginData.token, loginData.username);
     } catch (e) {
-      toast('Virhe: ' + (e.reason || e.message), 'error');
+      toast(t('common.error') + ': ' + (e.reason || e.message), 'error');
     } finally {
-      btn.disabled = false; btn.textContent = '🦊 Kirjaudu lompakolla';
+      btn.disabled = false;
+      btn.innerHTML = '🦊 <span data-i18n="index.walletLogin">' + t('index.walletLoginBtn') + '</span>';
     }
   }
 

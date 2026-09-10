@@ -19,7 +19,7 @@
     padding: 32px 20px 80px;
   }
   .display{ font-family:'Chakra Petch', sans-serif; }
-  .wrap{ max-width: 620px; margin: 0 auto; }
+  .wrap{ max-width: 760px; margin: 0 auto; }
 
   header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
   .brand{ display:flex; align-items:center; gap: 12px; }
@@ -31,7 +31,7 @@
   .user-pill .dot{ width:8px; height:8px; border-radius:50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
   .user-pill button{ background:none; border:none; color:var(--muted); font-size:11.5px; cursor:pointer; text-decoration:underline; }
 
-  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
+  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
   .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
   .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
 
@@ -65,6 +65,37 @@
   .toast.success{ border-color: rgba(61,214,140,0.4); }
   .toast.error{ border-color: rgba(229,72,77,0.4); }
 
+  .modal-overlay{
+    display:none; position:fixed; inset:0; z-index:1000;
+    background:rgba(0,0,0,0.55); align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-card{
+    width:min(420px, 100%); background:var(--panel); border:1px solid var(--line);
+    border-radius:16px; padding:20px 22px 18px; box-shadow:0 16px 48px rgba(0,0,0,0.5);
+    position:relative;
+  }
+  .modal-card.error{ border-color: rgba(229,72,77,0.45); }
+  .modal-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+  .modal-title{ font-family:'Chakra Petch',sans-serif; font-size:16px; font-weight:700; color:var(--text); }
+  .modal-close{
+    border:none; background:var(--panel-2); color:var(--muted); width:32px; height:32px;
+    border-radius:8px; cursor:pointer; font-size:18px; line-height:1; flex-shrink:0;
+  }
+  .modal-close:hover{ color:var(--text); }
+  .modal-body{ font-size:13.5px; color:var(--muted); line-height:1.5; margin-bottom:16px; }
+  .modal-body a{ color:var(--gold); font-weight:600; }
+  .modal-actions{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
+  .modal-actions .btn-primary{
+    border:none; padding:10px 16px; border-radius:10px; cursor:pointer;
+    background:linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305;
+    font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:13px; text-decoration:none;
+  }
+  .modal-actions .btn-ghost{
+    border:1px solid var(--line); background:transparent; color:var(--muted);
+    padding:10px 14px; border-radius:10px; cursor:pointer; font-size:13px;
+  }
+
 .helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line,#262B35);border-radius:999px;padding:2px;background:var(--panel,#14171D);margin-left:8px;}
 .helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
 .helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
@@ -86,12 +117,12 @@
   </header>
 
   <nav class="site-nav">
-    <a href="miner.html" class="nav-item active"><span data-i18n="nav.miner">⛏ Miner</span></a>
+    <a href="miner.html" class="nav-item active"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
     <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
-    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Swap</span></a>
+    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
     <a href="spot.html" class="nav-item"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Wallet</span></a>
-    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Board</span></a>
+    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
+    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Ranking</span></a>
     <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
   </nav>
 
@@ -120,6 +151,17 @@
 
 <div id="toastHost"></div>
 
+<div id="alertModal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-card error" id="alertModalCard">
+    <div class="modal-head">
+      <div class="modal-title" id="alertModalTitle">Notice</div>
+      <button type="button" class="modal-close" id="alertModalClose" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body" id="alertModalBody"></div>
+    <div class="modal-actions" id="alertModalActions"></div>
+  </div>
+</div>
+
 <script>
   const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')   ? 'http://localhost:3001'   : 'https://testnetworkserver.onrender.com';
 
@@ -141,26 +183,103 @@
     window.location.href = 'index.html';
   }
 
-  function toast(message, type = 'default') {
+  function toast(message, type = 'default', opts) {
     const host = document.getElementById('toastHost');
     const el = document.createElement('div');
     el.className = `toast ${type}`;
-    el.textContent = message;
+    if (opts && opts.html) el.innerHTML = message;
+    else el.textContent = message;
     host.appendChild(el);
-    setTimeout(() => el.remove(), 4500);
+    setTimeout(() => el.remove(), opts && opts.html ? 10000 : 5000);
+  }
+
+  function apiError(data) {
+    const err = new Error((data && data.error) || 'Error');
+    if (data) {
+      err.code = data.code;
+      err.guidePath = data.guidePath;
+      err.error = data.error;
+      err.errorEn = data.errorEn;
+    }
+    return err;
   }
 
   async function apiGet(path) {
     const res = await fetch(BACKEND_URL + path, { headers: authHeaders() });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Virhe');
+    if (!res.ok) throw apiError(data);
     return data;
   }
   async function apiPost(path, body) {
     const res = await fetch(BACKEND_URL + path, { method: 'POST', headers: authHeaders(), body: JSON.stringify(body || {}) });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Virhe');
+    if (!res.ok) throw apiError(data);
     return data;
+  }
+
+  function closeAlertModal() {
+    const ov = document.getElementById('alertModal');
+    if (ov) ov.classList.remove('open');
+  }
+
+  function showAlertModal({ title, bodyHtml, primaryHref, primaryLabel }) {
+    const ov = document.getElementById('alertModal');
+    const titleEl = document.getElementById('alertModalTitle');
+    const bodyEl = document.getElementById('alertModalBody');
+    const actions = document.getElementById('alertModalActions');
+    titleEl.textContent = title || (typeof t === 'function' ? t('common.error') : 'Error');
+    bodyEl.innerHTML = bodyHtml || '';
+    actions.innerHTML = '';
+    if (primaryHref) {
+      const a = document.createElement('a');
+      a.className = 'btn-primary';
+      a.href = primaryHref;
+      a.textContent = primaryLabel || (typeof t === 'function' ? t('miner.needGasLink') : 'Open guide');
+      actions.appendChild(a);
+    }
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn-ghost';
+    closeBtn.textContent = typeof t === 'function' ? t('common.close') : 'Close';
+    closeBtn.onclick = closeAlertModal;
+    actions.appendChild(closeBtn);
+    ov.classList.add('open');
+  }
+
+  document.getElementById('alertModalClose')?.addEventListener('click', closeAlertModal);
+  document.getElementById('alertModal')?.addEventListener('click', (ev) => {
+    if (ev.target.id === 'alertModal') closeAlertModal();
+  });
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') closeAlertModal();
+  });
+
+  function showActionError(e) {
+    const msg = (typeof apiMsg === 'function') ? apiMsg(e) : (e && (e.errorEn || e.error || e.message));
+    const isGas =
+      e &&
+      (e.code === 'INSUFFICIENT_GAS' ||
+        /tBNB-varat|insufficient funds|INSUFFICIENT_GAS|Low tBNB/i.test(String(e.message || msg || '')));
+
+    if (isGas) {
+      const href = e.guidePath || 'guide.html#tbnb';
+      const body =
+        typeof t === 'function'
+          ? t('miner.needGas')
+          : msg || 'Low tBNB. Fund your Helion wallet.';
+      showAlertModal({
+        title: typeof t === 'function' ? t('miner.needGasTitle') : 'Low tBNB',
+        bodyHtml: body,
+        primaryHref: href,
+        primaryLabel: typeof t === 'function' ? t('miner.needGasLink') : 'Open guide'
+      });
+      return;
+    }
+
+    showAlertModal({
+      title: typeof t === 'function' ? t('common.error') : 'Error',
+      bodyHtml: String(msg || (typeof t === 'function' ? t('common.error') : 'Error'))
+    });
   }
 
   function formatTime(ms) {
@@ -278,16 +397,17 @@
     try {
       if (mode === 'claim') {
         await apiPost('/api/miner/claim');
-        toast('Palkkio claimattu lompakkoosi!', 'success');
+        toast(t('miner.claimOk'), 'success');
       } else {
         await apiPost('/api/miner/activate');
-        toast('Kaivos aktivoitu 12 tunniksi!', 'success');
+        toast(t('miner.activateOk'), 'success');
       }
       await loadStatus();
       await refreshWallet();
     } catch (e) {
-      toast('Virhe: ' + e.message, 'error');
+      showActionError(e);
       btn.disabled = false;
+      updateGauge();
     }
   }
 

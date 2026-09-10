@@ -103,6 +103,23 @@ a{color:inherit;text-decoration:none;}
 .tab-body td{padding:7px 12px;border-bottom:1px solid rgba(42,48,60,0.45);}
 .tab-body button.link{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:11px;}
 .banner{font-size:10px;color:var(--muted);padding:6px 12px;background:rgba(124,92,252,0.08);border-bottom:1px solid var(--line);}
+.xfer{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;
+  border-bottom:1px solid var(--line);background:var(--panel2);font-size:11px;
+}
+.xfer label{color:var(--muted);margin-right:4px;}
+.xfer select,.xfer input{
+  background:var(--bg);border:1px solid var(--line);color:var(--text);
+  border-radius:6px;padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:11px;
+}
+.xfer input{width:100px;}
+.xfer button{
+  border:none;border-radius:6px;padding:7px 12px;font-weight:700;font-size:11px;
+  cursor:pointer;font-family:'Chakra Petch',sans-serif;
+}
+.xfer .dep{background:rgba(14,203,129,0.2);color:var(--buy);}
+.xfer .wd{background:rgba(246,70,93,0.15);color:var(--sell);}
+.xfer .note{color:var(--muted);font-size:10px;flex:1;min-width:160px;}
 #toastHost{position:fixed;bottom:16px;right:16px;z-index:50;display:flex;flex-direction:column;gap:8px;width:min(360px,90vw);}
 .toast{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
 .toast.ok{border-color:rgba(14,203,129,0.4);} .toast.err{border-color:rgba(246,70,93,0.4);}
@@ -129,12 +146,12 @@ a{color:inherit;text-decoration:none;}
     <div>Pool <span class="mono" id="oraclePx" style="color:var(--muted)">–</span></div>
   </div>
   <nav class="nav">
-    <a href="miner.html"><span data-i18n="nav.miner">⛏ Miner</span></a>
+    <a href="miner.html"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
     <a href="staking.html"><span data-i18n="nav.staking">🔒 Staking</span></a>
-    <a href="helion-trading.html"><span data-i18n="nav.swap">🔄 Swap</span></a>
+    <a href="helion-trading.html"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
     <a href="spot.html" class="active"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html"><span data-i18n="nav.wallet">💼 Wallet</span></a>
-    <a href="leaderboard.html"><span data-i18n="nav.board">🏆 Board</span></a>
+    <a href="wallet.html"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
+    <a href="leaderboard.html"><span data-i18n="nav.board">🏆 Ranking</span></a>
     <a href="admin.html">Admin</a>
   </nav>
   <div class="user"><span id="userLabel">–</span><button onclick="logout()" data-i18n="spot.logout">Logout</button></div>
@@ -160,10 +177,21 @@ a{color:inherit;text-decoration:none;}
   <!-- CENTER -->
   <div class="panel">
     <div class="center-top">
-      <div class="stat"><div class="l"><span data-i18n="spot.usdtAvail">BNB Available</span></div><div class="v" id="balUsdt">–</div></div>
-      <div class="stat"><div class="l"><span data-i18n="spot.btcAvail">HEL Available</span></div><div class="v" id="balBtc">–</div></div>
+      <div class="stat"><div class="l"><span data-i18n="spot.usdtAvail">BNB Available</span></div><div class="v" id="balBnb">–</div></div>
+      <div class="stat"><div class="l"><span data-i18n="spot.btcAvail">HEL Available</span></div><div class="v" id="balHel">–</div></div>
       <div class="stat"><div class="l" data-i18n="spot.locked">Locked</div><div class="v" id="balLocked">–</div></div>
       <div class="stat"><div class="l" data-i18n="spot.equity">Equity</div><div class="v" id="balEq">–</div></div>
+    </div>
+    <div class="xfer">
+      <label data-i18n="spot.transfer">Siirto</label>
+      <select id="xferAsset">
+        <option value="BNB">tBNB</option>
+        <option value="HEL">HEL</option>
+      </select>
+      <input type="number" id="xferAmt" min="0" step="any" placeholder="0.0">
+      <button type="button" class="dep" onclick="spotTransfer('deposit')" data-i18n="spot.deposit">Deposit</button>
+      <button type="button" class="wd" onclick="spotTransfer('withdraw')" data-i18n="spot.withdraw">Withdraw</button>
+      <span class="note" data-i18n="spot.xferNote">Custodial → Spot (deposit) · Spot → Custodial (withdraw)</span>
     </div>
     <div class="panel-h"><b data-i18n="spot.marketTrades">Market Trades</b></div>
     <div class="trades">
@@ -429,14 +457,44 @@ async function refreshTicker() {
   } catch (_) {}
 }
 
+async function spotTransfer(kind) {
+  const asset = document.getElementById('xferAsset').value;
+  const amount = document.getElementById('xferAmt').value;
+  if (!(Number(amount) > 0)) {
+    toast(typeof t === 'function' ? t('spot.xferNeedAmt') : 'Enter amount', false);
+    return;
+  }
+  try {
+    const path = kind === 'deposit' ? '/api/spot/deposit' : '/api/spot/withdraw';
+    const res = await fetch(BACKEND_URL + path, {
+      method: 'POST',
+      headers: auth(),
+      body: JSON.stringify({ asset, amount: Number(amount) })
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || kind + ' failed');
+    toast(
+      (kind === 'deposit'
+        ? (typeof t === 'function' ? t('spot.depositOk') : 'Deposited')
+        : (typeof t === 'function' ? t('spot.withdrawOk') : 'Withdrawn')) +
+        ' ' + amount + ' ' + (asset === 'BNB' ? 'tBNB' : 'HEL'),
+      true
+    );
+    document.getElementById('xferAmt').value = '';
+    await refreshAccount();
+  } catch (e) {
+    toast(e.message, false);
+  }
+}
+
 async function refreshAccount() {
   try {
     const res = await fetch(BACKEND_URL + '/api/spot/account', { headers: auth() });
     const d = await res.json();
     if (!res.ok) throw new Error(d.error || 'account');
     balances = d.balances || balances;
-    document.getElementById('balUsdt').textContent = fmt(balances.BNB, 6);
-    document.getElementById('balBtc').textContent = fmt(balances.HEL, 4);
+    document.getElementById('balBnb').textContent = fmt(balances.BNB, 6);
+    document.getElementById('balHel').textContent = fmt(balances.HEL, 4);
     document.getElementById('balLocked').textContent =
       fmt(balances.BNB_LOCKED, 6) + ' BNB / ' + fmt(balances.HEL_LOCKED, 4) + ' HEL';
     document.getElementById('balEq').textContent = fmt(d.equity, 6) + ' BNB';
