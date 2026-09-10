@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
+<script>
+  (function () {
+    var p = location.pathname;
+    if (p && !p.endsWith('/') && !/\.html?$/i.test(p)) {
+      location.replace(p + '/' + location.search + location.hash);
+    }
+  })();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Helion Leaderboard</title>

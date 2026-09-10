@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Helion — Kirjaudu</title>
+<script>
+  /* GitHub Pages: /repo ilman /-loppuja → suhteelliset polut (i18n.js) menevät väärin */
+  (function () {
+    var p = location.pathname;
+    if (p && !p.endsWith('/') && !/\.html?$/i.test(p)) {
+      location.replace(p + '/' + location.search + location.hash);
+    }
+  })();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -78,24 +87,43 @@
 
 <script>
   // ⚠️ Aseta backendisi julkinen osoite tähän deployn jälkeen
-  const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')   ? 'http://localhost:3001'   : 'https://testnetworkserver.onrender.com';
+  const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001'
+    : 'https://testnetworkserver.onrender.com';
 
   let isRegisterMode = false;
 
+  function tr(key, fallback) {
+    try {
+      if (typeof t === 'function') {
+        const v = t(key);
+        if (v && v !== key) return v;
+      }
+    } catch (_) {}
+    return fallback || key;
+  }
+
   function toast(message, type = 'default') {
     const host = document.getElementById('toastHost');
+    if (!host) { console.warn(message); return; }
     const el = document.createElement('div');
     el.className = `toast ${type}`;
     el.textContent = message;
     host.appendChild(el);
-    setTimeout(() => el.remove(), 4500);
+    setTimeout(() => el.remove(), 5000);
   }
 
   function toggleAuthMode() {
     isRegisterMode = !isRegisterMode;
-    document.getElementById('authTitle').textContent = isRegisterMode ? t('index.authRegister') : t('index.authLogin');
-    document.getElementById('loginBtn').textContent = isRegisterMode ? t('index.registerBtn') : t('index.loginBtn');
-    document.getElementById('toggleAuthBtn').textContent = isRegisterMode ? t('index.toggleToLogin') : t('index.toggleToRegister');
+    document.getElementById('authTitle').textContent = isRegisterMode
+      ? tr('index.authRegister', 'Rekisteröidy')
+      : tr('index.authLogin', 'Kirjaudu');
+    document.getElementById('loginBtn').textContent = isRegisterMode
+      ? tr('index.registerBtn', 'Luo tili')
+      : tr('index.loginBtn', 'Kirjaudu');
+    document.getElementById('toggleAuthBtn').textContent = isRegisterMode
+      ? tr('index.toggleToLogin', 'On jo tili? Kirjaudu')
+      : tr('index.toggleToRegister', 'Ei tiliä? Rekisteröidy');
   }
 
   function saveSessionAndRedirect(token, username) {
@@ -107,20 +135,47 @@
   async function doLogin() {
     const username = document.getElementById('authUsername').value.trim();
     const password = document.getElementById('authPassword').value;
-    if (!username || !password) { toast(t('index.fillBoth'), 'error'); return; }
+    if (!username || !password) {
+      toast(tr('index.fillBoth', 'Täytä molemmat kentät.'), 'error');
+      return;
+    }
+
+    const btn = document.getElementById('loginBtn');
+    const prev = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = tr('common.loading', 'Ladataan…');
 
     const endpoint = isRegisterMode ? '/api/register' : '/api/login';
     try {
       const res = await fetch(BACKEND_URL + endpoint, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-      const data = await res.json();
-      if (!res.ok) { toast((typeof apiMsg === 'function' ? apiMsg(data) : (data.error || t('common.error'))), 'error'); return; }
-      toast(isRegisterMode ? t('index.toastRegister') : t('index.toastLogin'), 'success');
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = (typeof apiMsg === 'function' ? apiMsg(data) : null)
+          || data.error || tr('common.error', 'Virhe');
+        toast(msg, 'error');
+        return;
+      }
+      toast(
+        isRegisterMode
+          ? tr('index.toastRegister', 'Tili luotu!')
+          : tr('index.toastLogin', 'Kirjauduttu sisään!'),
+        'success'
+      );
       saveSessionAndRedirect(data.token, data.username);
     } catch (e) {
-      toast(t('common.connectionError') + ': ' + e.message, 'error');
+      toast(
+        tr('common.connectionError', 'Yhteysvirhe') +
+          ': ' + (e.message || e) +
+          ' — jos Render nukahti, odota ~30s ja yritä uudelleen.',
+        'error'
+      );
+    } finally {
+      btn.disabled = false;
+      btn.textContent = prev;
     }
   }
 
