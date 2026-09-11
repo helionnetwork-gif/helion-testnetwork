@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-<script>
-  (function () {
-    var p = location.pathname;
-    if (p && !p.endsWith('/') && !/\.html?$/i.test(p)) {
-      location.replace(p + '/' + location.search + location.hash);
-    }
-  })();
-</script>
-
+<script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Helion Leaderboard</title>
@@ -123,7 +115,7 @@
 <div id="toastHost"></div>
 
 <script>
-  const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')   ? 'http://localhost:3001'   : 'https://testnetworkserver.onrender.com';
+  const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
 
   const token = localStorage.getItem('helion_token');
   const username = localStorage.getItem('helion_username');

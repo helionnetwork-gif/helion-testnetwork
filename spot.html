@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-<script>
-  (function () {
-    var p = location.pathname;
-    if (p && !p.endsWith('/') && !/\.html?$/i.test(p)) {
-      location.replace(p + '/' + location.search + location.hash);
-    }
-  })();
-</script>
-
+<script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Helion Spot Terminal</title>
@@ -161,7 +153,6 @@ a{color:inherit;text-decoration:none;}
     <a href="spot.html" class="active"><span data-i18n="nav.spot">📈 Spot</span></a>
     <a href="wallet.html"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
     <a href="leaderboard.html"><span data-i18n="nav.board">🏆 Ranking</span></a>
-    <a href="admin.html">Admin</a>
   </nav>
   <div class="user"><span id="userLabel">–</span><button onclick="logout()" data-i18n="spot.logout">Logout</button></div>
 </div>
@@ -291,9 +282,7 @@ a{color:inherit;text-decoration:none;}
 </div>
 <div id="toastHost"></div>
 <script>
-const BACKEND_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-  ? 'http://localhost:3001'
-  : 'https://testnetworkserver.onrender.com';
+const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
 
 const token = localStorage.getItem('helion_token');
 const username = localStorage.getItem('helion_username');
