@@ -4,7 +4,7 @@
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Helion — Home</title>
+<title>Helion — Kirjaudu</title>
 <script>
   (function () {
     var p = location.pathname;
@@ -18,339 +18,67 @@
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #050505;
-    --panel: #0c0c0c;
-    --panel-2: #141414;
-    --line: #2a2a2a;
-    --gold: #E8B923;
-    --gold-2: #C9A227;
-    --text: #F5F3EE;
-    --muted: #8B8F98;
-    --danger: #E5484D;
-    --success: #3DD68C;
+    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
+    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
+    --danger: #E5484D; --success: #3DD68C;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
-    background: #000;
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 16px 40px;
+    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
+    color: var(--text); font-family:'Inter',sans-serif; min-height:100vh;
+    display:flex; align-items:center; justify-content:center; padding:20px;
   }
-  .display{ font-family: 'Chakra Petch', sans-serif; }
+  .display{ font-family:'Chakra Petch', sans-serif; }
+  .wrap{ width:100%; max-width: 400px; }
 
-  .stage{
-    width: 100%;
-    max-width: 920px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: center;
-  }
-  @media (max-width: 820px){
-    .stage{ grid-template-columns: 1fr; max-width: 400px; gap: 28px; }
-    .brand-side{ text-align: center; order: 0; }
-    .phone-side{ order: 1; }
-  }
+  .logo-row{ text-align:center; margin-bottom:24px; }
+  .logo-row img{ width:88px; height:88px; border-radius:50%; object-fit:cover; border:3px solid var(--gold); box-shadow:0 0 28px rgba(242,169,59,0.4); }
+  .logo-row h1{ font-size:22px; margin-top:14px; }
+  .logo-row .tag{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; }
 
-  /* Left brand */
-  .brand-side .logo-lockup{
-    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
-  }
-  @media (max-width: 820px){
-    .brand-side .logo-lockup{ justify-content: center; }
-  }
-  .logo-mark{
-    width: 42px; height: 42px;
-    background: linear-gradient(135deg, #F2D06B, #C9A227);
-    clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
-    display: grid; place-items: center;
-    box-shadow: 0 0 24px rgba(232,185,35,0.35);
-  }
-  .logo-mark span{
-    font-family: 'Chakra Petch', sans-serif;
-    font-weight: 700; font-size: 18px; color: #111;
-  }
-  .logo-word{
-    font-family: 'Chakra Petch', sans-serif;
-    font-weight: 700; font-size: 28px; letter-spacing: 2px;
-    background: linear-gradient(180deg, #F2D06B, #C9A227);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .headline{
-    font-family: 'Chakra Petch', sans-serif;
-    font-weight: 700;
-    font-size: clamp(36px, 6vw, 56px);
-    line-height: 0.95;
-    letter-spacing: -1px;
-    background: linear-gradient(180deg, #F5D76E, #C9A227);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    margin-bottom: 16px;
-  }
-  .sub{
-    color: var(--gold-2);
-    font-size: 14px;
-    line-height: 1.5;
-    max-width: 340px;
-    margin-bottom: 8px;
-  }
-  @media (max-width: 820px){
-    .sub{ margin-left: auto; margin-right: auto; }
-  }
-  .tagline{
-    margin-top: 20px;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-  }
+  .card{ background: var(--panel); border:1px solid var(--line); border-radius:20px; padding:24px; margin-bottom:16px; }
+  .card h2{ font-size:15px; margin-bottom:16px; }
 
-  /* Phone frame */
-  .phone{
-    width: 100%;
-    max-width: 340px;
-    margin: 0 auto;
-    background: linear-gradient(160deg, #1a1508, #0a0a0a 40%, #050505);
-    border: 2px solid #3d3420;
-    border-radius: 36px;
-    padding: 12px 12px 20px;
-    box-shadow:
-      0 0 0 1px rgba(232,185,35,0.15),
-      0 24px 64px rgba(0,0,0,0.65),
-      inset 0 1px 0 rgba(242,208,107,0.12);
-  }
-  .phone-top{
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 10px 14px;
-  }
-  .phone-brand{
-    display: flex; align-items: center; gap: 8px;
-  }
-  .phone-brand .mini-mark{
-    width: 22px; height: 22px;
-    background: linear-gradient(135deg, #F2D06B, #C9A227);
-    clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
-  }
-  .phone-brand b{
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: 13px; letter-spacing: 1.5px;
-    background: linear-gradient(180deg, #F2D06B, #C9A227);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .badge-testnet{
-    font-size: 10px; font-weight: 700;
-    color: var(--gold);
-    border: 1px solid rgba(232,185,35,0.4);
-    background: rgba(232,185,35,0.08);
-    padding: 4px 10px; border-radius: 999px;
-    letter-spacing: 0.5px;
-  }
+  .input-row{ background: var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:4px 14px; margin-bottom:12px; }
+  .input-row input{ background:transparent; border:none; outline:none; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:14px; width:100%; padding:12px 0; }
 
-  .wallet-card{
-    background: #0e0e0e;
-    border: 1px solid #2a2518;
-    border-radius: 16px;
-    padding: 16px 16px 14px;
-    margin-bottom: 14px;
-  }
-  .wallet-card .lbl{
-    font-size: 11px; color: var(--muted); margin-bottom: 6px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .wallet-card .bal{
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 28px; font-weight: 700;
-    letter-spacing: -0.5px;
-  }
-  .wallet-card .asset{
-    font-size: 11px; color: var(--gold-2); margin-top: 2px;
-  }
-  .spark{
-    height: 36px; margin-top: 10px;
-    background: linear-gradient(90deg, transparent, rgba(232,185,35,0.15));
-    border-radius: 8px;
-    position: relative; overflow: hidden;
-  }
-  .spark svg{ width: 100%; height: 100%; }
+  .btn-block{ width:100%; border:none; padding:14px; border-radius:12px; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:13.5px; cursor:pointer; background:linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
+  .btn-block.secondary{ background:linear-gradient(180deg, var(--violet), #5b3fd6); color:#f4f1ff; margin-top:10px; }
+  .btn-block:disabled{ opacity:0.5; cursor:not-allowed; }
+  .link-btn{ background:none; border:none; color:var(--gold); font-size:12.5px; cursor:pointer; margin-top:12px; display:block; text-align:center; width:100%; }
 
-  .menu{
-    display: flex; flex-direction: column; gap: 8px;
-    margin-bottom: 16px;
-  }
-  .menu-item{
-    display: flex; align-items: center; gap: 12px;
-    background: #121212;
-    border: 1px solid #242424;
-    border-radius: 12px;
-    padding: 12px 14px;
-    color: var(--text);
-    text-decoration: none;
-    font-size: 13.5px;
-    font-weight: 600;
-    transition: border-color .15s, background .15s;
-  }
-  .menu-item:hover{
-    border-color: rgba(232,185,35,0.45);
-    background: #16140e;
-  }
-  .menu-item .ico{
-    width: 28px; height: 28px; border-radius: 8px;
-    background: rgba(232,185,35,0.1);
-    display: grid; place-items: center;
-    font-size: 14px; color: var(--gold);
-  }
-  .menu-item .chev{ margin-left: auto; color: var(--muted); font-size: 16px; }
+  .divider{ display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--muted); font-size:11px; text-transform:uppercase; }
+  .divider::before, .divider::after{ content:''; flex:1; height:1px; background:var(--line); }
 
-  .auth-box{
-    border-top: 1px solid #242424;
-    padding-top: 14px;
-  }
-  .auth-box h2{
-    font-family: 'Chakra Petch', sans-serif;
-    font-size: 14px; margin-bottom: 12px; color: var(--gold);
-  }
-  .input-row{
-    background: #0a0a0a;
-    border: 1px solid #2a2a2a;
-    border-radius: 10px;
-    padding: 2px 12px;
-    margin-bottom: 8px;
-  }
-  .input-row input{
-    background: transparent; border: none; outline: none;
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px; width: 100%; padding: 11px 0;
-  }
-  .btn-block{
-    width: 100%; border: none; padding: 12px;
-    border-radius: 10px;
-    font-family: 'Chakra Petch', sans-serif;
-    font-weight: 700; font-size: 13px; cursor: pointer;
-    background: linear-gradient(180deg, #F2D06B, #C9A227);
-    color: #1a1305;
-  }
-  .btn-block.secondary{
-    background: transparent;
-    border: 1px solid #3d3420;
-    color: var(--gold);
-    margin-top: 8px;
-  }
-  .btn-block:disabled{ opacity: 0.5; cursor: not-allowed; }
-  .link-btn{
-    background: none; border: none; color: var(--muted);
-    font-size: 12px; cursor: pointer; margin-top: 10px;
-    display: block; text-align: center; width: 100%;
-  }
-  .link-btn:hover{ color: var(--gold); }
-  .divider{
-    display: flex; align-items: center; gap: 8px;
-    margin: 12px 0; color: var(--muted); font-size: 10px;
-    text-transform: uppercase;
-  }
-  .divider::before, .divider::after{
-    content: ''; flex: 1; height: 1px; background: #2a2a2a;
-  }
-  .hint{
-    font-size: 10px; color: var(--muted);
-    text-align: center; margin-top: 8px; line-height: 1.4;
-  }
-  .phone-foot{
-    text-align: center;
-    font-size: 10px; color: #5a5340;
-    margin-top: 14px;
-  }
-
-  #toastHost{
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; gap: 10px; z-index: 100;
-    width: min(90vw, 380px);
-  }
-  .toast{
-    background: #141414; border: 1px solid #2a2a2a;
-    border-radius: 12px; padding: 14px 16px; font-size: 13px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-  }
+  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
+  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   .toast.success{ border-color: rgba(61,214,140,0.4); }
   .toast.error{ border-color: rgba(229,72,77,0.4); }
 
-  .helion-lang-switch{
-    display: inline-flex; gap: 2px;
-    border: 1px solid #2a2a2a; border-radius: 999px;
-    padding: 2px; background: #0c0c0c;
-  }
-  .helion-lang-switch button{
-    border: none; background: transparent; color: var(--muted);
-    font-size: 11px; font-weight: 700; padding: 5px 10px;
-    border-radius: 999px; cursor: pointer; font-family: inherit;
-  }
-  .helion-lang-switch button.active{
-    background: rgba(232,185,35,0.15); color: var(--gold);
-  }
+  .helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line,#262B35);border-radius:999px;padding:2px;background:var(--panel,#14171D);margin-left:8px;}
+  .helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
+  .helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
 </style>
 </head>
 <body>
-<div class="stage">
-  <div class="brand-side">
-    <div class="logo-lockup">
-      <div class="logo-mark"><span>H</span></div>
-      <div class="logo-word">HELION</div>
-    </div>
-    <h1 class="headline">HELION</h1>
-    <p class="sub" data-i18n="index.heroSub">
-      BSC Testnet — miner, staking, swap &amp; points. Spot coming next.
-    </p>
-    <p class="tagline">Built for the Future. Powered by Helion.</p>
+<div class="wrap">
+  <div class="logo-row">
+    <img src="logo.jpg" alt="Helion">
+    <h1 class="display">Helion</h1>
+    <div class="tag">BSC Testnet</div>
   </div>
 
-  <div class="phone-side">
-    <div class="phone">
-      <div class="phone-top">
-        <div class="phone-brand">
-          <div class="mini-mark"></div>
-          <b>HELION</b>
-        </div>
-        <span class="badge-testnet">TESTNET</span>
-      </div>
+  <div class="card">
+    <h2 class="display" id="authTitle" data-i18n="index.authLogin">Kirjaudu sisään</h2>
+    <div class="input-row"><input type="text" id="authUsername" placeholder="Käyttäjänimi" data-i18n-placeholder="index.username" autocomplete="username"></div>
+    <div class="input-row"><input type="password" id="authPassword" placeholder="Salasana" data-i18n-placeholder="index.password" autocomplete="current-password"></div>
+    <button class="btn-block" onclick="doLogin()" id="loginBtn" data-i18n="index.loginBtn">Kirjaudu</button>
+    <button class="link-btn" onclick="toggleAuthMode()" id="toggleAuthBtn" data-i18n="index.toggleAuth">Ei tiliä? Rekisteröidy</button>
 
-      <div class="wallet-card">
-        <div class="lbl">💼 <span data-i18n="index.walletLabel">WALLET</span></div>
-        <div class="bal">—</div>
-        <div class="asset">HELION</div>
-        <div class="spark">
-          <svg viewBox="0 0 200 40" preserveAspectRatio="none">
-            <polyline fill="none" stroke="#E8B923" stroke-width="2"
-              points="0,30 20,28 40,22 60,24 80,16 100,18 120,10 140,14 160,8 180,12 200,6"/>
-          </svg>
-        </div>
-      </div>
+    <div class="divider" data-i18n="index.or">tai</div>
 
-      <div class="menu">
-        <a class="menu-item" href="miner.html"><span class="ico">⛏</span><span data-i18n="nav.miner">Miner</span><span class="chev">›</span></a>
-        <a class="menu-item" href="staking.html"><span class="ico">🔒</span><span data-i18n="nav.staking">Staking</span><span class="chev">›</span></a>
-        <a class="menu-item" href="helion-trading.html"><span class="ico">🔄</span><span data-i18n="nav.swap">Swap</span><span class="chev">›</span></a>
-        <a class="menu-item" href="leaderboard.html"><span class="ico">🏆</span><span data-i18n="nav.board">Leaderboard</span><span class="chev">›</span></a>
-        <a class="menu-item" href="wallet.html"><span class="ico">💼</span><span data-i18n="nav.wallet">Wallet</span><span class="chev">›</span></a>
-        <a class="menu-item" href="guide.html"><span class="ico">📖</span><span data-i18n="nav.guide">Guide</span><span class="chev">›</span></a>
-      </div>
-
-      <div class="auth-box">
-        <h2 class="display" id="authTitle" data-i18n="index.authLogin">Kirjaudu sisään</h2>
-        <div class="input-row"><input type="text" id="authUsername" placeholder="Username" data-i18n-placeholder="index.username" autocomplete="username"></div>
-        <div class="input-row"><input type="password" id="authPassword" placeholder="Password" data-i18n-placeholder="index.password" autocomplete="current-password"></div>
-        <button class="btn-block" onclick="doLogin()" id="loginBtn" data-i18n="index.loginBtn">Kirjaudu</button>
-        <button class="link-btn" onclick="toggleAuthMode()" id="toggleAuthBtn" data-i18n="index.toggleAuth">Ei tiliä? Rekisteröidy</button>
-
-        <div class="divider" data-i18n="index.or">or</div>
-
-        <button class="btn-block secondary" onclick="loginWithWallet()" id="walletLoginBtn">🦊 <span data-i18n="index.walletLogin">Kirjaudu lompakolla</span></button>
-        <p class="hint" data-i18n="index.walletHintStatic">Requires a wallet linked on the Wallet page.</p>
-      </div>
-
-      <div class="phone-foot">Built for the Future. Powered by Helion.</div>
-    </div>
+    <button class="btn-block secondary" onclick="loginWithWallet()" id="walletLoginBtn">🦊 <span data-i18n="index.walletLogin">Kirjaudu lompakolla</span></button>
+    <p style="font-size:11px; color:var(--muted); margin-top:8px; text-align:center;" data-i18n="index.walletHintStatic">Vaatii että olet aiemmin linkittänyt lompakon Wallet-osiossa.</p>
   </div>
 </div>
 
@@ -384,14 +112,14 @@
   function toggleAuthMode() {
     isRegisterMode = !isRegisterMode;
     document.getElementById('authTitle').textContent = isRegisterMode
-      ? tr('index.authRegister', 'Register')
-      : tr('index.authLogin', 'Sign in');
+      ? tr('index.authRegister', 'Rekisteröidy')
+      : tr('index.authLogin', 'Kirjaudu');
     document.getElementById('loginBtn').textContent = isRegisterMode
-      ? tr('index.registerBtn', 'Create account')
-      : tr('index.loginBtn', 'Sign in');
+      ? tr('index.registerBtn', 'Luo tili')
+      : tr('index.loginBtn', 'Kirjaudu');
     document.getElementById('toggleAuthBtn').textContent = isRegisterMode
-      ? tr('index.toggleToLogin', 'Already have an account? Sign in')
-      : tr('index.toggleToRegister', 'No account? Register');
+      ? tr('index.toggleToLogin', 'On jo tili? Kirjaudu')
+      : tr('index.toggleToRegister', 'Ei tiliä? Rekisteröidy');
   }
 
   function saveSessionAndRedirect(token, username) {
@@ -404,14 +132,14 @@
     const username = document.getElementById('authUsername').value.trim();
     const password = document.getElementById('authPassword').value;
     if (!username || !password) {
-      toast(tr('index.fillBoth', 'Fill in both fields.'), 'error');
+      toast(tr('index.fillBoth', 'Täytä molemmat kentät.'), 'error');
       return;
     }
 
     const btn = document.getElementById('loginBtn');
     const prev = btn.textContent;
     btn.disabled = true;
-    btn.textContent = tr('common.loading', 'Loading…');
+    btn.textContent = tr('common.loading', 'Ladataan…');
 
     const endpoint = isRegisterMode ? '/api/register' : '/api/login';
     try {
@@ -423,22 +151,22 @@
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg = (typeof apiMsg === 'function' ? apiMsg(data) : null)
-          || data.error || tr('common.error', 'Error');
+          || data.error || tr('common.error', 'Virhe');
         toast(msg, 'error');
         return;
       }
       toast(
         isRegisterMode
-          ? tr('index.toastRegister', 'Account created!')
-          : tr('index.toastLogin', 'Signed in!'),
+          ? tr('index.toastRegister', 'Tili luotu!')
+          : tr('index.toastLogin', 'Kirjauduttu sisään!'),
         'success'
       );
       saveSessionAndRedirect(data.token, data.username);
     } catch (e) {
       toast(
-        tr('common.connectionError', 'Connection error') +
+        tr('common.connectionError', 'Yhteysvirhe') +
           ': ' + (e.message || e) +
-          ' — if Render is sleeping, wait ~30s and try again.',
+          ' — jos Render nukahti, odota ~30s ja yritä uudelleen.',
         'error'
       );
     } finally {
@@ -448,13 +176,10 @@
   }
 
   async function loginWithWallet() {
-    if (!window.ethereum) {
-      toast(tr('index.noMetamask', 'MetaMask not found.'), 'error');
-      return;
-    }
+    if (!window.ethereum) { toast(tr('index.noMetamask', 'MetaMask ei löytynyt.'), 'error'); return; }
     const btn = document.getElementById('walletLoginBtn');
     btn.disabled = true;
-    btn.textContent = tr('common.waitingMetamask', 'Waiting for MetaMask…');
+    btn.textContent = tr('common.waitingMetamask', 'Odotetaan MetaMaskia…');
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send('eth_requestAccounts', []);
@@ -464,7 +189,7 @@
       const nonceRes = await fetch(BACKEND_URL + '/api/auth/nonce?address=' + address);
       const nonceData = await nonceRes.json();
       if (!nonceRes.ok) {
-        toast((typeof apiMsg === 'function' ? apiMsg(nonceData) : null) || nonceData.error || tr('common.error', 'Error'), 'error');
+        toast((typeof apiMsg === 'function' ? apiMsg(nonceData) : null) || nonceData.error || tr('common.error', 'Virhe'), 'error');
         return;
       }
 
@@ -477,17 +202,17 @@
       });
       const loginData = await loginRes.json();
       if (!loginRes.ok) {
-        toast((typeof apiMsg === 'function' ? apiMsg(loginData) : null) || loginData.error || tr('index.loginFailed', 'Login failed.'), 'error');
+        toast((typeof apiMsg === 'function' ? apiMsg(loginData) : null) || loginData.error || tr('index.loginFailed', 'Kirjautuminen epäonnistui.'), 'error');
         return;
       }
 
-      toast(tr('index.toastWallet', 'Signed in with wallet!'), 'success');
+      toast(tr('index.toastWallet', 'Kirjauduttu lompakolla!'), 'success');
       saveSessionAndRedirect(loginData.token, loginData.username);
     } catch (e) {
-      toast(tr('common.error', 'Error') + ': ' + (e.reason || e.message), 'error');
+      toast(tr('common.error', 'Virhe') + ': ' + (e.reason || e.message), 'error');
     } finally {
       btn.disabled = false;
-      btn.innerHTML = '🦊 <span data-i18n="index.walletLogin">' + tr('index.walletLoginBtn', 'Sign in with wallet') + '</span>';
+      btn.innerHTML = '🦊 <span data-i18n="index.walletLogin">' + tr('index.walletLoginBtn', 'Kirjaudu lompakolla') + '</span>';
     }
   }
 
@@ -501,7 +226,7 @@
 </script>
 <script src="i18n.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function() {
     if (window.HelionI18n) {
       HelionI18n.mountLangSwitch(document.body);
       HelionI18n.applyLang();
