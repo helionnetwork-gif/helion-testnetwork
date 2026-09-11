@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<script src="config.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helion</title>
+<script>
+  (function () {
+    var p = location.pathname;
+    if (p && !p.endsWith('/') && !/\.html?$/i.test(p)) {
+      location.replace(p + '/' + location.search + location.hash);
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #050505;
+    --card: #0e0e0e;
+    --row: #121212;
+    --line: #242424;
+    --gold: #E8B923;
+    --gold-2: #C9A227;
+    --text: #F5F3EE;
+    --muted: #8B8F98;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: #000;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 20px 16px 48px;
+  }
+  .wrap{ max-width: 420px; margin: 0 auto; }
+
+  .top{
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .brand{
+    display: flex; align-items: center; gap: 10px;
+  }
+  .mark{
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #F2D06B, #C9A227);
+    clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+    box-shadow: 0 0 18px rgba(232,185,35,0.35);
+  }
+  .word{
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700; font-size: 20px; letter-spacing: 2px;
+    background: linear-gradient(180deg, #F2D06B, #C9A227);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .badge{
+    font-size: 10px; font-weight: 700; color: var(--gold);
+    border: 1px solid rgba(232,185,35,0.4);
+    background: rgba(232,185,35,0.08);
+    padding: 5px 12px; border-radius: 999px; letter-spacing: 0.6px;
+  }
+
+  .user-row{
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; font-size: 13px; color: var(--muted);
+  }
+  .user-row strong{ color: var(--text); }
+  .user-row button{
+    background: none; border: none; color: var(--muted);
+    font-size: 12px; cursor: pointer; text-decoration: underline;
+  }
+
+  .wallet{
+    background: var(--card);
+    border: 1px solid #2a2518;
+    border-radius: 18px;
+    padding: 18px 18px 16px;
+    margin-bottom: 18px;
+  }
+  .wallet .lbl{
+    font-size: 11px; color: var(--muted); letter-spacing: 0.8px;
+    text-transform: uppercase; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .wallet .bal{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 30px; font-weight: 700; letter-spacing: -0.5px;
+  }
+  .wallet .meta{
+    margin-top: 6px; font-size: 12px; color: var(--gold-2);
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .wallet .addr{
+    margin-top: 10px; font-size: 11px; color: var(--muted);
+    word-break: break-all; font-family: 'JetBrains Mono', monospace;
+  }
+  .spark{
+    height: 40px; margin-top: 12px; border-radius: 8px;
+    background: linear-gradient(90deg, transparent, rgba(232,185,35,0.12));
+    overflow: hidden;
+  }
+  .spark svg{ width: 100%; height: 100%; display: block; }
+
+  .menu{ display: flex; flex-direction: column; gap: 8px; }
+  .menu a{
+    display: flex; align-items: center; gap: 12px;
+    background: var(--row);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px; font-weight: 600;
+    transition: border-color .15s, background .15s;
+  }
+  .menu a:hover{
+    border-color: rgba(232,185,35,0.45);
+    background: #16140e;
+  }
+  .menu a .ico{
+    width: 32px; height: 32px; border-radius: 9px;
+    background: rgba(232,185,35,0.1);
+    display: grid; place-items: center;
+    font-size: 15px; color: var(--gold); flex-shrink: 0;
+  }
+  .menu a .chev{ margin-left: auto; color: var(--muted); font-size: 18px; font-weight: 400; }
+  .menu a.soon{ opacity: 0.55; }
+  .menu a.soon .tag{
+    margin-left: 8px; font-size: 10px; color: var(--gold);
+    border: 1px solid rgba(232,185,35,0.35);
+    padding: 2px 6px; border-radius: 6px; font-weight: 700;
+  }
+
+  .foot{
+    text-align: center; margin-top: 28px;
+    font-size: 11px; color: #5a5340;
+  }
+
+  #toastHost{
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 50; width: min(90vw, 360px);
+  }
+  .toast{
+    background: #141414; border: 1px solid #2a2a2a;
+    border-radius: 12px; padding: 12px 14px; font-size: 13px;
+    margin-top: 8px;
+  }
+  .toast.err{ border-color: rgba(229,72,77,0.4); }
+
+  .helion-lang-switch{
+    display: inline-flex; gap: 2px; border: 1px solid #2a2a2a;
+    border-radius: 999px; padding: 2px; background: #0c0c0c;
+  }
+  .helion-lang-switch button{
+    border: none; background: transparent; color: var(--muted);
+    font-size: 11px; font-weight: 700; padding: 5px 10px;
+    border-radius: 999px; cursor: pointer; font-family: inherit;
+  }
+  .helion-lang-switch button.active{
+    background: rgba(232,185,35,0.15); color: var(--gold);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <div class="mark"></div>
+      <div class="word">HELION</div>
+    </div>
+    <span class="badge">TESTNET</span>
+  </div>
+
+  <div class="user-row">
+    <span>@<strong id="usernameDisplay">–</strong></span>
+    <button type="button" onclick="logout()" data-i18n="nav.logout">Kirjaudu ulos</button>
+  </div>
+
+  <div class="wallet">
+    <div class="lbl">💼 <span data-i18n="index.walletLabel">Wallet</span></div>
+    <div class="bal" id="balHel">–</div>
+    <div class="meta">
+      <span id="balHelLabel">HEL</span>
+      <span id="balBnb">– tBNB</span>
+    </div>
+    <div class="addr" id="walletAddress">–</div>
+    <div class="spark">
+      <svg viewBox="0 0 200 40" preserveAspectRatio="none">
+        <polyline fill="none" stroke="#E8B923" stroke-width="2"
+          points="0,30 20,28 40,22 60,24 80,16 100,18 120,10 140,14 160,8 180,12 200,6"/>
+      </svg>
+    </div>
+  </div>
+
+  <nav class="menu">
+    <a href="miner.html">
+      <span class="ico">⛏</span>
+      <span data-i18n="nav.miner">Miner</span>
+      <span class="chev">›</span>
+    </a>
+    <a href="staking.html">
+      <span class="ico">🔒</span>
+      <span data-i18n="nav.staking">Staking</span>
+      <span class="chev">›</span>
+    </a>
+    <a href="helion-trading.html">
+      <span class="ico">🔄</span>
+      <span data-i18n="nav.swap">Swap</span>
+      <span class="chev">›</span>
+    </a>
+    <a href="spot.html" class="soon">
+      <span class="ico">📈</span>
+      <span data-i18n="nav.spot">Spot</span>
+      <span class="tag">SOON</span>
+      <span class="chev">›</span>
+    </a>
+    <a href="leaderboard.html">
+      <span class="ico">🏆</span>
+      <span data-i18n="nav.board">Leaderboard</span>
+      <span class="chev">›</span>
+    </a>
+    <a href="wallet.html">
+      <span class="ico">💼</span>
+      <span data-i18n="nav.wallet">Wallet</span>
+      <span class="chev">›</span>
+    </a>
+    <a href="guide.html">
+      <span class="ico">📖</span>
+      <span data-i18n="nav.guide">Guide</span>
+      <span class="chev">›</span>
+    </a>
+  </nav>
+
+  <div class="foot">Built for the Future. Powered by Helion.</div>
+</div>
+
+<div id="toastHost"></div>
+
+<script>
+  const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
+  const token = localStorage.getItem('helion_token');
+  const username = localStorage.getItem('helion_username');
+  if (!token) location.href = 'index.html';
+
+  document.getElementById('usernameDisplay').textContent = username || '–';
+
+  function logout() {
+    localStorage.removeItem('helion_token');
+    localStorage.removeItem('helion_username');
+    location.href = 'index.html';
+  }
+
+  function toast(msg, err) {
+    const host = document.getElementById('toastHost');
+    const el = document.createElement('div');
+    el.className = 'toast' + (err ? ' err' : '');
+    el.textContent = msg;
+    host.appendChild(el);
+    setTimeout(() => el.remove(), 4500);
+  }
+
+  function fmt(n, d) {
+    const x = Number(n);
+    if (!isFinite(x)) return '–';
+    return x.toLocaleString(undefined, { maximumFractionDigits: d });
+  }
+
+  async function loadWallet() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/wallet', {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'wallet');
+      document.getElementById('balHel').textContent = fmt(data.helBalance, 4);
+      document.getElementById('balBnb').textContent = fmt(data.bnbBalance, 4) + ' tBNB';
+      document.getElementById('walletAddress').textContent = data.address || '–';
+    } catch (e) {
+      toast((e && e.message) || 'Failed to load wallet', true);
+    }
+  }
+
+  loadWallet();
+</script>
+<script src="i18n.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.HelionI18n) {
+      HelionI18n.mountLangSwitch(document.body);
+      HelionI18n.applyLang();
+    }
+  });
+</script>
+</body>
+</html>
