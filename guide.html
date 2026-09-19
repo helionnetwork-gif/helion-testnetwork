@@ -3,100 +3,45 @@
 <head>
 <script src="config.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Helion — Ohjeet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Helion Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 <style>
-  :root{
-    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
-    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
-    --danger: #E5484D; --success: #3DD68C;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
-    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
-    padding: 32px 20px 80px; line-height: 1.5;
-  }
-  .display{ font-family:'Chakra Petch', sans-serif; }
-  .wrap{ max-width: 760px; width: 100%; margin: 0 auto; box-sizing: border-box; }
-  [data-lang-only]{ width: 100%; max-width: 100%; }
-  .section, .intro{ max-width: 100%; box-sizing: border-box; }
-  header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
-  .brand{ display:flex; align-items:center; gap: 12px; }
-  .brand h1{ font-size: 22px; }
-  .brand .tag{ font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;}
-  .brand-logo{ height: 40px; width: 40px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 16px rgba(242,169,59,0.35); }
-  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
-  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
-  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
-  .intro{
-    background: var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px;
-    font-size: 13px; color: var(--muted);
-  }
-  .intro strong{ color: var(--text); }
-  .toc{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
-  .toc a{
-    font-size:11px; padding:6px 10px; border-radius:999px; border:1px solid var(--line);
-    background: var(--panel-2); color: var(--gold); text-decoration:none; font-weight:600;
-  }
-  .section{
-    background: var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin-bottom:12px;
-  }
-  .section h2{
-    font-family:'Chakra Petch',sans-serif; font-size:15px; color: var(--gold); margin-bottom:8px;
-  }
-  .section h3{ font-size:13px; margin:12px 0 6px; color: var(--text); }
-  .section p, .section li{ font-size:12.5px; color: var(--muted); margin-bottom:6px; }
-  .section ol, .section ul{ padding-left: 1.25rem; margin-bottom: 10px; }
-  .section a{ color: var(--gold); }
-  .callout{
-    background: rgba(242,169,59,0.08); border:1px solid rgba(242,169,59,0.25);
-    border-radius:10px; padding:10px 12px; margin:10px 0; font-size:12.5px; color: var(--text);
-  }
-  .callout.warn{
-    background: rgba(229,72,77,0.08); border-color: rgba(229,72,77,0.35);
-  }
-  code, .mono{
-    font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--panel-2);
-    padding:2px 6px; border-radius:6px; color: var(--text);
-  }
-  .btn{
-    display:inline-block; margin-top:8px; margin-right:8px; padding:10px 16px; border-radius:12px;
-    background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; font-weight:700;
-    font-family:'Chakra Petch',sans-serif; font-size:13px; text-decoration:none; border:none; cursor:pointer;
-  }
-  .btn.secondary{
-    background: #1B1F27;
-    color: #F5F3EE !important;
-    border: 1px solid #F2A93B;
-  }
-  .btn.secondary:hover{
-    background: rgba(242,169,59,0.15);
-    color: #F2A93B !important;
-  }
-  table{ width:100%; border-collapse:collapse; font-size:12.5px; margin:10px 0; }
-  th, td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); color: var(--muted); }
-  th{ color: var(--text); font-weight:600; }
-  .helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--panel);margin-left:8px;}
-  .helion-lang-switch button{border:none;background:transparent;color:var(--muted);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
-  .helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold);}
+  .section{ background:var(--panel); border:1px solid var(--line); border-radius:22px; padding:20px; margin-bottom:14px; }
+  .section h2{ font-family:'Chakra Petch',sans-serif; font-size:16px; color:var(--gold); margin-bottom:12px; }
+  .section h3{ font-size:14px; margin:12px 0 8px; color:var(--text); }
+  .section ol, .section ul{ padding-left:18px; line-height:1.55; font-size:13.5px; }
+  .section p{ font-size:13.5px; line-height:1.5; margin-bottom:8px; }
+  .section a{ color:var(--gold); }
+  .callout{ margin-top:10px; padding:12px; border-radius:12px; background:rgba(242,169,59,0.08); border:1px solid rgba(242,169,59,0.28); font-size:12.5px; line-height:1.45; }
+  .callout.warn{ border-color:rgba(229,72,77,0.35); background:rgba(229,72,77,0.08); }
+  .toc-bar, .toc{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .toc-bar a, .toc a{ font-size:12px; color:var(--muted); text-decoration:none; border:1px solid var(--line); padding:6px 10px; border-radius:999px; background:var(--panel); }
+  .toc-bar a:hover, .toc a:hover{ color:var(--gold); border-color:var(--gold); }
+  .btn{ display:inline-block; padding:8px 12px; border-radius:10px; background:linear-gradient(180deg,var(--gold),#d68f26); color:#1a1305 !important; font-weight:700; font-size:12px; text-decoration:none; margin:4px 4px 0 0; }
+  .btn.secondary{ background:transparent; border:1px solid var(--line); color:var(--text) !important; }
+  table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  td{ padding:8px 6px; border-bottom:1px solid var(--line); color:var(--muted); }
+  td.mono{ color:var(--text); word-break:break-all; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">
-      <img src="logo.jpg" alt="Helion" class="brand-logo">
-      <div>
-        <h1 class="display" data-i18n="guide.pageTitle">Ohjeet</h1>
-        <div class="tag" data-i18n="guide.tag">Aloita tästä — BSC Testnet</div>
-      </div>
+    <a class="brand" href="home.html">
+      <img src="logo.jpg" alt="Helion" class="brand-logo" onerror="this.style.display='none'">
+      <div><h1 class="display">Helion Guide</h1><div class="tag">BSC Testnet · How to use</div></div>
+    </a>
+    <div class="user-pill">
+      <div class="dot"></div>
+      <span id="usernameDisplay">–</span>
+      <button type="button" onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
     </div>
   </header>
-
   <nav class="site-nav">
+    <a href="home.html" class="nav-item"><span data-i18n="nav.home">🏠 Home</span></a>
     <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
     <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
     <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
@@ -105,8 +50,7 @@
     <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Ranking</span></a>
     <a href="guide.html" class="nav-item active"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
   </nav>
-
-    <div data-lang-only="fi">
+<div data-lang-only="fi">
 <div class="intro">
     <strong>Helion</strong> on BSC Testnet -projekti (Chain ID <span class="mono">97</span>).
     Kaikki tokenit ovat <strong>testiarvoa</strong> — ei oikeaa rahaa.
@@ -385,6 +329,27 @@
     });
   });
 </script>
+
+</div>
+<div id="toastHost"></div>
+<script>
+  const username = localStorage.getItem('helion_username');
+  const el = document.getElementById('usernameDisplay');
+  if (el) el.textContent = username || 'guest';
+  function logout() {
+    localStorage.removeItem('helion_token');
+    localStorage.removeItem('helion_username');
+    location.href = 'index.html';
+  }
+</script>
 <script src="i18n.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.HelionI18n) {
+      HelionI18n.mountLangSwitch(document.body);
+      HelionI18n.applyLang();
+    }
+  });
+</script>
 </body>
 </html>

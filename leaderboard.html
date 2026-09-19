@@ -3,91 +3,29 @@
 <head>
 <script src="config.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Helion Leaderboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Helion — Rank</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
-    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
-    --danger: #E5484D; --success: #3DD68C;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
-    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
-    padding: 32px 20px 80px;
-  }
-  .display{ font-family:'Chakra Petch', sans-serif; }
-  .wrap{ max-width: 760px; margin: 0 auto; }
-
-  header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
-  .brand{ display:flex; align-items:center; gap: 10px; }
-  .brand-logo{ height: 38px; width: 38px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 14px rgba(242,169,59,0.3); }
-  .brand h1{ font-size: 19px; }
-  .brand .tag{ font-size: 10.5px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-
-  .user-pill{ background: var(--panel); border: 1px solid var(--line); padding: 9px 14px; border-radius: 999px; font-size: 12.5px; display:flex; align-items:center; gap:8px; }
-  .user-pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
-  .user-pill button{ background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; text-decoration:underline; }
-
-  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
-  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
-  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
-
-  .rules-card{ background: rgba(124,92,252,0.08); border:1px solid var(--violet); border-radius: 14px; padding: 14px 16px; font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
-  .rules-card strong{ color: var(--violet); }
-
-  .my-score-card{ background: var(--panel); border:2px solid var(--gold); border-radius: 18px; padding: 18px 20px; margin-bottom: 22px; display:flex; justify-content:space-between; align-items:center; }
-  .my-score-card .label{ font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; }
-  .my-score-card .score{ font-size:28px; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--gold); }
-  .my-score-card .breakdown{ font-size:11px; color:var(--muted); margin-top:4px; }
-
-  .board-list{ display:flex; flex-direction:column; gap: 8px; }
-  .board-row{ background: var(--panel); border:1px solid var(--line); border-radius: 14px; padding: 13px 16px; display:flex; align-items:center; gap: 14px; }
-  .board-row.you{ border-color: var(--gold); background: rgba(242,169,59,0.06); }
-  .board-row.rank-1{ border-color: var(--gold); }
-  .board-row.rank-2{ border-color: #C0C0C0; }
-  .board-row.rank-3{ border-color: #B08D57; }
-
-  .rank-badge{ width: 30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:13px; flex-shrink:0; background: var(--panel-2); color: var(--muted); }
-  .rank-badge.gold{ background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
-  .rank-badge.silver{ background: linear-gradient(180deg, #E8E8E8, #A8A8A8); color:#1a1305; }
-  .rank-badge.bronze{ background: linear-gradient(180deg, #CD8E5C, #9c6a3d); color:#1a1305; }
-
-  .row-name{ font-family:'JetBrains Mono',monospace; font-size: 13px; flex:1; }
-  .row-value{ text-align:right; }
-  .row-value .main{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:14px; color:var(--gold); }
-  .row-value .sub{ font-size: 10px; color: var(--muted); }
-
-  .empty-note{ text-align:center; color: var(--muted); font-size: 13px; padding: 30px 0; background:var(--panel); border:1px solid var(--line); border-radius:14px; }
-
-  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
-  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-  .toast.error{ border-color: rgba(229,72,77,0.4); }
-
-.helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line,#262B35);border-radius:999px;padding:2px;background:var(--panel,#14171D);margin-left:8px;}
-.helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
-.helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
-
-</style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">
-      <img src="logo.jpg" alt="Helion" class="brand-logo">
-      <div><h1 class="display" data-i18n="leaderboard.title">Leaderboard</h1><div class="tag">Contribution-kilpailu</div></div>
-    </div>
+    <a class="brand" href="home.html">
+      <img src="logo.jpg" alt="Helion" class="brand-logo" onerror="this.style.display='none'">
+      <div><h1 class="display">Helion Ranking</h1><div class="tag">BSC Testnet · Points</div></div>
+    </a>
     <div class="user-pill">
       <div class="dot"></div>
       <span id="usernameDisplay">–</span>
-      <button onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
+      <button type="button" onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
     </div>
   </header>
 
   <nav class="site-nav">
+    <a href="home.html" class="nav-item"><span data-i18n="nav.home">🏠 Home</span></a>
     <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
     <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
     <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
@@ -97,105 +35,76 @@
     <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
   </nav>
 
-  <div class="rules-card">
-    <span data-i18n="board.scoring">Pisteytys: +1 piste / 100 HEL stakettu · +1 piste / tehty kauppa · +0.1 piste / lähetys · +5 pistettä / kaivauksen aktivointi
-  </span></div>
-
-  <div class="my-score-card">
-    <div>
-      <div class="label">Sinun pisteesi</div>
-      <div class="breakdown" id="myBreakdown">–</div>
+<div class="card">
+    <h1 class="display" data-i18n="nav.board">Leaderboard</h1>
+    <p class="muted" style="margin-bottom:14px;">Pisteitä louhinnasta, stakeista, swapista ja siirroista.</p>
+    <div class="emission-box">
+      <div class="balance-row"><span>Pisteesi</span><strong class="mono" id="myScore">–</strong></div>
+      <div class="muted" id="myBreakdown" style="margin-top:8px;font-size:12px;"></div>
     </div>
-    <div class="score" id="myScore">–</div>
+    <ol class="board" id="boardList"></ol>
   </div>
 
-  <div class="board-list" id="boardList"><div class="empty-note" data-i18n="staking.loading">Ladataan…</div></div>
+  <div class="foot">Built for the Future. Powered by Helion.</div>
 </div>
-
 <div id="toastHost"></div>
-
 <script>
-  const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
 
+  const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
   const token = localStorage.getItem('helion_token');
   const username = localStorage.getItem('helion_username');
-  if (!token) { window.location.href = 'index.html'; }
+  if (!token || String(token).length < 20) location.replace('index.html');
 
   function authHeaders() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
-
   function logout() {
     localStorage.removeItem('helion_token');
     localStorage.removeItem('helion_username');
-    window.location.href = 'index.html';
+    location.replace('index.html');
   }
-
-  function toast(message, type = 'default') {
+  function toast(message, type) {
     const host = document.getElementById('toastHost');
     const el = document.createElement('div');
-    el.className = `toast ${type}`;
+    el.className = 'toast ' + (type || '');
     el.textContent = message;
     host.appendChild(el);
     setTimeout(() => el.remove(), 4500);
   }
+  document.getElementById('usernameDisplay').textContent = username || '–';
 
-  async function loadMyScore() {
+  async function load() {
     try {
-      const res = await fetch(BACKEND_URL + '/api/contribution', { headers: authHeaders() });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Virhe');
-      document.getElementById('myScore').textContent = data.score;
-      document.getElementById('myBreakdown').textContent =
-        `${Math.floor(data.stakeVolume/100)} staking · ${data.tradeCount} kauppaa · ${data.sendCount} lähetystä · ${data.mineCount} kaivausta`;
-    } catch (e) {
-      toast(t('board.balanceFail') + ': ' + e.message, 'error');
-    }
-  }
-
-  async function loadLeaderboard() {
-    const listEl = document.getElementById('boardList');
+      const meRes = await fetch(BACKEND_URL + '/api/contribution', { headers: authHeaders() });
+      const me = await meRes.json();
+      if (meRes.ok) {
+        document.getElementById('myScore').textContent = (me.score != null ? Number(me.score).toFixed(1) : '–');
+        document.getElementById('myBreakdown').textContent =
+          '⛏ ' + (me.mineCount || 0) + ' · 🔒 ' + (me.stakeVolume || 0) + ' HEL · 🔄 ' + (me.tradeCount || 0) + ' · 📤 ' + (me.sendCount || 0);
+      }
+    } catch (e) {}
     try {
       const res = await fetch(BACKEND_URL + '/api/leaderboard?limit=20');
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Virhe');
-
-      if (data.leaderboard.length === 0) {
-        listEl.innerHTML = '<div class="empty-note">' + t('board.empty') + '</div>';
-        return;
-      }
-
-      listEl.innerHTML = '';
-      data.leaderboard.forEach((entry, i) => {
-        const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-        const rowRankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-        const isYou = entry.username === username;
-        const row = document.createElement('div');
-        row.className = `board-row ${rowRankClass} ${isYou ? 'you' : ''}`;
-        row.innerHTML = `
-          <div class="rank-badge ${rankClass}">${i + 1}</div>
-          <div class="row-name">@${entry.username}${isYou ? ' ' + t('board.you') : ''}</div>
-          <div class="row-value">
-            <div class="main">${entry.score} ${t('board.points')}</div>
-            <div class="sub">${Math.floor(entry.stakeVolume/100)}·${entry.tradeCount}·${entry.sendCount}·${entry.mineCount}</div>
-          </div>
-        `;
-        listEl.appendChild(row);
+      const list = document.getElementById('boardList');
+      list.innerHTML = '';
+      const meName = (username || '').toLowerCase();
+      (data.leaderboard || []).forEach((row, i) => {
+        const li = document.createElement('li');
+        if ((row.username || '').toLowerCase() === meName) li.className = 'me';
+        li.innerHTML = '<span class="rank">#' + (i + 1) + '</span><span class="user">@' + row.username + '</span><span class="score mono">' + Number(row.score || 0).toFixed(1) + '</span>';
+        list.appendChild(li);
       });
     } catch (e) {
-      listEl.innerHTML = '<div class="empty-note">' + t('board.fail') + '</div>';
+      toast('Leaderboard failed: ' + e.message, 'error');
     }
   }
+  load();
 
-  document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
-  loadMyScore();
-  loadLeaderboard();
 </script>
 <script src="i18n.js"></script>
-
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     if (window.HelionI18n) {
-      var host = document.querySelector('.topbar') || document.querySelector('header') || document.querySelector('.nav') || document.querySelector('.site-nav') || document.body;
-      HelionI18n.mountLangSwitch(host);
+      HelionI18n.mountLangSwitch(document.body);
       HelionI18n.applyLang();
     }
   });

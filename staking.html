@@ -3,103 +3,29 @@
 <head>
 <script src="config.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Helion Staking</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Helion — Staking</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
-    --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
-    --danger: #E5484D; --success: #3DD68C;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
-    color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh;
-    padding: 32px 20px 80px;
-  }
-  .display{ font-family:'Chakra Petch', sans-serif; }
-  .wrap{ max-width: 760px; margin: 0 auto; }
-
-  header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
-  .brand{ display:flex; align-items:center; gap: 12px; }
-  .brand h1{ font-size: 22px; }
-  .brand .tag{ font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;}
-  .brand-logo{ height: 40px; width: 40px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 16px rgba(242,169,59,0.35); }
-
-  .user-pill{ background: var(--panel); border: 1px solid var(--line); padding: 10px 16px; border-radius: 999px; font-size: 13px; display:flex; align-items:center; gap:10px; }
-  .user-pill .dot{ width:8px; height:8px; border-radius:50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
-  .user-pill button{ background:none; border:none; color:var(--muted); font-size:11.5px; cursor:pointer; text-decoration:underline; }
-
-  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
-  .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
-  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
-
-  .balance-card{ background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 20px 22px; margin-bottom: 20px; }
-  .balance-card .label{ font-size: 11.5px; color: var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
-  .balance-card .value{ font-size: 24px; font-family:'JetBrains Mono',monospace; font-weight:700; }
-  .balance-card .addr{ font-size:11px; color:var(--muted); margin-top:8px; word-break:break-all; }
-
-  h2.section-title{ font-size:14px; margin-bottom:14px; }
-
-  .tiers-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-  @media (max-width: 640px){ .tiers-grid{ grid-template-columns: 1fr; } }
-  .tier-card{ background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 18px 16px; cursor: pointer; transition: all .15s ease; text-align:center; }
-  .tier-card.selected{ border-color: var(--gold); background: rgba(242,169,59,0.06); }
-  .tier-card .name{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:15px; margin-bottom:8px; }
-  .tier-card .duration{ font-size: 22px; font-family:'JetBrains Mono',monospace; font-weight:700; color: var(--gold); margin-bottom: 4px;}
-  .tier-card .reward{ font-size: 12.5px; color: var(--success); font-weight:600; margin-bottom: 8px; }
-  .tier-card .min{ font-size: 11px; color: var(--muted); }
-
-  .stake-box{ background: var(--panel); border:1px solid var(--line); border-radius: 20px; padding: 20px; margin-bottom: 24px; }
-  .input-row{ display:flex; align-items:center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 4px 4px 4px 14px; margin-bottom: 12px; }
-  .input-row input{ background: transparent; border:none; outline:none; color: var(--text); font-family:'JetBrains Mono', monospace; font-size: 15px; width: 100%; padding: 12px 0; }
-  .input-row .unit{ color: var(--muted); font-size: 12px; padding: 0 10px; white-space:nowrap; }
-  .btn-block{ width:100%; border:none; padding: 16px; border-radius:14px; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px; cursor:pointer; background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
-  .btn-block:disabled{ opacity:0.5; cursor:not-allowed; }
-
-  .positions-list{ display:flex; flex-direction:column; gap: 12px; }
-  .position-card{ background: var(--panel); border:1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
-  .position-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; flex-wrap:wrap; gap:8px;}
-  .position-amount{ font-size: 18px; font-family:'JetBrains Mono',monospace; font-weight:700; }
-  .position-tag{ font-size: 10.5px; padding: 4px 10px; border-radius: 999px; background: var(--panel-2); color: var(--muted); text-transform:uppercase; }
-  .position-tag.locked{ color: var(--gold); }
-  .position-tag.ready{ background: rgba(61,214,140,0.15); color: var(--success); }
-
-  .position-actions{ display:flex; gap: 10px; }
-  .position-actions button{ flex:1; padding: 11px; border-radius: 10px; font-size:12.5px; font-family:'Chakra Petch',sans-serif; font-weight:700; cursor:pointer; border:none; }
-  .btn-withdraw{ background: linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305; }
-  .btn-early{ background: transparent; border:1px solid var(--danger) !important; color: var(--danger); }
-
-  .empty-note{ text-align:center; color: var(--muted); font-size: 13px; padding: 30px 0; }
-
-  #toastHost{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display:flex; flex-direction:column; gap: 10px; z-index: 100; width: min(90vw, 380px); }
-  .toast{ background: var(--panel-2); border:1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-  .toast.success{ border-color: rgba(61,214,140,0.4); }
-  .toast.error{ border-color: rgba(229,72,77,0.4); }
-
-.helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line,#262B35);border-radius:999px;padding:2px;background:var(--panel,#14171D);margin-left:8px;}
-.helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
-.helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
-
-</style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">
-      <img src="logo.jpg" alt="Helion" class="brand-logo">
-      <div><h1 class="display" data-i18n="staking.title">Staking</h1><div class="tag">BSC Testnet</div></div>
-    </div>
+    <a class="brand" href="home.html">
+      <img src="logo.jpg" alt="Helion" class="brand-logo" onerror="this.style.display='none'">
+      <div><h1 class="display">Helion Staking</h1><div class="tag">BSC Testnet · Lock HEL</div></div>
+    </a>
     <div class="user-pill">
       <div class="dot"></div>
       <span id="usernameDisplay">–</span>
-      <button onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
+      <button type="button" onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
     </div>
   </header>
 
   <nav class="site-nav">
+    <a href="home.html" class="nav-item"><span data-i18n="nav.home">🏠 Home</span></a>
     <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
     <a href="staking.html" class="nav-item active"><span data-i18n="nav.staking">🔒 Staking</span></a>
     <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
@@ -109,39 +35,30 @@
     <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
   </nav>
 
-  <div class="balance-card">
-    <div class="label" data-i18n="staking.walletBal">Lompakkosaldo</div>
-    <div class="value" id="walletBalance">– HEL</div>
-    <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="walletUsd">–</div>
-    <div class="addr" id="walletAddress"></div>
+<div class="card">
+    <h1 class="display" data-i18n="nav.staking">Staking</h1>
+    <div class="balance-row"><span>HEL</span><strong class="mono" id="walletBalance">–</strong></div>
+    <div class="muted" id="walletUsd" style="text-align:right;margin-bottom:8px;">–</div>
+    <div class="muted mono" id="walletAddress" style="font-size:11px;word-break:break-all;margin-bottom:12px;">–</div>
+    <div class="tiers" id="tiersGrid"></div>
+    <p class="muted" id="selectedTierInfo" style="margin-bottom:10px;"></p>
+    <div class="input-row"><input type="number" id="stakeAmount" placeholder="HEL määrä" data-i18n-placeholder="wallet.amount"></div>
+    <button class="btn-block" id="stakeBtn" onclick="doStake()" data-i18n="staking.stake" disabled>Stake</button>
+  </div>
+  <div class="card">
+    <h2 class="display" data-i18n="staking.positions">Omat staket</h2>
+    <div id="positionsList"></div>
   </div>
 
-  <h2 class="section-title display" data-i18n="staking.chooseTier">Valitse taso</h2>
-  <div class="tiers-grid" id="tiersGrid"><div class="empty-note" data-i18n="staking.loading">Ladataan…</div></div>
-
-  <div class="stake-box">
-    <div class="input-row">
-      <input type="number" id="stakeAmount" placeholder="0.0" min="0" step="0.01">
-      <span class="unit">HEL</span>
-    </div>
-    <div style="font-size:11.5px; color:var(--muted); margin-bottom:12px;" id="selectedTierInfo">
-      <span data-i18n="staking.chooseFirst">Valitse taso yllä ennen staketusta.</span>
-    </div>
-    <button class="btn-block" id="stakeBtn" onclick="doStake()" disabled data-i18n="staking.chooseBtn">Valitse taso ensin</button>
-  </div>
-
-  <h2 class="section-title display" data-i18n="staking.myPositions">Omat stake-positiot</h2>
-  <div class="positions-list" id="positionsList"><div class="empty-note" data-i18n="staking.loading">Ladataan…</div></div>
+  <div class="foot">Built for the Future. Powered by Helion.</div>
 </div>
-
 <div id="toastHost"></div>
-
 <script>
-  const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
+const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
 
   const token = localStorage.getItem('helion_token');
   const username = localStorage.getItem('helion_username');
-  if (!token) { window.location.href = 'index.html'; }
+  if (!token || String(token).length < 20) { location.replace('index.html'); }
 
   let selectedTierId = null;
   let tiersCache = [];
@@ -339,12 +256,10 @@
   loadPositions();
 </script>
 <script src="i18n.js"></script>
-
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     if (window.HelionI18n) {
-      var host = document.querySelector('.topbar') || document.querySelector('header') || document.querySelector('.nav') || document.querySelector('.site-nav') || document.body;
-      HelionI18n.mountLangSwitch(host);
+      HelionI18n.mountLangSwitch(document.body);
       HelionI18n.applyLang();
     }
   });

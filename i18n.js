@@ -5,6 +5,7 @@
   const STRINGS = {
     fi: {
       'lang.name': 'FI',
+      'nav.home': '🏠 Home',
       'nav.miner': '⛏ Louhinta',
       'nav.staking': '🔒 Staking',
       'nav.swap': '🔄 Vaihto',
@@ -270,6 +271,7 @@
     },
     en: {
       'lang.name': 'EN',
+      'nav.home': '🏠 Home',
       'nav.miner': '⛏ Miner',
       'nav.staking': '🔒 Staking',
       'nav.swap': '🔄 Swap',

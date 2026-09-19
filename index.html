@@ -3,16 +3,8 @@
 <head>
 <script src="config.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Helion — Kirjaudu</title>
-<script>
-  (function () {
-    var p = location.pathname;
-    if (p && !p.endsWith('/') && !/\.html?$/i.test(p)) {
-      location.replace(p + '/' + location.search + location.hash);
-    }
-  })();
-</script>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -123,9 +115,13 @@
   }
 
   function saveSessionAndRedirect(token, username) {
+    if (!token || String(token).length < 20) {
+      toast(tr('common.error', 'Virhe') + ': token puuttuu vastauksesta', 'error');
+      return;
+    }
     localStorage.setItem('helion_token', token);
-    localStorage.setItem('helion_username', username);
-    window.location.href = 'home.html';
+    localStorage.setItem('helion_username', username || '');
+    window.location.replace('home.html');
   }
 
   async function doLogin() {
@@ -220,9 +216,13 @@
     if (e.key === 'Enter') doLogin();
   });
 
-  if (localStorage.getItem('helion_token')) {
-    window.location.href = 'home.html';
-  }
+  (function () {
+    var tok = localStorage.getItem('helion_token');
+    // JWT is long; skip empty / garbage to avoid bounce loops
+    if (tok && tok.length > 20 && !/home\.html$/i.test(location.pathname)) {
+      window.location.replace('home.html');
+    }
+  })();
 </script>
 <script src="i18n.js"></script>
 <script>

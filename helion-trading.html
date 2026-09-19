@@ -3,9 +3,10 @@
 <head>
 <script src="config.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Helion Trading</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -20,7 +21,7 @@
     padding: 32px 20px 80px;
   }
   .display{ font-family:'Chakra Petch', sans-serif; }
-  .wrap{ max-width: 760px; margin: 0 auto; }
+  .wrap{ max-width: 500px; margin: 0 auto; }
   header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap:wrap; gap:12px; }
   .brand{ display:flex; align-items:center; gap: 10px; }
   .brand-logo{ height: 34px; width: 34px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 0 14px rgba(242,169,59,0.3); }
@@ -29,7 +30,7 @@
   .user-pill{ background: var(--panel); border: 1px solid var(--line); padding: 9px 14px; border-radius: 999px; font-size: 12.5px; display:flex; align-items:center; gap:8px; }
   .user-pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
   .user-pill button{ background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; text-decoration:underline; }
-  .site-nav{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
+  .site-nav{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
   .site-nav .nav-item{ flex:1; text-align:center; padding:10px 6px; border-radius:10px; font-size:11.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:nowrap; }
   .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
   .powered-by{ text-align:center; font-size: 11px; color: var(--muted); margin-bottom: 18px; }
@@ -91,7 +92,8 @@
     </div>
   </header>
 
-  <nav class="site-nav">
+    <nav class="site-nav">
+    <a href="home.html" class="nav-item"><span data-i18n="nav.home">🏠 Home</span></a>
     <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
     <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
     <a href="helion-trading.html" class="nav-item active"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
