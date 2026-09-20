@@ -137,7 +137,7 @@ a{color:inherit;text-decoration:none;}
     <img src="logo.jpg" alt="">
     <div>
       <h1 class="display" data-i18n="spot.title">Helion Spot</h1>
-      <span data-i18n="spot.subtitle">HEL/BNB · Pool + book</span>
+      <span data-i18n="spot.subtitle">HEL/USDC · Mock book</span>
     </div>
   </div>
   <div class="ticker-strip">
@@ -147,23 +147,23 @@ a{color:inherit;text-decoration:none;}
     <div>Pool <span class="mono" id="oraclePx" style="color:var(--muted)">–</span></div>
   </div>
   <nav class="nav">
-    <a href="miner.html"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
+    <a href="miner.html"><span data-i18n="nav.miner">⛏ Kaivos</span></a>
     <a href="staking.html"><span data-i18n="nav.staking">🔒 Staking</span></a>
-    <a href="helion-trading.html"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
+    <a href="helion-trading.html"><span data-i18n="nav.swap">🔄 Swap</span></a>
     <a href="spot.html" class="active"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
-    <a href="leaderboard.html"><span data-i18n="nav.board">🏆 Ranking</span></a>
+    <a href="wallet.html"><span data-i18n="nav.wallet">💼 Lompakkoko</span></a>
+    <a href="leaderboard.html"><span data-i18n="nav.board">🏆 Top</span></a>
   </nav>
   <div class="user"><span id="userLabel">–</span><button onclick="logout()" data-i18n="spot.logout">Logout</button></div>
 </div>
 
-<div class="banner" data-i18n="spot.banner">HEL/BNB · book matches first, leftover market fills the Helion AMM pool</div>
+<div class="banner" data-i18n="spot.banner">HEL/USDC · internal order book (mock USDC, testnet)</div>
 
 <div class="terminal">
   <!-- LEFT: vertical order book -->
   <div class="panel">
     <div class="panel-h"><b data-i18n="spot.orderBook">Order Book</b><span class="mono" id="spreadLbl">spread –</span></div>
-    <div class="ob-head"><span data-i18n="spot.priceUsdt">Price (BNB)</span><span data-i18n="spot.sizeBtc">Size (HEL)</span><span data-i18n="spot.total">Total</span></div>
+    <div class="ob-head"><span data-i18n="spot.priceUsdt">Price (USDC)</span><span data-i18n="spot.sizeBtc">Size (HEL)</span><span data-i18n="spot.total">Total</span></div>
     <div class="ob">
       <div class="ob-asks" id="asksBox"></div>
       <div class="ob-mid">
@@ -177,7 +177,7 @@ a{color:inherit;text-decoration:none;}
   <!-- CENTER -->
   <div class="panel">
     <div class="center-top">
-      <div class="stat"><div class="l"><span data-i18n="spot.usdtAvail">BNB Available</span></div><div class="v" id="balBnb">–</div></div>
+      <div class="stat"><div class="l"><span data-i18n="spot.usdtAvail">USDC Available</span></div><div class="v" id="balBnb">–</div></div>
       <div class="stat"><div class="l"><span data-i18n="spot.btcAvail">HEL Available</span></div><div class="v" id="balHel">–</div></div>
       <div class="stat"><div class="l" data-i18n="spot.locked">Locked</div><div class="v" id="balLocked">–</div></div>
       <div class="stat"><div class="l" data-i18n="spot.equity">Equity</div><div class="v" id="balEq">–</div></div>
@@ -185,6 +185,7 @@ a{color:inherit;text-decoration:none;}
     <div class="xfer">
       <label data-i18n="spot.transfer">Siirto</label>
       <select id="xferAsset">
+        <option value="USDC">USDC</option>
         <option value="BNB">tBNB</option>
         <option value="HEL">HEL</option>
       </select>
@@ -204,7 +205,7 @@ a{color:inherit;text-decoration:none;}
 
   <!-- RIGHT: order ticket -->
   <div class="panel">
-    <div class="panel-h"><b data-i18n="spot.orderTicket">Order Ticket</b><span>HEL/BNB</span></div>
+    <div class="panel-h"><b data-i18n="spot.orderTicket">Order Ticket</b><span>HEL/USDC</span></div>
     <div class="form">
       <div class="side-toggle">
         <button class="buy on" id="btnBuy" onclick="setSide('BUY')" data-i18n="common.buy">Buy</button>
@@ -219,11 +220,11 @@ a{color:inherit;text-decoration:none;}
 
       <div class="field" id="fStop" style="display:none;">
         <label data-i18n="spot.stopPrice">Stop Price <span id="availStop"></span></label>
-        <div class="box"><input type="number" id="stopPrice" placeholder="0.00" step="0.01"><span class="u">BNB</span></div>
+        <div class="box"><input type="number" id="stopPrice" placeholder="0.00" step="0.01"><span class="u">USDC</span></div>
       </div>
       <div class="field" id="fPrice">
         <label><span data-i18n="common.price">Price</span> <span id="availPrice"></span></label>
-        <div class="box"><input type="number" id="limitPrice" placeholder="0.00" step="0.01"><span class="u">BNB</span></div>
+        <div class="box"><input type="number" id="limitPrice" placeholder="0.00" step="0.01"><span class="u">USDC</span></div>
       </div>
       <div class="field">
         <label><span data-i18n="spot.amount">Amount</span> <span id="availAmt"></span></label>
@@ -237,7 +238,7 @@ a{color:inherit;text-decoration:none;}
       </div>
       <div class="field">
         <label data-i18n="spot.totalEst">Total (est.)</label>
-        <div class="box"><input type="text" id="totalEst" readonly placeholder="–"><span class="u">BNB</span></div>
+        <div class="box"><input type="text" id="totalEst" readonly placeholder="–"><span class="u">USDC</span></div>
       </div>
       <button class="submit buy" id="submitBtn" onclick="submitOrder()" data-i18n="spot.buyBtc">Buy HEL</button>
       <p class="hint" id="typeHint">Limit: order rests on the book until filled or cancelled.</p>
@@ -291,7 +292,7 @@ document.getElementById('userLabel').textContent = '@' + (username || '–');
 
 let side = 'BUY';
 let orderType = 'LIMIT';
-let balances = { BNB: 0, HEL: 0, BNB_LOCKED: 0, HEL_LOCKED: 0 };
+let balances = { BNB: 0, HEL: 0, BNB_LOCKED: 0, HEL_LOCKED: 0, USDC: 0, USDC_LOCKED: 0 };
 let lastPrice = 0;
 
 function auth() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
@@ -342,7 +343,7 @@ function setType(t) {
 
   const hints = {
     LIMIT: 'Limit: rests on the book until filled or cancelled.',
-    MARKET: 'Market: fills the book first, leftover against the Helion HEL/BNB pool.',
+    MARKET: 'Market: fills the book first, leftover against the Helion HEL/USDC pool.',
     STOP_LIMIT: 'Stop Limit: when stop triggers, a limit order is placed.',
     STOP_MARKET: 'Stop Market: when stop triggers, a market order is sent.'
   };
@@ -354,7 +355,7 @@ function updateAvailLabels() {
   document.getElementById('availAmt').textContent =
     side === 'SELL' ? ('Avail ' + fmt(balances.HEL, 4) + ' HEL') : '';
   document.getElementById('availPrice').textContent =
-    side === 'BUY' ? ('Avail ' + fmt(balances.BNB, 6) + ' BNB') : '';
+    side === 'BUY' ? ('Avail ' + fmt(balances.USDC != null ? balances.USDC : balances.BNB, 4) + ' USDC') : '';
 }
 
 function setPct(p) {
@@ -362,7 +363,7 @@ function setPct(p) {
     document.getElementById('qty').value = (balances.HEL * p).toFixed(4);
   } else {
     const px = Number(document.getElementById('limitPrice').value) || lastPrice;
-    if (px > 0) document.getElementById('qty').value = ((balances.BNB * p) / px).toFixed(4);
+    if (px > 0) document.getElementById('qty').value = ((((balances.USDC != null ? balances.USDC : balances.BNB) * p) / px)).toFixed(4);
   }
   calcTotal();
 }
@@ -475,7 +476,7 @@ async function spotTransfer(kind) {
       (kind === 'deposit'
         ? (typeof t === 'function' ? t('spot.depositOk') : 'Deposited')
         : (typeof t === 'function' ? t('spot.withdrawOk') : 'Withdrawn')) +
-        ' ' + amount + ' ' + (asset === 'BNB' ? 'tBNB' : 'HEL'),
+        ' ' + amount + ' ' + (asset === 'BNB' ? 'tBNB' : asset === 'USDC' ? 'USDC' : 'HEL'),
       true
     );
     document.getElementById('xferAmt').value = '';
@@ -491,11 +492,13 @@ async function refreshAccount() {
     const d = await res.json();
     if (!res.ok) throw new Error(d.error || 'account');
     balances = d.balances || balances;
-    document.getElementById('balBnb').textContent = fmt(balances.BNB, 6);
+    const qAvail = (balances.USDC != null) ? balances.USDC : balances.BNB;
+    const qLock = (balances.USDC_LOCKED != null) ? balances.USDC_LOCKED : balances.BNB_LOCKED;
+    document.getElementById('balBnb').textContent = fmt(qAvail, 4);
     document.getElementById('balHel').textContent = fmt(balances.HEL, 4);
     document.getElementById('balLocked').textContent =
-      fmt(balances.BNB_LOCKED, 6) + ' BNB / ' + fmt(balances.HEL_LOCKED, 4) + ' HEL';
-    document.getElementById('balEq').textContent = fmt(d.equity, 6) + ' BNB';
+      fmt(qLock, 4) + ' USDC / ' + fmt(balances.HEL_LOCKED, 4) + ' HEL';
+    document.getElementById('balEq').textContent = fmt(d.equity, 4) + ' USDC';
     updateAvailLabels();
 
     const open = (d.openOrders || []).filter(o => o.type === 'LIMIT' || !o.type || o.status === 'NEW');
@@ -523,7 +526,7 @@ async function refreshAccount() {
       </tr>`).join('') : '<tr><td colspan="7" style="color:var(--muted);padding:12px;">No stop orders</td></tr>';
 
     document.getElementById('balBody').innerHTML = `
-      <tr><td>BNB</td><td>${fmt(balances.BNB,6)}</td><td>${fmt(balances.BNB_LOCKED,6)}</td><td>${fmt((balances.BNB||0)+(balances.BNB_LOCKED||0),6)}</td></tr>
+      <tr><td>USDC</td><td>${fmt(balances.BNB,6)}</td><td>${fmt(balances.BNB_LOCKED,6)}</td><td>${fmt((balances.BNB||0)+(balances.BNB_LOCKED||0),6)}</td></tr>
       <tr><td>HEL</td><td>${fmt(balances.HEL,4)}</td><td>${fmt(balances.HEL_LOCKED,4)}</td><td>${fmt((balances.HEL||0)+(balances.HEL_LOCKED||0),4)}</td></tr>`;
   } catch (e) {
     toast('Account: ' + e.message, false);

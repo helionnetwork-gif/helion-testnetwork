@@ -9,6 +9,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="theme.css">
+<style>
+.tx-list{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.tx-row{display:grid;grid-template-columns:1fr auto;gap:6px 10px;padding:10px 12px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;font-size:12px;}
+.tx-row .meta{color:var(--muted);font-size:11px;}
+.tx-row a{color:var(--gold);text-decoration:none;font-size:11px;}
+.hist-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.hist-head h2{margin:0;}
+.btn-sm{border:1px solid var(--line);background:transparent;color:var(--gold);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.modal-bg.show{display:flex;}
+.modal-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;width:min(480px,100%);max-height:80vh;overflow:auto;position:relative;}
+.modal-x{position:absolute;right:12px;top:12px;border:none;background:none;color:var(--muted);font-size:20px;cursor:pointer;}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -30,9 +43,9 @@
     <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
     <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Swap</span></a>
     <a href="spot.html" class="nav-item"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Lompak</span></a>
+    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Lompakkoko</span></a>
     <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Top</span></a>
-    <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohje</span></a>
+    <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeetet</span></a>
   </nav>
 
 <div class="card">
@@ -66,6 +79,23 @@
       <h2 id="alertModalTitle" class="display">Notice</h2>
       <p id="alertModalBody" class="muted" style="margin:12px 0;"></p>
       <div id="alertModalActions"></div>
+    </div>
+  </div>
+
+
+  <div class="card">
+    <div class="hist-head">
+      <h2 class="display" data-i18n="miner.histTitle">Kaivaushistoria</h2>
+      <button type="button" class="btn-sm" onclick="openMineModal()" data-i18n="wallet.txMore">Näytä lisää</button>
+    </div>
+    <div class="tx-list" id="mineList"><div class="muted">–</div></div>
+  </div>
+
+  <div class="modal-bg" id="mineModal" onclick="if(event.target===this)closeMineModal()">
+    <div class="modal-card">
+      <button type="button" class="modal-x" onclick="closeMineModal()">×</button>
+      <h2 class="display" data-i18n="miner.histModalTitle">Mining history</h2>
+      <div class="tx-list" id="mineListModal"></div>
     </div>
   </div>
 
@@ -307,6 +337,49 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     startGaugeClock();
   }
 
+
+  function fmtMineTime(ts) {
+    try { return new Date(ts).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' }); }
+    catch (e) { return '–'; }
+  }
+
+  function renderMineRows(list, host) {
+    if (!host) return;
+    if (!list || !list.length) {
+      host.innerHTML = '<div class="muted">' + (typeof t === 'function' ? t('miner.histEmpty') : 'No mining events yet') + '</div>';
+      return;
+    }
+    var explor = 'https://testnet.bscscan.com/tx/';
+    host.innerHTML = list.map(function (ev) {
+      var label = ev.type === 'claim' ? 'Claim' : (ev.type === 'activate' ? 'Activate' : (ev.type || 'Mine'));
+      var link = ev.txHash ? '<a href="' + explor + ev.txHash + '" target="_blank" rel="noopener">BscScan ↗</a>' : '';
+      var hash = ev.txHash ? String(ev.txHash).slice(0, 10) + '…' : '–';
+      return '<div class="tx-row"><div><div><strong>' + label + '</strong></div><div class="meta">' + fmtMineTime(ev.ts) + ' · ' + hash + '</div></div><div style="text-align:right">' + link + '</div></div>';
+    }).join('');
+  }
+
+  async function loadMineHistory(limit, hostId) {
+    var host = document.getElementById(hostId);
+    if (host) host.innerHTML = '<div class="muted">…</div>';
+    try {
+      var data = await apiGet('/api/miner/history?limit=' + limit);
+      renderMineRows(data.history || [], host);
+    } catch (e) {
+      if (host) host.innerHTML = '<div class="muted">' + (e.message || 'Failed') + '</div>';
+    }
+  }
+
+  function openMineModal() {
+    var m = document.getElementById('mineModal');
+    if (m) m.classList.add('show');
+    loadMineHistory(40, 'mineListModal');
+  }
+  function closeMineModal() {
+    var m = document.getElementById('mineModal');
+    if (m) m.classList.remove('show');
+  }
+
+
   async function handleAction() {
     const btn = document.getElementById('actionBtn');
     const mode = btn.dataset.mode;
@@ -324,6 +397,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       }
       await loadStatus();
       await refreshWallet();
+      await loadMineHistory(3, 'mineList');
     } catch (e) {
       showActionError(e);
       btn.disabled = false;
@@ -334,6 +408,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
   refreshWallet();
   loadStatus();
+  loadMineHistory(3, 'mineList');
 </script>
 <script src="i18n.js"></script>
 <script>

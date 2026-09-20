@@ -9,6 +9,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="theme.css">
+<style>
+.tx-list{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.tx-row{display:grid;grid-template-columns:1fr auto;gap:6px 10px;padding:10px 12px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;font-size:12px;}
+.tx-row .meta{color:var(--muted);font-size:11px;}
+.tx-row .val{font-family:'JetBrains Mono',monospace;font-weight:600;}
+.tx-row .val.in{color:var(--success);}
+.tx-row .val.out{color:var(--danger);}
+.tx-row a{color:var(--gold);text-decoration:none;font-size:11px;}
+.hist-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+.hist-head h2{margin:0;}
+.btn-sm{border:1px solid var(--line);background:transparent;color:var(--gold);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.modal-bg.show{display:flex;}
+.modal-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;width:min(480px,100%);max-height:80vh;overflow:auto;position:relative;box-shadow:0 16px 48px rgba(0,0,0,0.45);}
+.modal-card h2{font-family:'Chakra Petch',sans-serif;font-size:17px;margin-bottom:12px;padding-right:28px;}
+.modal-x{position:absolute;right:12px;top:12px;border:none;background:none;color:var(--muted);font-size:20px;cursor:pointer;}
+</style>
 
 </head>
 <body>
@@ -27,13 +44,13 @@
 
   <nav class="site-nav">
     <a href="home.html" class="nav-item"><span data-i18n="nav.home">🏠 Home</span></a>
-    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Louhinta</span></a>
+    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Kaivos</span></a>
     <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
-    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Vaihto</span></a>
+    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Swap</span></a>
     <a href="spot.html" class="nav-item"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html" class="nav-item active"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
-    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Ranking</span></a>
-    <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
+    <a href="wallet.html" class="nav-item active"><span data-i18n="nav.wallet">💼 Lompakkoko</span></a>
+    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Top</span></a>
+    <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeetet</span></a>
   </nav>
 
 <div class="card">
@@ -48,6 +65,14 @@
     <div class="balance-row muted"><span>HEL</span><span id="priceHel">–</span></div>
     <div class="balance-row muted"><span>tBNB</span><span id="priceBnb">–</span></div>
     <button class="btn-block secondary" style="margin-top:14px;" onclick="refreshWallet()" data-i18n="wallet.refresh">Päivitä</button>
+  </div>
+
+
+  <div class="card">
+    <h2 class="display">Mock USDC</h2>
+    <p class="muted" style="font-size:12px;margin-bottom:10px;" data-i18n="wallet.usdcHint">Testnet only — not real USD. Use for Spot HEL/USDC.</p>
+    <div class="balance-row"><span>USDC</span><strong class="mono" id="usdcBalance">–</strong></div>
+    <button type="button" class="btn-block" id="faucetUsdcBtn" onclick="faucetUsdc()" data-i18n="wallet.faucetUsdc">Get 1000 test USDC</button>
   </div>
 
   <div class="card">
@@ -67,6 +92,24 @@
     <p class="muted" data-i18n="wallet.linkDesc" style="margin-bottom:12px;">Linkitä MetaMask allekirjoituksella.</p>
     <button class="btn-block secondary" onclick="linkWallet()" id="linkWalletBtn">🦊 <span data-i18n="wallet.linkMeta">Linkitä MetaMask</span></button>
     <div class="linked-list" id="linkedList"></div>
+  </div>
+
+
+  <div class="card">
+    <div class="hist-head">
+      <h2 class="display" data-i18n="wallet.txTitle">Tapahtumat</h2>
+      <button type="button" class="btn-sm" onclick="openTxModal()" data-i18n="wallet.txMore">Näytä lisää</button>
+    </div>
+    <p class="muted" style="font-size:11px;margin-bottom:4px;" data-i18n="wallet.txHint">3 uusinta ketjutapahtumaa (BSC Testnet)</p>
+    <div class="tx-list" id="txList"><div class="muted" id="txEmpty">–</div></div>
+  </div>
+
+  <div class="modal-bg" id="txModal" onclick="if(event.target===this)closeTxModal()">
+    <div class="modal-card">
+      <button type="button" class="modal-x" onclick="closeTxModal()" aria-label="Close">×</button>
+      <h2 class="display" data-i18n="wallet.txModalTitle">Transaction history</h2>
+      <div class="tx-list" id="txListModal"></div>
+    </div>
   </div>
 
   <div class="foot">Built for the Future. Powered by Helion.</div>
@@ -92,6 +135,54 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     onRecipientChange();
   }
 
+  
+  function fmtTxTime(ts) {
+    try {
+      return new Date(ts).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
+    } catch (e) { return '–'; }
+  }
+
+  function renderTxRows(txs, host) {
+    if (!host) return;
+    if (!txs || !txs.length) {
+      host.innerHTML = '<div class="muted">' + (typeof t === 'function' ? t('wallet.txEmpty') : 'No transactions yet') + '</div>';
+      return;
+    }
+    host.innerHTML = txs.map(function (tx) {
+      var dir = tx.direction === 'in' ? 'in' : 'out';
+      var sign = dir === 'in' ? '+' : '−';
+      var label = (tx.direction === 'in' ? 'IN' : 'OUT') + ' · ' + (tx.symbol || '');
+      var val = sign + ' ' + (Number(tx.value) || 0).toLocaleString(undefined, { maximumFractionDigits: 6 }) + ' ' + (tx.symbol || '');
+      var link = tx.explorer ? '<a href="' + tx.explorer + '" target="_blank" rel="noopener">BscScan ↗</a>' : '';
+      var err = tx.isError ? ' · failed' : '';
+      return '<div class="tx-row"><div><div>' + label + err + '</div><div class="meta">' + fmtTxTime(tx.ts) + ' · ' + String(tx.hash || '').slice(0, 10) + '…</div></div><div style="text-align:right"><div class="val ' + dir + '">' + val + '</div>' + link + '</div></div>';
+    }).join('');
+  }
+
+  async function loadTxs(limit, hostId) {
+    const host = document.getElementById(hostId);
+    if (host) host.innerHTML = '<div class="muted">…</div>';
+    try {
+      const res = await fetch(BACKEND_URL + '/api/wallet/txs?limit=' + limit, { headers: authHeaders() });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'tx error');
+      renderTxRows(data.txs || [], host);
+    } catch (e) {
+      if (host) host.innerHTML = '<div class="muted">' + (e.message || 'Failed to load') + '</div>';
+    }
+  }
+
+  function openTxModal() {
+    const m = document.getElementById('txModal');
+    if (m) m.classList.add('show');
+    loadTxs(30, 'txListModal');
+  }
+  function closeTxModal() {
+    const m = document.getElementById('txModal');
+    if (m) m.classList.remove('show');
+  }
+
+
   function logout() {
     localStorage.removeItem('helion_token');
     localStorage.removeItem('helion_username');
@@ -116,6 +207,23 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 2 });
   }
 
+
+  async function faucetUsdc() {
+    const btn = document.getElementById('faucetUsdcBtn');
+    if (btn) { btn.disabled = true; }
+    try {
+      const res = await fetch(BACKEND_URL + '/api/faucet/usdc', { method: 'POST', headers: authHeaders() });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Faucet failed');
+      toast('+' + (data.amount || 1000) + ' USDC', 'success');
+      if (typeof refreshWallet === 'function') refreshWallet();
+    } catch (e) {
+      toast(e.message || 'Faucet error', 'error');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
   async function refreshWallet() {
     try {
       const res = await fetch(BACKEND_URL + '/api/wallet', { headers: authHeaders() });
@@ -126,6 +234,11 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       const bnbAmt = parseFloat(data.bnbBalance) || 0;
       document.getElementById('helBalance').textContent = helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
       document.getElementById('bnbBalance').textContent = bnbAmt.toFixed(4) + ' tBNB';
+      const usdcEl = document.getElementById('usdcBalance');
+      if (usdcEl) {
+        const u = parseFloat(data.usdcBalance);
+        usdcEl.textContent = (Number.isFinite(u) ? u : 0).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' USDC';
+      }
 
       try {
         const priceRes = await fetch(BACKEND_URL + '/api/prices');
@@ -150,6 +263,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
         document.getElementById('helUsd').textContent = '–';
         document.getElementById('bnbUsd').textContent = '–';
       }
+      if (typeof loadTxs === 'function') loadTxs(3, 'txList');
     } catch (e) {
       toast((typeof t==='function'?t('wallet.balanceFail'):'Balance failed') + ': ' + e.message, 'error');
     }
@@ -258,6 +372,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     } catch (e) { /* hiljainen */ }
   }
 
+  loadTxs(3, 'txList');
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
   refreshWallet();
   loadLinkedWallets();
