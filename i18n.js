@@ -15,6 +15,11 @@
       'nav.guide': '📖 Ohjeet',
       'nav.admin': 'Admin',
       'nav.logout': 'Kirjaudu ulos',
+      'wallet.analytics': 'Salkku & käyrät',
+      'wallet.analyticsHint': 'Katso miten salkun ja tokenien arvo on muuttunut. Aikavälit: 1m → koko historia.',
+      'wallet.portfolioNow': 'Salkun arvo',
+      'wallet.analyticsNote': 'Muutos lasketaan nykyisillä saldoilla vanhoilla hinnoilla (hintaliike, ei talletuksia). Historia kertyy kun palvelin tallentaa hintoja (~1 min).',
+
       'wallet.txTitle': 'Tapahtumat',
       'wallet.txMore': 'Näytä lisää',
       'wallet.txHint': '3 uusinta ketjutapahtumaa (BSC Testnet)',
@@ -291,6 +296,11 @@
       'nav.guide': '📖 Guide',
       'nav.admin': 'Admin',
       'nav.logout': 'Log out',
+      'wallet.analytics': 'Portfolio & charts',
+      'wallet.analyticsHint': 'See how your wallet and token prices moved. Ranges: 1m → full history.',
+      'wallet.portfolioNow': 'Portfolio value',
+      'wallet.analyticsNote': 'Change uses current holdings marked to past prices (price move, not deposits). History builds as the server samples prices (~1 min).',
+
       'wallet.txTitle': 'Transactions',
       'wallet.txMore': 'Show more',
       'wallet.txHint': '3 latest on-chain txs (BSC Testnet)',

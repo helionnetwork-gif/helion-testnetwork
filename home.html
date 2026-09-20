@@ -47,7 +47,7 @@
       <span id="bnbUsd" class="usd">–</span>
     </div>
     <div class="prices-row">
-      <span>HEL <b id="priceHel">–</b></span>
+      <span>HEL <b id="priceHel">–</b> <span id="helChange24" class="usd"></span></span>
       <span>tBNB <b id="priceBnb">–</b></span>
     </div>
     <div class="addr" id="walletAddress">–</div>
@@ -172,6 +172,12 @@
         document.getElementById('priceBnb').textContent = fmtUsd(prices.bnbUsd);
         if (prices.poolExists && prices.helUsd > 0) {
           document.getElementById('priceHel').textContent = fmtUsd(prices.helUsd);
+          const c24 = document.getElementById('helChange24');
+          if (c24 && prices.change24h && prices.change24h.helUsdPct != null) {
+            const p = prices.change24h.helUsdPct;
+            c24.textContent = (p >= 0 ? '+' : '') + p.toFixed(2) + '% 24h';
+            c24.style.color = p >= 0 ? 'var(--success)' : 'var(--danger)';
+          }
           document.getElementById('helUsd').textContent = '≈ ' + fmtUsd(helAmt * prices.helUsd);
         } else {
           document.getElementById('priceHel').textContent = '–';

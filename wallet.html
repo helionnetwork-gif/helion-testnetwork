@@ -25,6 +25,29 @@
 .modal-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;width:min(480px,100%);max-height:80vh;overflow:auto;position:relative;box-shadow:0 16px 48px rgba(0,0,0,0.45);}
 .modal-card h2{font-family:'Chakra Petch',sans-serif;font-size:17px;margin-bottom:12px;padding-right:28px;}
 .modal-x{position:absolute;right:12px;top:12px;border:none;background:none;color:var(--muted);font-size:20px;cursor:pointer;}
+
+.range-row{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px;}
+.range-row button{
+  border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+  border-radius:999px;padding:6px 10px;font-size:11px;font-weight:700;
+  cursor:pointer;font-family:'Chakra Petch',sans-serif;
+}
+.range-row button.on{background:rgba(242,169,59,0.15);color:var(--gold);border-color:rgba(242,169,59,0.35);}
+.perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.perf-box{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+.perf-box .lbl{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.perf-box .val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;}
+.perf-box .val.up{color:var(--success);}
+.perf-box .val.down{color:var(--danger);}
+.chart-wrap{position:relative;width:100%;height:200px;margin-top:4px;}
+.chart-wrap canvas{width:100%;height:100%;display:block;}
+.chart-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px;}
+.asset-tabs{display:flex;gap:6px;margin-bottom:8px;}
+.asset-tabs button{
+  flex:1;border:1px solid var(--line);background:transparent;color:var(--muted);
+  border-radius:10px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+}
+.asset-tabs button.on{color:var(--gold);border-color:rgba(242,169,59,0.4);background:rgba(242,169,59,0.08);}
 </style>
 
 </head>
@@ -73,6 +96,48 @@
     <p class="muted" style="font-size:12px;margin-bottom:10px;" data-i18n="wallet.usdcHint">Testnet only — not real USD. Use for Spot HEL/USDC.</p>
     <div class="balance-row"><span>USDC</span><strong class="mono" id="usdcBalance">–</strong></div>
     <button type="button" class="btn-block" id="faucetUsdcBtn" onclick="faucetUsdc()" data-i18n="wallet.faucetUsdc">Get 1000 test USDC</button>
+  </div>
+
+
+  <div class="card" id="analyticsCard">
+    <h2 class="display" data-i18n="wallet.analytics">Portfolio & charts</h2>
+    <p class="muted" style="font-size:12px;margin-bottom:8px;" data-i18n="wallet.analyticsHint">
+      See how your wallet value and token prices moved. Ranges: 1m → all history.
+    </p>
+    <div class="range-row" id="rangeRow">
+      <button type="button" data-range="1m">1m</button>
+      <button type="button" data-range="5m">5m</button>
+      <button type="button" data-range="15m">15m</button>
+      <button type="button" data-range="1h">1h</button>
+      <button type="button" data-range="4h">4h</button>
+      <button type="button" data-range="1d" class="on">1d</button>
+      <button type="button" data-range="7d">7d</button>
+      <button type="button" data-range="30d">30d</button>
+      <button type="button" data-range="all">All</button>
+    </div>
+    <div class="perf-grid">
+      <div class="perf-box">
+        <div class="lbl" data-i18n="wallet.portfolioNow">Portfolio value</div>
+        <div class="val" id="perfValue">–</div>
+      </div>
+      <div class="perf-box">
+        <div class="lbl" id="perfChangeLbl">Change (range)</div>
+        <div class="val" id="perfChange">–</div>
+      </div>
+    </div>
+    <div class="asset-tabs">
+      <button type="button" class="on" data-series="portfolio" id="tabPortfolio">Portfolio $</button>
+      <button type="button" data-series="helUsd" id="tabHel">HEL price</button>
+      <button type="button" data-series="bnbUsd" id="tabBnb">BNB price</button>
+    </div>
+    <div class="chart-wrap"><canvas id="priceChart" width="640" height="200"></canvas></div>
+    <div class="chart-meta">
+      <span id="chartFrom">–</span>
+      <span id="chartTo">–</span>
+    </div>
+    <p class="muted" style="font-size:11px;margin-top:8px;" data-i18n="wallet.analyticsNote">
+      Change uses current holdings marked to past prices (price move, not deposits). History builds as the server samples prices.
+    </p>
   </div>
 
   <div class="card">
@@ -372,10 +437,164 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     } catch (e) { /* hiljainen */ }
   }
 
+
+  // ---- Analytics / charts ----
+  let chartRange = '1d';
+  let chartSeries = 'portfolio';
+  let chartPoints = [];
+  let lastHoldings = { HEL: 0, BNB: 0, USDC: 0 };
+
+  document.getElementById('rangeRow').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-range]');
+    if (!btn) return;
+    document.querySelectorAll('#rangeRow button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    chartRange = btn.getAttribute('data-range');
+    loadAnalytics();
+  });
+  document.querySelector('.asset-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-series]');
+    if (!btn) return;
+    document.querySelectorAll('.asset-tabs button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    chartSeries = btn.getAttribute('data-series');
+    drawChart();
+  });
+
+  function fmtTs(ts) {
+    if (!ts) return '–';
+    try {
+      return new Date(ts).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch (_) { return String(ts); }
+  }
+
+  function drawChart() {
+    const canvas = document.getElementById('priceChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth || 640;
+    const h = canvas.clientHeight || 200;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    const pts = chartPoints;
+    if (!pts.length) {
+      ctx.fillStyle = '#8B8F98';
+      ctx.font = '12px Inter, sans-serif';
+      ctx.fillText('No history yet — samples every ~1 min', 12, h / 2);
+      return;
+    }
+
+    let values;
+    if (chartSeries === 'portfolio') {
+      values = pts.map(p =>
+        (lastHoldings.HEL || 0) * (p.helUsd || 0) +
+        (lastHoldings.BNB || 0) * (p.bnbUsd || 0) +
+        (lastHoldings.USDC || 0)
+      );
+    } else if (chartSeries === 'bnbUsd') {
+      values = pts.map(p => p.bnbUsd || 0);
+    } else {
+      values = pts.map(p => p.helUsd || 0);
+    }
+
+    let min = Math.min(...values);
+    let max = Math.max(...values);
+    if (min === max) { min *= 0.98; max *= 1.02; if (min === 0 && max === 0) { max = 1; } }
+    const pad = 12;
+    const left = 8, right = w - 8, top = pad, bottom = h - pad;
+
+    // grid
+    ctx.strokeStyle = 'rgba(38,43,53,0.9)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 4; i++) {
+      const y = top + (bottom - top) * (i / 3);
+      ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
+    }
+
+    const up = values[values.length - 1] >= values[0];
+    const stroke = up ? '#3DD68C' : '#E5484D';
+    const fill = up ? 'rgba(61,214,140,0.12)' : 'rgba(229,72,77,0.12)';
+
+    function xAt(i) {
+      return left + (right - left) * (pts.length === 1 ? 0.5 : i / (pts.length - 1));
+    }
+    function yAt(v) {
+      return bottom - ((v - min) / (max - min)) * (bottom - top);
+    }
+
+    ctx.beginPath();
+    pts.forEach((_, i) => {
+      const x = xAt(i), y = yAt(values[i]);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // fill under
+    ctx.lineTo(xAt(pts.length - 1), bottom);
+    ctx.lineTo(xAt(0), bottom);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+
+    // end dot
+    const lx = xAt(pts.length - 1), ly = yAt(values[values.length - 1]);
+    ctx.beginPath();
+    ctx.arc(lx, ly, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = stroke;
+    ctx.fill();
+
+    document.getElementById('chartFrom').textContent = fmtTs(pts[0].t);
+    document.getElementById('chartTo').textContent = fmtTs(pts[pts.length - 1].t);
+  }
+
+  async function loadAnalytics() {
+    try {
+      const [histRes, perfRes] = await Promise.all([
+        fetch(BACKEND_URL + '/api/prices/history?range=' + encodeURIComponent(chartRange)),
+        fetch(BACKEND_URL + '/api/wallet/performance?range=' + encodeURIComponent(chartRange === '1d' ? '24h' : chartRange), {
+          headers: authHeaders()
+        })
+      ]);
+      const hist = await histRes.json();
+      const perf = await perfRes.json();
+      chartPoints = hist.points || [];
+      if (perf.holdings) lastHoldings = perf.holdings;
+
+      const elV = document.getElementById('perfValue');
+      const elC = document.getElementById('perfChange');
+      if (perf.valueNow != null) {
+        elV.textContent = '$' + Number(perf.valueNow).toFixed(2);
+      }
+      if (perf.changeUsd != null) {
+        const sign = perf.changeUsd >= 0 ? '+' : '';
+        const pct = perf.changePct != null ? ' (' + sign + Number(perf.changePct).toFixed(2) + '%)' : '';
+        elC.textContent = sign + '$' + Number(perf.changeUsd).toFixed(2) + pct;
+        elC.className = 'val ' + (perf.changeUsd >= 0 ? 'up' : 'down');
+      } else {
+        elC.textContent = '–';
+        elC.className = 'val';
+      }
+      document.getElementById('perfChangeLbl').textContent =
+        'Change (' + chartRange + ')';
+      drawChart();
+    } catch (e) {
+      console.warn('analytics', e);
+    }
+  }
+
+  window.addEventListener('resize', () => drawChart());
+
   loadTxs(3, 'txList');
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
   refreshWallet();
   loadLinkedWallets();
+  loadAnalytics();
 </script>
 <script src="i18n.js"></script>
 <script>
