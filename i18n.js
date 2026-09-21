@@ -19,6 +19,14 @@
       'wallet.analyticsHint': 'Katso miten salkun ja tokenien arvo on muuttunut. Aikavälit: 1m → koko historia.',
       'wallet.portfolioNow': 'Salkun arvo',
       'wallet.analyticsNote': 'Muutos lasketaan nykyisillä saldoilla vanhoilla hinnoilla (hintaliike, ei talletuksia). Historia kertyy kun palvelin tallentaa hintoja (~1 min).',
+      'index.walletLabel': 'Lompakko',
+      'miner.inactive': 'Ei aktiivista kaivasta',
+      'miner.ready': 'Valmis lunastamaan',
+      'staking.selected': 'Valittu',
+      'staking.readyTag': 'Valmis nostoon',
+      'staking.locked': 'Lukittu',
+      'wallet.bnbSendNote': 'tBNB-lähetys: gas varataan automaattisesti. Ulkoinen lähetys käyttää omaa tBNB:täsi.',
+
 
       'wallet.txTitle': 'Tapahtumat',
       'wallet.txMore': 'Näytä lisää',
@@ -300,6 +308,14 @@
       'wallet.analyticsHint': 'See how your wallet and token prices moved. Ranges: 1m → full history.',
       'wallet.portfolioNow': 'Portfolio value',
       'wallet.analyticsNote': 'Change uses current holdings marked to past prices (price move, not deposits). History builds as the server samples prices (~1 min).',
+      'index.walletLabel': 'Wallet',
+      'miner.inactive': 'No active mine',
+      'miner.ready': 'Ready to claim',
+      'staking.selected': 'Selected',
+      'staking.readyTag': 'Ready to withdraw',
+      'staking.locked': 'Locked',
+      'wallet.bnbSendNote': 'tBNB send: gas is reserved automatically. External sends use your own tBNB.',
+
 
       'wallet.txTitle': 'Transactions',
       'wallet.txMore': 'Show more',
@@ -671,8 +687,10 @@
     // Show/hide language-specific blocks (e.g. full guide pages)
     document.querySelectorAll('[data-lang-only]').forEach((el) => {
       const only = el.getAttribute('data-lang-only');
-      el.hidden = only !== lang;
-      el.style.display = only === lang ? '' : 'none';
+      const on = only === lang;
+      el.hidden = !on;
+      el.style.display = on ? '' : 'none';
+      el.classList.toggle('is-active', on);
     });
   }
 
