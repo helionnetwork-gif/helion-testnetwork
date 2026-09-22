@@ -1,44 +1,60 @@
-# Helion Frontend (public repo)
+# Helion Server (private repo)
 
-Staattiset sivut GitHub Pagesiin. API on erillisessä **private** server-reposta (Render).
+Node/Express API: custodial wallets, miner, staking, swap, spot matching, Upstash persistence.
+
+**Älä tee tästä public-reposta.** Salaisuudet vain Render Environment -muuttujiin.
+
+## Stack
+
+- Express + ethers + JWT
+- Upstash Redis (`blobStore.js`) — tuotannon persistenssi
+- BSC Testnet (HEL/BNB, miner, staking, swap)
+- Sisäinen spot order book + market maker
+
+## Käynnistys
+
+```bash
+cp .env.example .env
+# täytä JWT_SECRET, TREASURY_PRIVATE_KEY, UPSTASH_*, kontraktiosoitteet…
+npm install
+npm start
+```
+
+Loki OK:
+```text
+[blobStore] Upstash Redis ok
+[Helion] persist=upstash
+Helion Wallet API käynnissä portissa …
+```
+
+## Render
+
+1. Connect **tämä private repo**
+2. Build: `npm install`
+3. Start: `npm start` / `node server.js`
+4. Environment: kopioi `.env.example`-avaimet + oikeat arvot
+5. **Älä** aseta `DATA_DIR` ilman maksullista diskiä
+
+## Frontend
+
+Julkinen HTML-repo kutsuu tätä API:a (`BACKEND_URL` / `config.js`).
 
 ## Tiedostot
 
-| Tiedosto | |
-|----------|--|
-| `config.js` | **API-osoite** (muuta vain tästä) |
-| `index.html` | Login / register |
-| `wallet.html` | Custodial wallet |
-| `miner.html` | Mining |
-| `staking.html` | Staking |
-| `helion-trading.html` | Swap |
-| `spot.html` | HEL/BNB spot |
-| `leaderboard.html` | Board |
-| `guide.html` | Ohjeet |
-| `i18n.js` | FI / EN |
-| `logo.jpg` | Logo |
-
-## API-osoite
-
-`config.js`:
-
-```js
-BACKEND_URL: local ? 'http://localhost:3001' : 'https://testnetworkserver.onrender.com'
-```
-
-Jos Render-URL vaihtuu, muuta **vain** `config.js` ja pushaa.
-
-## GitHub Pages
-
-1. Pushaa tämän kansion sisältö public-repon **juureen**
-2. Settings → Pages → branch `main` → folder `/ (root)`
-3. Avaa `https://USER.github.io/REPO/` (kauttaviiva lopussa)
-
-## Paikallinen testi
-
-1. Käynnistä server-repo: `node server.js` (portti 3001)
-2. Avaa `index.html` selaimessa tai live-serverillä
+| Tiedosto | Rooli |
+|----------|--------|
+| `server.js` | HTTP API |
+| `blobStore.js` | Upstash / file persist |
+| `users.js` / `wallet.js` | Auth + custodial keys |
+| `spotEngine.js` | HEL/BNB matching |
+| `spotMarketMaker.js` | MM |
+| `gridBot.js` | Admin grid bot |
+| `swapRoutes.js` | Pool / router helpers |
+| `contributions.js` | Leaderboard pisteet |
+| `dataDir.js` | Paikallinen cache-polku |
 
 ## Ei kuulu tähän repoon
 
-- `server.js`, private keys, `.env`, `users.json`, `wallets.json`
+- `*.html`, `i18n.js`, `logo.jpg` → frontend-repo
+- `users.json`, `wallets.json`, `spotEngine.json` → runtime (gitignore)
+- `.env` → vain paikallinen / Render
