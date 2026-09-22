@@ -548,3 +548,7 @@ td.mono{ color: var(--text); word-break: break-all; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* i18n language blocks: hide until applyLang */
+[data-lang-only]{display:none;}
+[data-lang-only].is-active{display:block;}
