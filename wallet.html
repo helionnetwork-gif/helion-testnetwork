@@ -152,6 +152,13 @@
     <button class="btn-block" onclick="doTransfer()" id="transferBtn" data-i18n="wallet.send">Lähetä</button>
   </div>
 
+
+  <div class="card" id="pinSetupCard">
+    <h2 class="display" data-i18n="wallet.pinTitle">PIN</h2>
+    <p class="muted" style="font-size:12px;margin-bottom:10px;" data-i18n="wallet.pinHint">Optional 4–8 digit PIN for faster login (password still works).</p>
+    <div class="input-row"><input type="password" id="newPin" inputmode="numeric" maxlength="8" placeholder="PIN" data-i18n-placeholder="wallet.pinPh"></div>
+    <button class="btn-block secondary" type="button" onclick="savePin()" id="savePinBtn" data-i18n="wallet.pinSave">Save PIN</button>
+  </div>
   <div class="card">
     <h2 class="display" data-i18n="wallet.linkTitle">Linkitä oma lompakko</h2>
     <p class="muted" data-i18n="wallet.linkDesc" style="margin-bottom:12px;">Linkitä MetaMask allekirjoituksella.</p>
@@ -589,6 +596,24 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
   }
 
   window.addEventListener('resize', () => drawChart());
+
+  async function savePin() {
+    const pin = (document.getElementById('newPin') || {}).value || '';
+    const btn = document.getElementById('savePinBtn');
+    if (btn) btn.disabled = true;
+    try {
+      const res = await fetch(BACKEND_URL + '/api/pin/set', {
+        method: 'POST',
+        headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { toast(data.error || 'Error', 'error'); return; }
+      toast(data.messageEn || data.message || 'PIN saved', 'success');
+      document.getElementById('newPin').value = '';
+    } catch (e) { toast(String(e.message || e), 'error'); }
+    finally { if (btn) btn.disabled = false; }
+  }
 
   loadTxs(3, 'txList');
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');

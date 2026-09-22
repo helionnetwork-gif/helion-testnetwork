@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Helion — Email verified</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0A0C10; --panel: #14171D; --panel-2: #1B1F27; --line: #262B35;
+      --gold: #F2A93B; --violet: #7C5CFC; --text: #F5F3EE; --muted: #8B8F98;
+      --danger: #E5484D; --success: #3DD68C; --orange: #F26A1B;
+    }
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{
+      background: radial-gradient(circle at 50% -10%, #1a1408 0%, var(--bg) 45%);
+      color: var(--text); font-family:'Inter',sans-serif; min-height:100vh;
+      display:flex; align-items:center; justify-content:center; padding:20px;
+    }
+    .display{ font-family:'Chakra Petch', sans-serif; }
+    .wrap{ width:100%; max-width: 400px; }
+    .logo-row{ text-align:center; margin-bottom:24px; }
+    .logo-row img{ width:88px; height:88px; border-radius:50%; object-fit:cover; border:3px solid var(--gold); box-shadow:0 0 28px rgba(242,169,59,0.4); }
+    .logo-row h1{ font-size:22px; margin-top:14px; }
+    .logo-row .tag{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; }
+    .card{ background: var(--panel); border:1px solid var(--line); border-radius:20px; padding:28px 24px; text-align:center; }
+    .icon{
+      width:64px; height:64px; margin:0 auto 16px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; font-size:28px;
+      background: rgba(61,214,140,0.12); border:1px solid rgba(61,214,140,0.35);
+    }
+    .icon.err{ background: rgba(229,72,77,0.12); border-color: rgba(229,72,77,0.35); }
+    .icon.wait{ background: rgba(242,169,59,0.12); border-color: rgba(242,169,59,0.35); }
+    h2{ font-size:18px; margin-bottom:10px; }
+    p{ font-size:14px; color:var(--muted); line-height:1.55; margin-bottom:8px; }
+    .user{ color:var(--gold); font-family:'JetBrains Mono',monospace; font-size:13px; margin:12px 0 20px; }
+    .btn-block{
+      width:100%; border:none; padding:14px; border-radius:12px; margin-top:8px;
+      font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14px; cursor:pointer;
+      background:linear-gradient(180deg, var(--gold), #d68f26); color:#1a1305;
+    }
+    .btn-block:disabled{ opacity:0.5; cursor:not-allowed; }
+    .btn-link{
+      display:block; margin-top:14px; background:none; border:none; color:var(--gold);
+      font-size:13px; cursor:pointer; width:100%;
+    }
+    .spin{ display:inline-block; animation: rot 0.9s linear infinite; }
+    @keyframes rot { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo-row">
+      <img src="logo.png" alt="Helion" onerror="this.style.display='none'">
+      <h1 class="display">Helion Network</h1>
+      <div class="tag">Email verification</div>
+    </div>
+
+    <div class="card" id="card">
+      <div class="icon wait" id="icon"><span class="spin">⟳</span></div>
+      <h2 class="display" id="title">Verifying…</h2>
+      <p id="msg">Please wait while we confirm your email.</p>
+      <div class="user" id="userLine" style="display:none"></div>
+      <button type="button" class="btn-block" id="confirmBtn" style="display:none" onclick="confirmVerify()">Confirm verification</button>
+      <button type="button" class="btn-block" id="okBtn" style="display:none" onclick="continueIn()">OK — Continue</button>
+      <button type="button" class="btn-link" id="loginLink" style="display:none" onclick="location.href='index.html'">Back to login</button>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    let sessionToken = null;
+    let sessionUser = null;
+
+    function show(state, title, message, username) {
+      const icon = document.getElementById('icon');
+      const okBtn = document.getElementById('okBtn');
+      const confirmBtn = document.getElementById('confirmBtn');
+      const loginLink = document.getElementById('loginLink');
+      const userLine = document.getElementById('userLine');
+      document.getElementById('title').textContent = title;
+      document.getElementById('msg').textContent = message;
+      icon.className = 'icon ' + (state === 'ok' ? '' : state === 'err' ? 'err' : 'wait');
+      icon.innerHTML = state === 'ok' ? '✓' : state === 'err' ? '!' : (state === 'ready' ? '✉' : '<span class="spin">⟳</span>');
+      if (username) {
+        userLine.style.display = '';
+        userLine.textContent = '@' + username;
+      } else {
+        userLine.style.display = 'none';
+      }
+      okBtn.style.display = state === 'ok' ? '' : 'none';
+      if (confirmBtn) confirmBtn.style.display = state === 'ready' ? '' : 'none';
+      loginLink.style.display = state === 'err' ? '' : 'none';
+    }
+
+    function continueIn() {
+      if (!sessionToken || String(sessionToken).length < 20) {
+        location.href = 'index.html';
+        return;
+      }
+      localStorage.setItem('helion_token', sessionToken);
+      localStorage.setItem('helion_username', sessionUser || '');
+      location.replace('home.html');
+    }
+
+    let pendingCode = '';
+
+    function getBackend() {
+      return (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL)
+        || window.HELION_BACKEND_URL
+        || (location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+            ? 'http://localhost:3001'
+            : 'https://testnetworkserver.onrender.com');
+    }
+
+    async function confirmVerify() {
+      const code = pendingCode;
+      if (!code) {
+        show('err', 'Missing code', 'No verification code. Open the link from your email again.');
+        return;
+      }
+      const backend = getBackend();
+      const btn = document.getElementById('confirmBtn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Verifying…'; }
+      show('wait', 'Verifying…', 'Please wait while we confirm your email.');
+      try {
+        const res = await fetch(backend + '/api/verify-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: code })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          show('err', 'Verification failed', data.errorEn || data.error || 'Invalid or expired code. Register again if more than 24 hours have passed.');
+          return;
+        }
+        sessionToken = data.token;
+        sessionUser = data.username || '';
+        show('ok', 'Email verified', 'Thanks for confirming. Press OK to continue to Helion.', sessionUser);
+        try { history.replaceState({}, '', 'verify.html'); } catch (_) {}
+      } catch (e) {
+        show('err', 'Connection error', String(e.message || e) + ' — is the API running on ' + getBackend() + '?');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Confirm verification'; }
+      }
+    }
+
+    function run() {
+      const q = new URLSearchParams(location.search);
+      if (q.get('verified') === '1' && q.get('token')) {
+        sessionToken = q.get('token');
+        sessionUser = q.get('username') || '';
+        show('ok', 'Email verified', 'Your account is confirmed. Press OK to open Helion.', sessionUser);
+        try { history.replaceState({}, '', 'verify.html'); } catch (_) {}
+        return;
+      }
+
+      const code = (q.get('verify') || q.get('code') || '').trim();
+      if (!code) {
+        show('err', 'Missing code', 'No verification code in the link. Open the link from your email, or enter the code on the login page.');
+        return;
+      }
+      pendingCode = code;
+      show('ready', 'Confirm your email', 'Click the button below to verify your Helion account. Code: ' + code);
+    }
+
+    run();
+  </script>
+</body>
+</html>

@@ -58,22 +58,20 @@
     <img src="logo.jpg" alt="Helion">
     <h1 class="display">Helion</h1>
     <div class="tag">BSC Testnet</div>
-
-    <!-- Badges (tummat + suorakulmaisemmat) -->
-    <div style="margin-top: 16px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-      <a href="https://microhunts.com/projects/helion-network-exchange?utm_source=badge" target="_blank" rel="noopener noreferrer">
-        <img src="https://microhunts.com/microhunts/images/badges/featured-on-dark.svg" alt="Featured on Micro Hunts" style="height:44px;width:auto;border-radius:4px;"/>
-      </a>
-      <a href="https://saashunt.best/projects/helion-network-exchange?utm_source=badge" target="_blank" rel="noopener noreferrer">
-        <img src="https://saashunt.best/images/badges/featured-on-dark.svg" alt="Featured on SaasHunt" style="height:44px;width:auto;border-radius:4px;"/>
-      </a>
-    </div>
   </div>
 
   <div class="card">
     <h2 class="display" id="authTitle" data-i18n="index.authLogin">Kirjaudu sisään</h2>
     <div class="input-row"><input type="text" id="authUsername" placeholder="Käyttäjänimi" data-i18n-placeholder="index.username" autocomplete="username"></div>
+    <div class="input-row" id="emailRow" style="display:none"><input type="email" id="authEmail" placeholder="Email" data-i18n-placeholder="index.email" autocomplete="email"></div>
     <div class="input-row"><input type="password" id="authPassword" placeholder="Salasana" data-i18n-placeholder="index.password" autocomplete="current-password"></div>
+    <div class="input-row" id="pinRow" style="display:none"><input type="password" id="authPin" inputmode="numeric" maxlength="8" placeholder="PIN (optional)" data-i18n-placeholder="index.pinOptional" autocomplete="one-time-code"></div>
+    <p class="muted" id="authHint" style="font-size:12px;margin:8px 0 0;display:none"></p>
+    <div id="verifyBox" style="display:none;margin-top:12px">
+      <div class="input-row"><input type="text" id="verifyCode" placeholder="Email code" data-i18n-placeholder="index.verifyCode" maxlength="12"></div>
+      <button type="button" class="btn-block secondary" onclick="doVerifyEmail()" id="verifyBtn" data-i18n="index.verifyBtn">Vahvista email</button>
+      <button type="button" class="btn-block secondary" onclick="doResendVerify()" id="resendBtn" data-i18n="index.resendBtn">Lähetä uudelleen</button>
+    </div>
     <button class="btn-block" onclick="doLogin()" id="loginBtn" data-i18n="index.loginBtn">Kirjaudu</button>
     <button class="link-btn" onclick="toggleAuthMode()" id="toggleAuthBtn" data-i18n="index.toggleAuth">Ei tiliä? Rekisteröidy</button>
 
@@ -122,6 +120,17 @@
     document.getElementById('toggleAuthBtn').textContent = isRegisterMode
       ? tr('index.toggleToLogin', 'On jo tili? Kirjaudu')
       : tr('index.toggleToRegister', 'Ei tiliä? Rekisteröidy');
+    const emailRow = document.getElementById('emailRow');
+    const pinRow = document.getElementById('pinRow');
+    const hint = document.getElementById('authHint');
+    if (emailRow) emailRow.style.display = isRegisterMode ? '' : 'none';
+    if (pinRow) pinRow.style.display = isRegisterMode ? 'none' : '';
+    if (hint) {
+      hint.style.display = isRegisterMode ? '' : 'none';
+      hint.textContent = isRegisterMode
+        ? tr('index.emailHint', 'Email required. Verify within 24h or the account is deleted.')
+        : '';
+    }
   }
 
   function saveSessionAndRedirect(token, username) {
@@ -147,18 +156,43 @@
     btn.disabled = true;
     btn.textContent = tr('common.loading', 'Ladataan…');
 
+    const email = (document.getElementById('authEmail') || {}).value || '';
+    const pin = (document.getElementById('authPin') || {}).value || '';
     const endpoint = isRegisterMode ? '/api/register' : '/api/login';
     try {
+      const body = isRegisterMode
+        ? { username, password, email: email.trim() }
+        : (pin && !password ? { username, pin } : { username, password });
+      if (isRegisterMode && !email.trim()) {
+        toast(tr('index.emailRequired', 'Sähköposti vaaditaan.'), 'error');
+        return;
+      }
       const res = await fetch(BACKEND_URL + endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify(body)
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg = (typeof apiMsg === 'function' ? apiMsg(data) : null)
           || data.error || tr('common.error', 'Virhe');
         toast(msg, 'error');
+        if (data.code === 'EMAIL_NOT_VERIFIED') {
+          const vb = document.getElementById('verifyBox');
+          if (vb) vb.style.display = '';
+          window.__pendingVerifyUser = username;
+        }
+        return;
+      }
+      if (data.needsVerification) {
+        toast(data.messageEn || data.message || tr('index.checkEmail', 'Check your email to verify (24h).'), 'success');
+        const vb = document.getElementById('verifyBox');
+        if (vb) vb.style.display = '';
+        window.__pendingVerifyUser = data.username || username;
+        if (data.devToken) {
+          const vc = document.getElementById('verifyCode');
+          if (vc) vc.value = data.devToken;
+        }
         return;
       }
       toast(
@@ -172,7 +206,7 @@
       toast(
         tr('common.connectionError', 'Yhteysvirhe') +
           ': ' + (e.message || e) +
-          ' — jos Render nukahti, odota \~30s ja yritä uudelleen.',
+          ' — jos Render nukahti, odota ~30s ja yritä uudelleen.',
         'error'
       );
     } finally {
@@ -180,6 +214,65 @@
       btn.textContent = prev;
     }
   }
+
+  async function doVerifyEmail() {
+    const code = (document.getElementById('verifyCode') || {}).value || '';
+    if (!code.trim()) { toast(tr('index.verifyCodeRequired', 'Enter the code from email.'), 'error'); return; }
+    const btn = document.getElementById('verifyBtn');
+    if (btn) { btn.disabled = true; }
+    try {
+      const res = await fetch(BACKEND_URL + '/api/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: code.trim() })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast((typeof apiMsg === 'function' ? apiMsg(data) : null) || data.error || 'Error', 'error');
+        return;
+      }
+      toast(data.messageEn || data.message || 'Verified!', 'success');
+      saveSessionAndRedirect(data.token, data.username);
+    } catch (e) {
+      toast(String(e.message || e), 'error');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  async function doResendVerify() {
+    const username = window.__pendingVerifyUser || document.getElementById('authUsername').value.trim();
+    if (!username) { toast('Username required', 'error'); return; }
+    try {
+      const res = await fetch(BACKEND_URL + '/api/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { toast(data.error || 'Error', 'error'); return; }
+      toast(data.messageEn || data.message || 'Sent', 'success');
+    } catch (e) { toast(String(e.message || e), 'error'); }
+  }
+
+  // Deep link: ?verify=TOKEN or ?verified=1&token=...
+  (function handleVerifyQuery() {
+    try {
+      const q = new URLSearchParams(location.search);
+      if (q.get('verified') === '1' && q.get('token')) {
+        saveSessionAndRedirect(q.get('token'), q.get('username') || '');
+        return;
+      }
+      const v = q.get('verify');
+      if (v) {
+        const box = document.getElementById('verifyBox');
+        if (box) box.style.display = '';
+        const vc = document.getElementById('verifyCode');
+        if (vc) vc.value = v;
+        setTimeout(() => doVerifyEmail(), 300);
+      }
+    } catch (_) {}
+  })();
 
   async function loginWithWallet() {
     if (!window.ethereum) { toast(tr('index.noMetamask', 'MetaMask ei löytynyt.'), 'error'); return; }
