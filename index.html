@@ -189,9 +189,11 @@
         const vb = document.getElementById('verifyBox');
         if (vb) vb.style.display = '';
         window.__pendingVerifyUser = data.username || username;
-        if (data.devToken) {
+        const code = data.verifyCode || data.devToken;
+        if (code) {
           const vc = document.getElementById('verifyCode');
-          if (vc) vc.value = data.devToken;
+          if (vc) vc.value = code;
+          toast(tr('index.codeShown', 'Verification code ready — enter or confirm below.'), 'success');
         }
         return;
       }
