@@ -144,7 +144,7 @@
   async function doUnlockPin() {
     const username = window.__pendingPinUser || '';
     const pin = (document.getElementById('unlockPin') || {}).value || '';
-    if (!username) { toast('Username missing', 'error'); return; }
+    if (!username) { toast(tr('index.userMissing', 'Username missing'), 'error'); return; }
     if (!pin || pin.replace(/\D/g, '').length < 4) {
       toast(tr('index.pinRequired', 'Enter your PIN (4–8 digits).'), 'error');
       return;
@@ -163,7 +163,7 @@
         return;
       }
       if (!data.token) {
-        toast('No session token', 'error');
+        toast(tr('index.noToken', 'No session token'), 'error');
         return;
       }
       closePinModal();

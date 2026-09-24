@@ -324,7 +324,7 @@
       const feeNum = parseFloat(result.fee) || 0;
       const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
       const feeUsd = direction === 'buy' ? feeNum * (lastPrices.bnbUsd || 0) : feeNum * (lastPrices.helUsd || 0);
-      toast('Swap onnistui! Fee: ' + feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit + ' (' + fmtUsd(feeUsd) + ')', 'success');
+      toast(t('swap.ok') + feeNum.toLocaleString(undefined, { maximumFractionDigits: 6 }) + feeUnit + ' (' + fmtUsd(feeUsd) + ')', 'success');
       document.getElementById('fromAmount').value = '';
       document.getElementById('toAmount').value = '';
       document.getElementById('feeInfo').textContent = '–';
@@ -361,7 +361,7 @@
     btn.disabled = true; btn.textContent = 'Poistetaan…';
     try {
       await apiPost('/api/trading/remove-liquidity', { lpAmount: val });
-      toast('Likviditeetti poistettu!', 'success');
+      toast(t('swap.liqRemoved'), 'success');
       document.getElementById('lpRemoveAmount').value = '';
       await refreshPool(); await refreshLpBalance(); await refreshBalances(); await refreshPrices();
     } catch (e) { toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error'); }

@@ -325,11 +325,13 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       if (box && data.emission) {
         const em = data.emission;
         box.style.display = 'block';
-        box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Hybrid emission</div>' +
-          '<div><strong>Aikataulu:</strong> ' + Number(em.scheduledReward).toLocaleString('fi-FI', {maximumFractionDigits: 2}) + ' HEL / sykli</div>' +
-          '<div><strong>Epoch:</strong> #' + em.epoch + ' · ½ / ' + em.halvingIntervalDays + ' pv</div>' +
-          '<div><strong>Seuraava pudotus:</strong> ' + em.daysToHalving + ' pv</div>' +
-          '<div style="font-size:11px;color:var(--muted);margin-top:8px;">Palkkio puolittuu 90 pv välein (min 0.5). Mainnet: community-bucket 18% kattona. Ketjupalkkio voi poiketa kunnes kontrakti päivitetään.</div>';
+        const loc = (typeof HelionI18n !== 'undefined' && HelionI18n.getLang && HelionI18n.getLang() === 'en') ? 'en-US' : 'fi-FI';
+        const tt = (k, fb) => (typeof t === 'function' ? t(k) : fb);
+        box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">' + tt('miner.emissionTitle', 'Hybrid emission') + '</div>' +
+          '<div><strong>' + tt('miner.emissionSchedule', 'Schedule') + ':</strong> ' + Number(em.scheduledReward).toLocaleString(loc, {maximumFractionDigits: 2}) + ' ' + tt('miner.emissionCycle', 'HEL / cycle') + '</div>' +
+          '<div><strong>' + tt('miner.emissionEpoch', 'Epoch') + ':</strong> #' + em.epoch + ' · ½ / ' + em.halvingIntervalDays + ' ' + tt('miner.emissionDays', 'days') + '</div>' +
+          '<div><strong>' + tt('miner.emissionNext', 'Next drop') + ':</strong> ' + em.daysToHalving + ' ' + tt('miner.emissionDays', 'days') + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:8px;">' + tt('miner.emissionNote', '') + '</div>';
       }
     } catch (e) {
       toast(t('miner.statusFail') + ': ' + e.message, 'error');

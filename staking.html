@@ -230,7 +230,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
   async function handleWithdraw(index) {
     try {
       await apiPost('/api/staking/withdraw', { stakeIndex: index });
-      toast('Nosto onnistui!', 'success');
+      toast(t('staking.withdrawOk'), 'success');
       await refreshWallet();
       await loadPositions();
     } catch (e) {
