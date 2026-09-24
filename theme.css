@@ -113,69 +113,69 @@ header{
 }
 .user-pill button:hover{ color: var(--gold); }
 
-/* Nav — unified L-frame (top + left), smaller glass icons */
+/* Nav — unified L-frame (top + left), glass bar + larger icons */
 .site-nav{
   display: flex;
   flex-wrap: nowrap;
-  gap: 2px;
+  gap: 4px;
   margin-bottom: 18px;
-  padding: 6px 8px 5px 6px;
+  padding: 8px 10px 7px 8px;
   justify-content: space-between;
   align-items: center;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   position: relative;
-  /* stronger glass panel */
   background:
-    linear-gradient(145deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.05) 38%, rgba(255,255,255,0.02) 100%);
+    linear-gradient(145deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0.02) 100%);
   border-radius: 0 14px 14px 0;
-  border-top: 1px solid rgba(255,255,255,0.38);
-  border-left: 1px solid rgba(255,255,255,0.32);
-  border-right: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-top: 1px solid rgba(255,255,255,0.36);
+  border-left: 1px solid rgba(255,255,255,0.30);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  /* soft depth — no harsh offset shadow */
   box-shadow:
-    inset 1px 1px 0 rgba(255,255,255,0.22),
-    inset 0 -1px 0 rgba(255,255,255,0.04),
-    8px 4px 28px rgba(0,0,0,0.18);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    inset 1px 1px 0 rgba(255,255,255,0.20),
+    inset 0 -1px 0 rgba(0,0,0,0.15),
+    0 4px 16px rgba(0,0,0,0.22);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
 }
 .site-nav::before{
   content: '';
   position: absolute;
-  left: 8%;
-  right: 18%;
+  left: 6%;
+  right: 20%;
   top: 1px;
-  height: 40%;
-  border-radius: 0 12px 0 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.28), transparent);
+  height: 42%;
+  border-radius: 0 10px 0 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.22), transparent);
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.65;
+  z-index: 0;
 }
 .site-nav::-webkit-scrollbar{ display: none; }
 
 .site-nav .nav-item{
   flex: 1 1 0;
-  min-width: 34px;
-  max-width: 42px;
-  height: 34px;
-  aspect-ratio: auto;
+  min-width: 42px;
+  max-width: 52px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0;
   line-height: 0;
   text-decoration: none;
-  color: rgba(255,255,255,0.78);
+  color: rgba(255,255,255,0.82);
   background: transparent;
   border: none;
   box-shadow: none;
   position: relative;
   z-index: 1;
-  transition: background .18s, transform .14s, opacity .18s;
+  transition: background .18s, transform .14s, color .18s;
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
 }
@@ -183,17 +183,19 @@ header{
 
 .site-nav .nav-item .nav-svg{
   display: block;
-  width: 18px;
-  height: 18px;
-  opacity: 0.72;
-  filter: drop-shadow(0 0.5px 0.5px rgba(255,255,255,0.25));
+  width: 24px;
+  height: 24px;
+  opacity: 0.85;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
 }
 .site-nav .nav-item:hover{
   background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.95);
 }
-.site-nav .nav-item:hover .nav-svg{ opacity: 0.95; }
+.site-nav .nav-item:hover .nav-svg{ opacity: 1; }
 .site-nav .nav-item.active{
   background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,1);
 }
 .site-nav .nav-item.active .nav-svg{ opacity: 1; }
 .site-nav .nav-item:active{ transform: scale(0.94); }
@@ -557,17 +559,17 @@ td.mono{ color: var(--text); word-break: break-all; }
 @media (max-width: 640px){
   body{ padding: calc(14px + var(--safe-t)) 12px calc(40px + var(--safe-b)); }
   .wrap{ max-width: 100%; }
-  .site-nav{ gap: 1px; padding: 5px 6px 4px 5px; }
-  .site-nav .nav-item{ min-width: 30px; max-width: 36px; height: 30px; }
-  .site-nav .nav-item .nav-svg{ width: 16px; height: 16px; }
+  .site-nav{ gap: 2px; padding: 6px 8px 5px 6px; }
+  .site-nav .nav-item{ min-width: 38px; max-width: 46px; height: 38px; }
+  .site-nav .nav-item .nav-svg{ width: 22px; height: 22px; }
   .user-pill span{ max-width: 88px; }
   .tiers{ grid-template-columns: 1fr 1fr; }
   .pool-stats{ grid-template-columns: 1fr 1fr; gap: 8px; }
 }
 
 @media (max-width: 400px){
-  .site-nav .nav-item{ min-width: 28px; max-width: 34px; height: 28px; }
-  .site-nav .nav-item .nav-svg{ width: 15px; height: 15px; }
+  .site-nav .nav-item{ min-width: 36px; max-width: 44px; height: 36px; }
+  .site-nav .nav-item .nav-svg{ width: 20px; height: 20px; }
   header{ gap: 10px; }
   .brand-logo{ height: 36px; width: 36px; }
 }
@@ -575,16 +577,16 @@ td.mono{ color: var(--text); word-break: break-all; }
 @media (min-width: 768px){
   body{ padding: 36px 24px 64px; }
   .wrap{ max-width: 760px; }
-  .site-nav .nav-item{ min-width: 36px; max-width: 44px; height: 36px; }
-  .site-nav .nav-item .nav-svg{ width: 18px; height: 18px; }
+  .site-nav .nav-item{ min-width: 44px; max-width: 54px; height: 44px; }
+  .site-nav .nav-item .nav-svg{ width: 24px; height: 24px; }
   .card, .panel, .section{ padding: 20px; }
 }
 
 @media (min-width: 900px){
   .wrap{ max-width: 820px; }
-  .site-nav{ gap: 3px; padding: 7px 10px 6px 8px; }
-  .site-nav .nav-item{ min-width: 38px; max-width: 46px; height: 36px; }
-  .site-nav .nav-item .nav-svg{ width: 18px; height: 18px; }
+  .site-nav{ gap: 4px; padding: 8px 12px 7px 10px; }
+  .site-nav .nav-item{ min-width: 46px; max-width: 56px; height: 44px; }
+  .site-nav .nav-item .nav-svg{ width: 24px; height: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce){
