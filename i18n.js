@@ -751,6 +751,15 @@
       el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder'), lang));
     });
 
+    document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-title');
+      if (!key) return;
+      const val = t(key, lang);
+      el.setAttribute('title', val);
+      el.setAttribute('aria-label', val);
+    });
+
+
     document.querySelectorAll('[data-lang-btn]').forEach((btn) => {
       const active = btn.getAttribute('data-lang-btn') === lang;
       btn.classList.toggle('active', active);
