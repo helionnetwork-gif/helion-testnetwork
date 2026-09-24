@@ -50,6 +50,32 @@
   .helion-lang-switch{display:inline-flex;gap:2px;border:1px solid var(--line,#262B35);border-radius:999px;padding:2px;background:var(--panel,#14171D);margin-left:8px;}
   .helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
   .helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
+
+  /* Email verify modal */
+  #verifyModal{
+    display:none; position:fixed; inset:0; z-index:200;
+    background:rgba(5,6,10,0.72); backdrop-filter:blur(6px);
+    align-items:center; justify-content:center; padding:20px;
+  }
+  #verifyModal.open{ display:flex; }
+  #verifyModal .modal-card{
+    width:100%; max-width:400px; background:var(--panel);
+    border:1px solid var(--line); border-radius:20px; padding:28px 24px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.55);
+  }
+  #verifyModal .modal-icon{
+    width:56px; height:56px; margin:0 auto 14px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+    background:rgba(242,169,59,0.12); border:1px solid rgba(242,169,59,0.35);
+  }
+  #verifyModal h2{ text-align:center; font-size:18px; margin-bottom:8px; }
+  #verifyModal .modal-msg{
+    text-align:center; font-size:13px; color:var(--muted); line-height:1.55; margin-bottom:16px;
+  }
+  #verifyModal .modal-user{
+    text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px;
+    color:var(--gold); margin-bottom:16px;
+  }
 </style>
 </head>
 <body>
@@ -67,11 +93,6 @@
     <div class="input-row"><input type="password" id="authPassword" placeholder="Salasana" data-i18n-placeholder="index.password" autocomplete="current-password"></div>
     <div class="input-row" id="pinRow" style="display:none"><input type="password" id="authPin" inputmode="numeric" maxlength="8" placeholder="PIN (optional)" data-i18n-placeholder="index.pinOptional" autocomplete="one-time-code"></div>
     <p class="muted" id="authHint" style="font-size:12px;margin:8px 0 0;display:none"></p>
-    <div id="verifyBox" style="display:none;margin-top:12px">
-      <div class="input-row"><input type="text" id="verifyCode" placeholder="Email code" data-i18n-placeholder="index.verifyCode" maxlength="12"></div>
-      <button type="button" class="btn-block secondary" onclick="doVerifyEmail()" id="verifyBtn" data-i18n="index.verifyBtn">Vahvista email</button>
-      <button type="button" class="btn-block secondary" onclick="doResendVerify()" id="resendBtn" data-i18n="index.resendBtn">Lähetä uudelleen</button>
-    </div>
     <button class="btn-block" onclick="doLogin()" id="loginBtn" data-i18n="index.loginBtn">Kirjaudu</button>
     <button class="link-btn" onclick="toggleAuthMode()" id="toggleAuthBtn" data-i18n="index.toggleAuth">Ei tiliä? Rekisteröidy</button>
 
@@ -82,12 +103,56 @@
   </div>
 </div>
 
+
+<!-- Email verification window -->
+<div id="verifyModal" role="dialog" aria-modal="true" aria-labelledby="verifyModalTitle">
+  <div class="modal-card">
+    <div class="modal-icon">✉</div>
+    <h2 class="display" id="verifyModalTitle" data-i18n="index.verifyTitle">Verify your email</h2>
+    <p class="modal-msg" id="verifyModalMsg" data-i18n="index.verifyMsg">
+      We sent a verification code to your email. Enter the code below or open the link in the message.
+    </p>
+    <div class="modal-user" id="verifyModalUser"></div>
+    <div class="input-row">
+      <input type="text" id="verifyCode" placeholder="Email code" data-i18n-placeholder="index.verifyCode" maxlength="12" autocomplete="one-time-code">
+    </div>
+    <button type="button" class="btn-block" onclick="doVerifyEmail()" id="verifyBtn" data-i18n="index.verifyBtn">Verify email</button>
+    <button type="button" class="btn-block secondary" onclick="doResendVerify()" id="resendBtn" data-i18n="index.resendBtn">Resend code</button>
+    <button type="button" class="link-btn" onclick="closeVerifyModal()" data-i18n="index.backLogin">Back to login</button>
+  </div>
+</div>
+
 <div id="toastHost"></div>
 
 <script>
   const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
 
   let isRegisterMode = false;
+
+  function openVerifyModal(username, email) {
+    window.__pendingVerifyUser = username || '';
+    const modal = document.getElementById('verifyModal');
+    const userEl = document.getElementById('verifyModalUser');
+    const msg = document.getElementById('verifyModalMsg');
+    if (userEl) {
+      userEl.textContent = username ? '@' + username : '';
+    }
+    if (msg && email) {
+      msg.textContent = (typeof tr === 'function'
+        ? tr('index.verifyMsgEmail', 'We sent a code to {email}. Enter it below or open the link in the email.')
+        : 'We sent a code to {email}. Enter it below or open the link in the email.'
+      ).replace('{email}', email);
+    }
+    const vc = document.getElementById('verifyCode');
+    if (vc) { vc.value = ''; setTimeout(() => vc.focus(), 200); }
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeVerifyModal() {
+    const modal = document.getElementById('verifyModal');
+    if (modal) modal.classList.remove('open');
+  }
+
 
   function tr(key, fallback) {
     try {
@@ -178,23 +243,12 @@
           || data.error || tr('common.error', 'Virhe');
         toast(msg, 'error');
         if (data.code === 'EMAIL_NOT_VERIFIED') {
-          const vb = document.getElementById('verifyBox');
-          if (vb) vb.style.display = '';
-          window.__pendingVerifyUser = username;
+          openVerifyModal(username, '');
         }
         return;
       }
       if (data.needsVerification) {
-        toast(data.messageEn || data.message || tr('index.checkEmail', 'Check your email to verify (24h).'), 'success');
-        const vb = document.getElementById('verifyBox');
-        if (vb) vb.style.display = '';
-        window.__pendingVerifyUser = data.username || username;
-        const code = data.verifyCode || data.devToken;
-        if (code) {
-          const vc = document.getElementById('verifyCode');
-          if (vc) vc.value = code;
-          toast(tr('index.codeShown', 'Verification code ready — enter or confirm below.'), 'success');
-        }
+        openVerifyModal(data.username || username, (document.getElementById('authEmail') || {}).value || '');
         return;
       }
       toast(
@@ -267,11 +321,9 @@
       }
       const v = q.get('verify');
       if (v) {
-        const box = document.getElementById('verifyBox');
-        if (box) box.style.display = '';
+        openVerifyModal('', '');
         const vc = document.getElementById('verifyCode');
         if (vc) vc.value = v;
-        setTimeout(() => doVerifyEmail(), 300);
       }
     } catch (_) {}
   })();
