@@ -51,28 +51,28 @@
   .helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
   .helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
 
-  /* Email verify modal */
-  #verifyModal, #pinModal{
+  /* PIN modal */
+  #pinModal{
     display:none; position:fixed; inset:0; z-index:200;
     background:rgba(5,6,10,0.72); backdrop-filter:blur(6px);
     align-items:center; justify-content:center; padding:20px;
   }
-  #verifyModal.open, #pinModal.open{ display:flex; }
-  #verifyModal .modal-card, #pinModal .modal-card{
+  #pinModal.open{ display:flex; }
+  #pinModal .modal-card{
     width:100%; max-width:400px; background:var(--panel);
     border:1px solid var(--line); border-radius:20px; padding:28px 24px;
     box-shadow:0 20px 50px rgba(0,0,0,0.55);
   }
-  #verifyModal .modal-icon, #pinModal .modal-icon{
+  #pinModal .modal-icon{
     width:56px; height:56px; margin:0 auto 14px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; font-size:24px;
     background:rgba(242,169,59,0.12); border:1px solid rgba(242,169,59,0.35);
   }
-  #verifyModal h2, #pinModal h2{ text-align:center; font-size:18px; margin-bottom:8px; }
-  #verifyModal .modal-msg, #pinModal .modal-msg{
+  #pinModal h2{ text-align:center; font-size:18px; margin-bottom:8px; }
+  #pinModal .modal-msg{
     text-align:center; font-size:13px; color:var(--muted); line-height:1.55; margin-bottom:16px;
   }
-  #verifyModal .modal-user, #pinModal .modal-user{
+  #pinModal .modal-user{
     text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px;
     color:var(--gold); margin-bottom:16px;
   }
@@ -89,7 +89,6 @@
   <div class="card">
     <h2 class="display" id="authTitle" data-i18n="index.authLogin">Kirjaudu sisään</h2>
     <div class="input-row"><input type="text" id="authUsername" placeholder="Käyttäjänimi" data-i18n-placeholder="index.username" autocomplete="username"></div>
-    <div class="input-row" id="emailRow" style="display:none"><input type="email" id="authEmail" placeholder="Email" data-i18n-placeholder="index.email" autocomplete="email"></div>
     <div class="input-row"><input type="password" id="authPassword" placeholder="Salasana" data-i18n-placeholder="index.password" autocomplete="current-password"></div>
     <div class="input-row" id="regPinRow" style="display:none"><input type="password" id="regPin" inputmode="numeric" maxlength="8" placeholder="Create PIN (4–8 digits)" data-i18n-placeholder="index.createPin" autocomplete="new-password"></div>
     <div class="input-row" id="regPin2Row" style="display:none"><input type="password" id="regPin2" inputmode="numeric" maxlength="8" placeholder="Confirm PIN" data-i18n-placeholder="index.confirmPin" autocomplete="new-password"></div>
@@ -176,29 +175,7 @@
     }
   }
 
-  function openVerifyModal(username, email) {
-    window.__pendingVerifyUser = username || '';
-    const modal = document.getElementById('verifyModal');
-    const userEl = document.getElementById('verifyModalUser');
-    const msg = document.getElementById('verifyModalMsg');
-    if (userEl) {
-      userEl.textContent = username ? '@' + username : '';
-    }
-    if (msg && email) {
-      msg.textContent = (typeof tr === 'function'
-        ? tr('index.verifyMsgEmail', 'We sent a code to {email}. Enter it below or open the link in the email.')
-        : 'We sent a code to {email}. Enter it below or open the link in the email.'
-      ).replace('{email}', email);
-    }
-    const vc = document.getElementById('verifyCode');
-    if (vc) { vc.value = ''; setTimeout(() => vc.focus(), 200); }
-    if (modal) modal.classList.add('open');
-  }
 
-  function closeVerifyModal() {
-    const modal = document.getElementById('verifyModal');
-    if (modal) modal.classList.remove('open');
-  }
 
 
   function tr(key, fallback) {
@@ -232,10 +209,8 @@
     document.getElementById('toggleAuthBtn').textContent = isRegisterMode
       ? tr('index.toggleToLogin', 'On jo tili? Kirjaudu')
       : tr('index.toggleToRegister', 'Ei tiliä? Rekisteröidy');
-    const emailRow = document.getElementById('emailRow');
     const pinRow = document.getElementById('pinRow');
     const hint = document.getElementById('authHint');
-    if (emailRow) emailRow.style.display = isRegisterMode ? '' : 'none';
     const r1 = document.getElementById('regPinRow');
     const r2 = document.getElementById('regPin2Row');
     if (r1) r1.style.display = isRegisterMode ? '' : 'none';
@@ -245,7 +220,7 @@
     if (hint) {
       hint.style.display = isRegisterMode ? '' : 'none';
       hint.textContent = isRegisterMode
-        ? tr('index.emailHint', 'Email required. Verify within 24h or the account is deleted.')
+        ? tr('index.pinHint', 'Choose a PIN (4–8 digits). You will need it every login.')
         : '';
     }
   }
@@ -273,7 +248,6 @@
     btn.disabled = true;
     btn.textContent = tr('common.loading', 'Ladataan…');
 
-    const email = (document.getElementById('authEmail') || {}).value || '';
     const pin = (document.getElementById('authPin') || {}).value || '';
     const endpoint = isRegisterMode ? '/api/register' : '/api/login';
     try {
@@ -289,7 +263,7 @@
           toast(tr('index.pinMismatch', 'PIN codes do not match.'), 'error');
           return;
         }
-        body = { username, password, email: email.trim(), pin: p1 };
+        body = { username, password, pin: p1 };
       } else {
         body = { username, password };
       }
@@ -303,9 +277,6 @@
         const msg = (typeof apiMsg === 'function' ? apiMsg(data) : null)
           || data.error || tr('common.error', 'Virhe');
         toast(msg, 'error');
-        if (data.code === 'EMAIL_NOT_VERIFIED') {
-          /* email verify postponed */
-        }
         return;
       }
       if (data.needsPin) {
@@ -332,62 +303,8 @@
     }
   }
 
-  async function doVerifyEmail() {
-    const code = (document.getElementById('verifyCode') || {}).value || '';
-    if (!code.trim()) { toast(tr('index.verifyCodeRequired', 'Enter the code from email.'), 'error'); return; }
-    const btn = document.getElementById('verifyBtn');
-    if (btn) { btn.disabled = true; }
-    try {
-      const res = await fetch(BACKEND_URL + '/api/verify-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: code.trim() })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        toast((typeof apiMsg === 'function' ? apiMsg(data) : null) || data.error || 'Error', 'error');
-        return;
-      }
-      toast(data.messageEn || data.message || 'Verified!', 'success');
-      saveSessionAndRedirect(data.token, data.username);
-    } catch (e) {
-      toast(String(e.message || e), 'error');
-    } finally {
-      if (btn) btn.disabled = false;
-    }
-  }
 
-  async function doResendVerify() {
-    const username = window.__pendingVerifyUser || document.getElementById('authUsername').value.trim();
-    if (!username) { toast('Username required', 'error'); return; }
-    try {
-      const res = await fetch(BACKEND_URL + '/api/resend-verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) { toast(data.error || 'Error', 'error'); return; }
-      toast(data.messageEn || data.message || 'Sent', 'success');
-    } catch (e) { toast(String(e.message || e), 'error'); }
-  }
 
-  // Deep link: ?verify=TOKEN or ?verified=1&token=...
-  (function handleVerifyQuery() {
-    try {
-      const q = new URLSearchParams(location.search);
-      if (q.get('verified') === '1' && q.get('token')) {
-        saveSessionAndRedirect(q.get('token'), q.get('username') || '');
-        return;
-      }
-      const v = q.get('verify');
-      if (v) {
-        openVerifyModal('', '');
-        const vc = document.getElementById('verifyCode');
-        if (vc) vc.value = v;
-      }
-    } catch (_) {}
-  })();
 
   async function loginWithWallet() {
     if (!window.ethereum) { toast(tr('index.noMetamask', 'MetaMask ei löytynyt.'), 'error'); return; }
