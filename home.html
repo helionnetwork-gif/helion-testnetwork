@@ -23,13 +23,23 @@
     </div>
   </header>
 
+  <nav class="site-nav">
+    <a href="home.html" class="nav-item active"><span data-i18n="nav.home">🏠 Home</span></a>
+    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Kaivos</span></a>
+    <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
+    <a href="helion-trading.html" class="nav-item"><span data-i18n="nav.swap">🔄 Swap</span></a>
+    <a href="spot.html" class="nav-item"><span data-i18n="nav.spot">📈 Spot</span></a>
+    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
+    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Top</span></a>
+    <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
+  </nav>
 
 
   <div class="card wallet">
     <div class="lbl">💼 <span data-i18n="index.walletLabel">Wallet</span></div>
     <div class="bal" id="balHel">–</div>
     <div class="meta">
-      <span id="balHelLabel">HNET</span>
+      <span id="balHelLabel">HEL</span>
       <span id="helUsd" class="usd">–</span>
     </div>
     <div class="bal-secondary">
@@ -37,7 +47,7 @@
       <span id="bnbUsd" class="usd">–</span>
     </div>
     <div class="prices-row">
-      <span>HNET <b id="priceHel">–</b> <span id="helChange24" class="usd"></span></span>
+      <span>HEL <b id="priceHel">–</b> <span id="helChange24" class="usd"></span></span>
       <span>tBNB <b id="priceBnb">–</b></span>
     </div>
     <div class="addr" id="walletAddress">–</div>
@@ -150,7 +160,7 @@
       const bnbAmt = parseFloat(data.bnbBalance) || 0;
 
       document.getElementById('balHel').textContent = fmt(helAmt, 4);
-      document.getElementById('balHelLabel').textContent = 'HNET';
+      document.getElementById('balHelLabel').textContent = 'HEL';
       document.getElementById('balBnb').textContent = fmt(bnbAmt, 4) + ' tBNB';
       document.getElementById('walletAddress').textContent = data.address || '–';
 

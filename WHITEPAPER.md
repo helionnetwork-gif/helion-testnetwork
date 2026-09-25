@@ -11,7 +11,7 @@ Document status: Public draft · Not an offer to sell securities
 
 ### Important notice
 
-This document is provided for informational purposes only. It does not constitute investment, legal, tax, or financial advice. Nothing herein is an offer to sell, or a solicitation to buy, any token, security, or financial instrument. HNET token mechanics described below are subject to change prior to mainnet deployment. Digital assets involve substantial risk, including total loss of capital. Prospective participants should conduct independent due diligence and consult qualified advisors. Past or projected parameters are not guarantees of future performance.
+This document is provided for informational purposes only. It does not constitute investment, legal, tax, or financial advice. Nothing herein is an offer to sell, or a solicitation to buy, any token, security, or financial instrument. HEL token mechanics described below are subject to change prior to mainnet deployment. Digital assets involve substantial risk, including total loss of capital. Prospective participants should conduct independent due diligence and consult qualified advisors. Past or projected parameters are not guarantees of future performance.
 
 ---
 
@@ -19,7 +19,7 @@ This document is provided for informational purposes only. It does not constitut
 
 Helion Network is building a unified **exchange and DeFi hub** on BNB Smart Chain: spot trading, swap, staking-oriented yield, and a single user wallet experience designed so participants do not need multiple disconnected applications for core market activity.
 
-The network’s native unit of account for incentives and protocol alignment is **HNET**, a fixed-supply token (100 billion maximum). Economic design separates:
+The network’s native unit of account for incentives and protocol alignment is **HEL**, a fixed-supply token (100 billion maximum). Economic design separates:
 
 - **User incentive supply** (community rewards),
 - **Capital formation** (investor allocations with vesting),
@@ -35,7 +35,7 @@ Product development is currently advanced on **BSC Testnet**, with mainnet deplo
 | Fixed supply | Hard cap; no unbounded mint |
 | User-first incentives | 40% of supply to community programs |
 | Aligned capital | Investor tokens vest; limited TGE float |
-| Sustainable fees | Operational fees in native gas asset (BNB), not forced HNET sell pressure |
+| Sustainable fees | Operational fees in native gas asset (BNB), not forced HEL sell pressure |
 | Transparent buckets | Clear allocation, unlock logic, and governance of treasury |
 
 ---
@@ -60,7 +60,7 @@ Helion targets a coherent product surface—**one account, one wallet context, m
 | Module | Description |
 |--------|-------------|
 | **Wallet** | Custodial account wallet for streamlined onboarding on testnet; path to broader wallet options as the product matures |
-| **Swap** | HNET pairs with native gas asset routes; pool-aware pricing |
+| **Swap** | HEL pairs with native gas asset routes; pool-aware pricing |
 | **Spot** | Internal matching with market-making support; quote design evolving (e.g. stable quote assets in test environments) |
 | **Mining** | Time-cycled participation with scheduled emission decay |
 | **Staking / Finance** | Lock-based rewards; roadmap includes expanded yield, lending, and pool participation |
@@ -68,7 +68,7 @@ Helion targets a coherent product surface—**one account, one wallet context, m
 
 ### 3.2 Fee philosophy
 
-Protocol and product fees are denominated primarily in the **chain gas asset (BNB / tBNB on testnet)**, not in HNET. A planned split directs a portion of fee proceeds to a reward treasury distributed by contribution ranking, with the remainder supporting operations and treasury resilience. This reduces structural sell pressure on HNET from mandatory fee conversion.
+Protocol and product fees are denominated primarily in the **chain gas asset (BNB / tBNB on testnet)**, not in HEL. A planned split directs a portion of fee proceeds to a reward treasury distributed by contribution ranking, with the remainder supporting operations and treasury resilience. This reduces structural sell pressure on HEL from mandatory fee conversion.
 
 ### 3.3 Security roadmap (product)
 
@@ -83,25 +83,25 @@ Near-term controls include email verification with time-limited activation, opti
 | Settlement network | BNB Smart Chain |
 | Current phase | Testnet validation |
 | Target phase | Mainnet exchange & DeFi hub |
-| Token standard | BEP-20 compatible HNET |
+| Token standard | BEP-20 compatible HEL |
 | Off-chain services | API, matching support, custodial orchestration (testnet), analytics |
 
 Architecture prioritizes **fast iteration on testnet** while keeping a clear boundary between: (a) user balances and incentives, (b) market infrastructure, and (c) treasury / investor delivery schedules for mainnet.
 
 ---
 
-## 5. Token overview — HNET
+## 5. Token overview — HEL
 
 | Parameter | Specification |
 |-----------|----------------|
 | Name | Helion |
-| Ticker | HNET |
-| Maximum supply | **100,000,000,000** HNET |
+| Ticker | HEL |
+| Maximum supply | **100,000,000,000** HEL |
 | Supply policy | **Fixed** — no inflation beyond scheduled release from predefined buckets |
 | Primary network | BNB Smart Chain |
 | Representation | BEP-20 (mainnet) |
 
-HNET is designed as the **coordination and incentive asset** of the Helion economy: staking and mining rewards, ecosystem alignment, and long-term participation—not as the unit of protocol fee payment.
+HEL is designed as the **coordination and incentive asset** of the Helion economy: staking and mining rewards, ecosystem alignment, and long-term participation—not as the unit of protocol fee payment.
 
 ---
 
@@ -109,7 +109,7 @@ HNET is designed as the **coordination and incentive asset** of the Helion econo
 
 ### 6.1 Summary table
 
-| Bucket | Share | Amount (HNET) | Purpose |
+| Bucket | Share | Amount (HEL) | Purpose |
 |--------|------:|-------------:|---------|
 | Community (staking + mining + rewards) | **40%** | 40,000,000,000 | User incentives over multi-year emission |
 | Investors (seed / private / public) | **15%** | 15,000,000,000 | Capital formation under vesting |
@@ -148,7 +148,7 @@ Indicative subdivision of the investor bucket (finalized in transaction document
 | Private | 3–6 months | 12–18 months | 5–10% |
 | Public | 0–1 month | 3–6 months | 10–25% |
 
-Investor consideration may be denominated in stablecoins or BNB; HNET is delivered per vesting contracts. Valuation and price per round are **outside** this whitepaper and set in formal offering materials.
+Investor consideration may be denominated in stablecoins or BNB; HEL is delivered per vesting contracts. Valuation and price per round are **outside** this whitepaper and set in formal offering materials.
 
 ### 6.4 Team — 12%
 
@@ -189,16 +189,16 @@ Circulating supply at any date is a function of vesting cliffs, linear releases,
 
 ---
 
-## 8. Value capture and HNET demand (non-promissory)
+## 8. Value capture and HEL demand (non-promissory)
 
 Mechanisms intended to create organic demand or alignment—**without guaranteeing price**:
 
-1. **Staking** — HNET locked for protocol yield parameters  
-2. **Mining participation** — HNET rewards for sustained engagement  
+1. **Staking** — HEL locked for protocol yield parameters  
+2. **Mining participation** — HEL rewards for sustained engagement  
 3. **Ecosystem access** — future fee discounts or governance rights (if activated by governance)  
-4. **Liquidity provision** — HNET as a leg in core pairs  
+4. **Liquidity provision** — HEL as a leg in core pairs  
 
-Fee revenues in BNB strengthen treasury and contribution rewards without forcing users to sell HNET to pay gas-style fees.
+Fee revenues in BNB strengthen treasury and contribution rewards without forcing users to sell HEL to pay gas-style fees.
 
 ---
 

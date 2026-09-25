@@ -1,4 +1,4 @@
-# Helion (HNET) — Tokenomics v0.3
+# Helion (HEL) — Tokenomics v0.3
 
 **Institutional allocation schedule** · Companion to the Helion Network Whitepaper v1.0  
 
@@ -11,7 +11,7 @@
 | Parameter | Specification |
 |-----------|----------------|
 | Asset | Helion |
-| Ticker | **HNET** |
+| Ticker | **HEL** |
 | Maximum supply | **100,000,000,000** (100 billion) |
 | Supply type | **Fixed** — releases only from predefined buckets |
 | Network | BNB Smart Chain (testnet today → mainnet target) |
@@ -21,7 +21,7 @@
 
 ## 2. Allocation summary
 
-| Bucket | % | HNET amount | Purpose |
+| Bucket | % | HEL amount | Purpose |
 |--------|--:|----------:|---------|
 | **Community** (staking + mining + rewards) | **40%** | 40,000,000,000 | Long-horizon user incentives |
 | **Investors** (seed / private / public) | **15%** | 15,000,000,000 | Capital formation under vesting |
@@ -54,7 +54,7 @@ Community supply is **earned over time**, not unlocked in full at TGE.
 
 ### Illustrative mining schedule
 ```text
-baseReward     = 50 HNET per cycle (configurable)
+baseReward     = 50 HEL per cycle (configurable)
 epoch          = floor(daysSinceGenesis / 90)
 scheduled      = max(0.5, baseReward / 2^epoch)
 ```
@@ -118,11 +118,11 @@ Deployment for AMM depth, listing inventories, and market-making programs. Struc
 
 ---
 
-## 9. Fee policy (non-HNET)
+## 9. Fee policy (non-HEL)
 
-- Product fees are paid in **BNB** (tBNB on testnet), not HNET.  
+- Product fees are paid in **BNB** (tBNB on testnet), not HEL.  
 - Planned split: **50%** to a reward treasury distributed by contribution ranking; **50%** to operations / treasury.  
-- Objective: avoid mandatory HNET sell pressure from fee payment.
+- Objective: avoid mandatory HEL sell pressure from fee payment.
 
 ---
 
@@ -143,7 +143,7 @@ Deployment for AMM depth, listing inventories, and market-making programs. Struc
 
 - Staking and future Finance features  
 - Mining participation  
-- Pair liquidity (HNET as a market leg)  
+- Pair liquidity (HEL as a market leg)  
 - Possible future fee discount / governance (not activated solely by this document)  
 - Contribution scores rank fee-share eligibility; scores are not themselves a second token
 
