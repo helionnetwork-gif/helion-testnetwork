@@ -12,7 +12,7 @@ Staattiset sivut GitHub Pagesiin. API on erillisessä **private** server-reposta
 | `miner.html` | Mining |
 | `staking.html` | Staking |
 | `helion-trading.html` | Swap |
-| `spot.html` | HEL/BNB spot |
+| `spot.html` | HNET/BNB spot |
 | `leaderboard.html` | Board |
 | `guide.html` | Ohjeet |
 | `i18n.js` | FI / EN |

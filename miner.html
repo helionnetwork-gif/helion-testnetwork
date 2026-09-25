@@ -99,7 +99,7 @@
       <div class="mine-meta">
         <div class="time" id="gaugeTime">12:00:00</div>
         <div class="label" data-i18n="miner.timeLeft">Kaivos-aika jäljellä</div>
-        <div class="session" id="sessionMined">0.00 HEL</div>
+        <div class="session" id="sessionMined">0.00 HNET</div>
         <div class="session-lbl" data-i18n="miner.sessionMined">Tämän syklin kaivaus</div>
         <div class="status-badge" id="gaugeStatus">Ei aktiivinen</div>
       </div>
@@ -279,7 +279,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
 
     function setSession(earned) {
       if (sessionEl) {
-        sessionEl.textContent = earned.toLocaleString(loc, { maximumFractionDigits: 4, minimumFractionDigits: 2 }) + ' HEL';
+        sessionEl.textContent = earned.toLocaleString(loc, { maximumFractionDigits: 4, minimumFractionDigits: 2 }) + ' HNET';
       }
     }
 
@@ -315,7 +315,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       }
       if (actionBtn) {
         actionBtn.disabled = false;
-        actionBtn.textContent = ('Claim ' + reward.toLocaleString(loc, { maximumFractionDigits: 2 }) + ' HEL').trim();
+        actionBtn.textContent = ('Claim ' + reward.toLocaleString(loc, { maximumFractionDigits: 2 }) + ' HNET').trim();
         actionBtn.dataset.mode = 'claim';
       }
       clearInterval(miningInterval);
@@ -365,7 +365,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       const data = await apiGet('/api/wallet');
       const helAmt = parseFloat(data.helBalance);
       document.getElementById('walletBalance').textContent =
-        helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+        helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HNET';
       await fetchHelPrice();
       document.getElementById('walletUsd').textContent = fmtUsdAmt(helAmt, lastHelPrice);
     } catch (e) {
@@ -385,7 +385,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       rewardPerCycleDisplay = rewardPerCycleNum.toLocaleString('fi-FI', {maximumFractionDigits: 2});
       const mined = parseFloat(data.totalMined);
       document.getElementById('totalMinedDisplay').textContent =
-        mined.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+        mined.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HNET';
       await fetchHelPrice();
       document.getElementById('minedUsd').textContent = fmtUsdAmt(mined, lastHelPrice);
       const box = document.getElementById('emissionBox');
@@ -395,7 +395,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
         const loc = (typeof HelionI18n !== 'undefined' && HelionI18n.getLang && HelionI18n.getLang() === 'en') ? 'en-US' : 'fi-FI';
         const tt = (k, fb) => (typeof t === 'function' ? t(k) : fb);
         box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">' + tt('miner.emissionTitle', 'Hybrid emission') + '</div>' +
-          '<div><strong>' + tt('miner.emissionSchedule', 'Schedule') + ':</strong> ' + Number(em.scheduledReward).toLocaleString(loc, {maximumFractionDigits: 2}) + ' ' + tt('miner.emissionCycle', 'HEL / cycle') + '</div>' +
+          '<div><strong>' + tt('miner.emissionSchedule', 'Schedule') + ':</strong> ' + Number(em.scheduledReward).toLocaleString(loc, {maximumFractionDigits: 2}) + ' ' + tt('miner.emissionCycle', 'HNET / cycle') + '</div>' +
           '<div><strong>' + tt('miner.emissionEpoch', 'Epoch') + ':</strong> #' + em.epoch + ' · ½ / ' + em.halvingIntervalDays + ' ' + tt('miner.emissionDays', 'days') + '</div>' +
           '<div><strong>' + tt('miner.emissionNext', 'Next drop') + ':</strong> ' + em.daysToHalving + ' ' + tt('miner.emissionDays', 'days') + '</div>' +
           '<div style="font-size:11px;color:var(--muted);margin-top:8px;">' + tt('miner.emissionNote', '') + '</div>';

@@ -15,7 +15,7 @@
   <header>
     <a class="brand" href="home.html">
       <img src="logo.jpg" alt="Helion" class="brand-logo" onerror="this.style.display='none'">
-      <div><h1 class="display">Helion Staking</h1><div class="tag">BSC Testnet · Lock HEL</div></div>
+      <div><h1 class="display">Helion Staking</h1><div class="tag">BSC Testnet · Lock HNET</div></div>
     </a>
     <div class="user-pill">
       <div class="dot"></div>
@@ -37,12 +37,12 @@
 
 <div class="card">
     <h1 class="display" data-i18n="nav.staking">Staking</h1>
-    <div class="balance-row"><span>HEL</span><strong class="mono" id="walletBalance">–</strong></div>
+    <div class="balance-row"><span>HNET</span><strong class="mono" id="walletBalance">–</strong></div>
     <div class="muted" id="walletUsd" style="text-align:right;margin-bottom:8px;">–</div>
     <div class="muted mono" id="walletAddress" style="font-size:11px;word-break:break-all;margin-bottom:12px;">–</div>
     <div class="tiers" id="tiersGrid"></div>
     <p class="muted" id="selectedTierInfo" style="margin-bottom:10px;"></p>
-    <div class="input-row"><input type="number" id="stakeAmount" placeholder="HEL määrä" data-i18n-placeholder="wallet.amount"></div>
+    <div class="input-row"><input type="number" id="stakeAmount" placeholder="HNET määrä" data-i18n-placeholder="wallet.amount"></div>
     <button class="btn-block" id="stakeBtn" onclick="doStake()" data-i18n="staking.stake" disabled>Stake</button>
   </div>
   <div class="card">
@@ -114,7 +114,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       const data = await apiGet('/api/wallet');
       const helAmt = parseFloat(data.helBalance);
       document.getElementById('walletBalance').textContent =
-        helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HEL';
+        helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HNET';
       document.getElementById('walletAddress').textContent = data.address;
       try {
         const priceRes = await fetch(BACKEND_URL + '/api/prices');
@@ -153,7 +153,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
         <div class="name">${tierLabel(t.name)}</div>
         <div class="duration">${t.lockDurationDays} ${(window.t&&window.t('staking.days'))||'vrk'}</div>
         <div class="reward">+${t.rewardPct.toFixed(2)}% ${(window.t&&window.t('staking.reward'))||'tuotto'}</div>
-        <div class="min">Min. ${parseFloat(t.minStake).toLocaleString('fi-FI')} HEL</div>
+        <div class="min">Min. ${parseFloat(t.minStake).toLocaleString('fi-FI')} HNET</div>
       `;
       grid.appendChild(card);
     });
@@ -165,7 +165,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     const tier = tiersCache.find(x => x.id === tierId);
     const tt = window.t || ((k)=>k);
     document.getElementById('selectedTierInfo').textContent =
-      `${tt('staking.selected')}: ${tierLabel(tier.name)} · ${tier.lockDurationDays} ${tt('staking.days')} · min ${parseFloat(tier.minStake).toLocaleString()} HEL · ${tt('staking.reward')} ${tier.rewardPct.toFixed(2)}%`;
+      `${tt('staking.selected')}: ${tierLabel(tier.name)} · ${tier.lockDurationDays} ${tt('staking.days')} · min ${parseFloat(tier.minStake).toLocaleString()} HNET · ${tt('staking.reward')} ${tier.rewardPct.toFixed(2)}%`;
     const btn = document.getElementById('stakeBtn');
     btn.disabled = false;
     btn.textContent = tt('staking.stake');
@@ -208,7 +208,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
         card.className = 'position-card';
         card.innerHTML = `
           <div class="position-top">
-            <div class="position-amount">${parseFloat(p.amount).toLocaleString('fi-FI',{maximumFractionDigits:2})} HEL</div>
+            <div class="position-amount">${parseFloat(p.amount).toLocaleString('fi-FI',{maximumFractionDigits:2})} HNET</div>
             <div class="position-tag ${p.ready ? 'ready' : 'locked'}">${p.ready ? t('staking.readyTag') : t('staking.locked')}</div>
           </div>
           <div style="font-size:11.5px; color:var(--muted); margin-bottom:14px;">

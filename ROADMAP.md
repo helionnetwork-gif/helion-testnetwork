@@ -8,7 +8,7 @@
 - React app (`helion-app`) + legacy HTML
 
 ## Vaihe 1 — Testnet complete
-- Spot HEL/BNB (deposit → order book → withdraw)
+- Spot HNET/BNB (deposit → order book → withdraw)
 - Yhtenäinen UI (helion-app ensisijainen)
 - Hybrid mining emission näkyviin + kontraktipäivitys kun valmis
 - Tester-ohjelma / pisteet
@@ -25,7 +25,7 @@
 - Dokumentaatio + riskit
 
 ## Vaihe 4 — Mainnet launch
-- HEL mainnet, kiinteä 100 mrd supply
+- HNET mainnet, kiinteä 100 mrd supply
 - Miner / staking / swap parametrein
 - Spot kun likviditeetti riittää
 - Community-jako sääntöjen mukaan

@@ -81,7 +81,7 @@
   <header>
     <div class="brand">
       <img src="logo.jpg" alt="Helion" class="brand-logo">
-      <div><h1 class="display">Helion Trading</h1><div class="tag">BSC Testnet · HEL / tBNB</div></div>
+      <div><h1 class="display">Helion Trading</h1><div class="tag">BSC Testnet · HNET / tBNB</div></div>
     </div>
     <div class="user-pill">
       <div class="dot"></div>
@@ -101,15 +101,15 @@
     <a href="guide.html" class="nav-item" title="Guide" aria-label="Guide" data-i18n-title="nav.guide"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 4h9.5A2.5 2.5 0 0 1 18 6.5V20l-6-2.5L6 20V4z" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M9 9h5M9 12h4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" opacity="0.7"/></svg></a>
   </nav>
 
-  <div class="powered-by"><span data-i18n="swap.powered">Trading via PancakeSwap router · HEL ↔ tBNB only</span></div>
+  <div class="powered-by"><span data-i18n="swap.powered">Trading via PancakeSwap router · HNET ↔ tBNB only</span></div>
   <div class="fee-banner" data-i18n="swap.notice"><strong>Huom:</strong> </div>
 
   <div class="pool-stats">
-    <div class="pool-stat"><div class="label" data-i18n="swap.poolHel">Pool HEL</div><div class="value" id="poolHel">–</div></div>
+    <div class="pool-stat"><div class="label" data-i18n="swap.poolHel">Pool HNET</div><div class="value" id="poolHel">–</div></div>
     <div class="pool-stat"><div class="label" data-i18n="swap.poolBnb">Pool tBNB</div><div class="value" id="poolBnb">–</div></div>
   </div>
   <div class="pool-stats" style="margin-bottom:16px;">
-    <div class="pool-stat"><div class="label" data-i18n="swap.priceHel">HEL hinta</div><div class="value" id="priceHel" style="font-size:13px;">–</div></div>
+    <div class="pool-stat"><div class="label" data-i18n="swap.priceHel">HNET hinta</div><div class="value" id="priceHel" style="font-size:13px;">–</div></div>
     <div class="pool-stat"><div class="label" data-i18n="swap.priceBnb">tBNB hinta</div><div class="value" id="priceBnb" style="font-size:13px;">–</div></div>
   </div>
 
@@ -120,7 +120,7 @@
 
   <div class="card" id="swapPanel">
     <div class="balances-bar">
-      <div class="bal-chip"><b>HEL</b> <span id="balHel">–</span></div>
+      <div class="bal-chip"><b>HNET</b> <span id="balHel">–</span></div>
       <div class="bal-chip"><b>tBNB</b> <span id="balBnb">–</span></div>
     </div>
 
@@ -136,7 +136,7 @@
       <div class="row-top"><span data-i18n="swap.receive">Saat (arvio)</span><span>&nbsp;</span></div>
       <div class="row-input">
         <input type="text" id="toAmount" placeholder="0.0" readonly>
-        <div class="token-badge" id="toTokenBadge"><span class="token-dot hel"></span>HEL</div>
+        <div class="token-badge" id="toTokenBadge"><span class="token-dot hel"></span>HNET</div>
       </div>
     </div>
 
@@ -148,9 +148,9 @@
   </div>
 
   <div class="card hidden" id="liquidityPanel">
-    <div class="lp-input-row"><input type="number" id="lpHelAmount" placeholder="0.0"><span class="unit">HEL</span></div>
+    <div class="lp-input-row"><input type="number" id="lpHelAmount" placeholder="0.0"><span class="unit">HNET</span></div>
     <div class="lp-input-row"><input type="number" id="lpBnbAmount" placeholder="0.0"><span class="unit">TBNB</span></div>
-    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn" data-i18n="swap.addLiq">Lisää likviditeettiä (HEL/tBNB)</button>
+    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn" data-i18n="swap.addLiq">Lisää likviditeettiä (HNET/tBNB)</button>
     <div style="height:1px; background:var(--line); margin:20px 0;"></div>
     <div class="info-row" style="margin-top:0;"><span>LP-tokenisi</span><span id="lpBalanceInfo">–</span></div>
     <div class="lp-input-row" style="margin-top:10px;"><input type="number" id="lpRemoveAmount" placeholder="0.0"><span class="unit">LP</span></div>
@@ -164,7 +164,7 @@
   const username = localStorage.getItem('helion_username');
   if (!token) { window.location.href = 'index.html'; }
 
-  let direction = 'buy'; // buy = tBNB→HEL, sell = HEL→tBNB
+  let direction = 'buy'; // buy = tBNB→HNET, sell = HNET→tBNB
   let lastPrices = { bnbUsd: 0, helUsd: 0, poolExists: false };
   let userBal = { hel: 0, bnb: 0 };
 
@@ -237,9 +237,9 @@
     const toBadge = document.getElementById('toTokenBadge');
     if (direction === 'buy') {
       fromBadge.innerHTML = '<span class="token-dot pair"></span>TBNB';
-      toBadge.innerHTML = '<span class="token-dot hel"></span>HEL';
+      toBadge.innerHTML = '<span class="token-dot hel"></span>HNET';
     } else {
-      fromBadge.innerHTML = '<span class="token-dot hel"></span>HEL';
+      fromBadge.innerHTML = '<span class="token-dot hel"></span>HNET';
       toBadge.innerHTML = '<span class="token-dot pair"></span>TBNB';
     }
     document.getElementById('fromAmount').value = '';
@@ -247,7 +247,7 @@
     document.getElementById('feeInfo').textContent = '–';
     document.getElementById('feeUsd').textContent = '–';
     document.getElementById('outUsd').textContent = '–';
-    document.getElementById('routeInfo').textContent = direction === 'buy' ? 'TBNB → HEL' : 'HEL → TBNB';
+    document.getElementById('routeInfo').textContent = direction === 'buy' ? 'TBNB → HNET' : 'HNET → TBNB';
   }
   function flipDirection() {
     direction = direction === 'buy' ? 'sell' : 'buy';
@@ -295,7 +295,7 @@
         }
         const feeNum = parseFloat(data.fee) || 0;
         const outNum = parseFloat(data.amountOut) || 0;
-        const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
+        const feeUnit = direction === 'buy' ? ' TBNB' : ' HNET';
         document.getElementById('feeInfo').textContent = feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit;
         const feeUsd = direction === 'buy' ? feeNum * (lastPrices.bnbUsd || 0) : feeNum * (lastPrices.helUsd || 0);
         const outUsd = direction === 'buy' ? outNum * (lastPrices.helUsd || 0) : outNum * (lastPrices.bnbUsd || 0);
@@ -320,7 +320,7 @@
       const minAmountOut = (expectedOut * 0.97).toFixed(18);
       const result = await apiPost('/api/trading/swap', { direction, amount: val, minAmountOut });
       const feeNum = parseFloat(result.fee) || 0;
-      const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
+      const feeUnit = direction === 'buy' ? ' TBNB' : ' HNET';
       const feeUsd = direction === 'buy' ? feeNum * (lastPrices.bnbUsd || 0) : feeNum * (lastPrices.helUsd || 0);
       toast(t('swap.ok') + feeNum.toLocaleString(undefined, { maximumFractionDigits: 6 }) + feeUnit + ' (' + fmtUsd(feeUsd) + ')', 'success');
       document.getElementById('fromAmount').value = '';

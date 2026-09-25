@@ -29,7 +29,7 @@
     <div class="lbl">💼 <span data-i18n="index.walletLabel">Wallet</span></div>
     <div class="bal" id="balHel">–</div>
     <div class="meta">
-      <span id="balHelLabel">HEL</span>
+      <span id="balHelLabel">HNET</span>
       <span id="helUsd" class="usd">–</span>
     </div>
     <div class="bal-secondary">
@@ -37,7 +37,7 @@
       <span id="bnbUsd" class="usd">–</span>
     </div>
     <div class="prices-row">
-      <span>HEL <b id="priceHel">–</b> <span id="helChange24" class="usd"></span></span>
+      <span>HNET <b id="priceHel">–</b> <span id="helChange24" class="usd"></span></span>
       <span>tBNB <b id="priceBnb">–</b></span>
     </div>
     <div class="addr" id="walletAddress">–</div>
@@ -150,7 +150,7 @@
       const bnbAmt = parseFloat(data.bnbBalance) || 0;
 
       document.getElementById('balHel').textContent = fmt(helAmt, 4);
-      document.getElementById('balHelLabel').textContent = 'HEL';
+      document.getElementById('balHelLabel').textContent = 'HNET';
       document.getElementById('balBnb').textContent = fmt(bnbAmt, 4) + ' tBNB';
       document.getElementById('walletAddress').textContent = data.address || '–';
 
