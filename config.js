@@ -11,6 +11,8 @@
   var local = host === 'localhost' || host === '127.0.0.1' || host === '';
 
   global.HELION_CONFIG = {
+    /** Display ticker (on-chain symbol HNET; API may still use helBalance field names) */
+    TOKEN_SYMBOL: 'HNET',
     BACKEND_URL:
       global.HELION_BACKEND_URL ||
       (local

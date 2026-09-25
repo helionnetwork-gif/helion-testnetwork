@@ -29,14 +29,33 @@ a{color:inherit;text-decoration:none;}
 .ticker-strip{display:flex;gap:18px;align-items:center;flex-wrap:wrap;font-size:12px;}
 .ticker-strip .px{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;}
 .ticker-strip .up{color:var(--buy);} .ticker-strip .dn{color:var(--sell);}
-.nav{display:flex;gap:4px;flex-wrap:wrap;}
-.nav a{padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;color:var(--muted);font-family:'Chakra Petch',sans-serif;}
-.nav a.active{background:rgba(240,185,11,0.12);color:var(--gold);}
+/* Compact top nav — blends into header */
+.spot-nav{
+  display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;
+  gap:0;padding:4px 8px;min-height:32px;
+  background:rgba(18,21,26,0.85);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.spot-nav::-webkit-scrollbar{display:none;}
+.spot-nav .nav-item{
+  flex:0 0 auto;width:32px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:6px;text-decoration:none;background:transparent;border:none;
+  color:var(--muted);position:relative;
+}
+.spot-nav .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.04);}
+.spot-nav .nav-item.active{color:var(--text);}
+.spot-nav .nav-item.active::after{
+  content:'';position:absolute;left:50%;bottom:1px;transform:translateX(-50%);
+  width:10px;height:1.5px;border-radius:1px;background:rgba(255,255,255,0.4);
+}
+.spot-nav .nav-item .nav-svg{display:block;width:15px;height:15px;opacity:0.65;}
+.spot-nav .nav-item.active .nav-svg,.spot-nav .nav-item:hover .nav-svg{opacity:1;}
 .user{font-size:12px;color:var(--muted);}
 .user button{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:11px;margin-left:8px;}
 
 /* layout */
-.terminal{display:grid;grid-template-columns:280px 1fr 320px;grid-template-rows:1fr auto;height:calc(100vh - 54px);gap:1px;background:var(--line);}
+.terminal{display:grid;grid-template-columns:280px 1fr 320px;grid-template-rows:1fr auto;height:calc(100vh - 86px);gap:1px;background:var(--line);}
 @media(max-width:1100px){.terminal{grid-template-columns:1fr;height:auto;}}
 .panel{background:var(--panel);overflow:hidden;display:flex;flex-direction:column;}
 .panel-h{padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--muted);display:flex;justify-content:space-between;align-items:center;}
@@ -132,12 +151,22 @@ a{color:inherit;text-decoration:none;}
 </style>
 </head>
 <body>
-<div class="topbar">
+<nav class="spot-nav">
+    <a href="home.html" class="nav-item" title="Home" aria-label="Home" data-i18n-title="nav.home"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5.5v-6h-3v6H5a1 1 0 0 1-1-1v-9.5z" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg></a>
+    <a href="miner.html" class="nav-item" title="Miner" aria-label="Miner" data-i18n-title="nav.miner"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 4h8l1 3H7l1-3z" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M6 7h12v2.5c0 3.5-2.5 6.5-6 7.5-3.5-1-6-4-6-7.5V7z" fill="rgba(255,255,255,0.05)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M12 17v3M9 20h6" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg></a>
+    <a href="staking.html" class="nav-item" title="Staking" aria-label="Staking" data-i18n-title="nav.staking"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35"/><path d="M8 10V8a4 4 0 0 1 8 0v2" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/><circle cx="12" cy="15" r="1.3" fill="currentColor" opacity="0.8"/></svg></a>
+    <a href="helion-trading.html" class="nav-item" title="Swap" aria-label="Swap" data-i18n-title="nav.swap"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 7h11l-2.5-2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 17H6l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 7v4M6 17v-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/><circle cx="12" cy="12" r="2" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="1.2"/></svg></a>
+    <a href="spot.html" class="nav-item active" title="Spot" aria-label="Spot" data-i18n-title="nav.spot"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 16l4.5-5 3.5 3 4-6 4 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16l4.5-5 3.5 3 4-6 4 2V20H4v-4z" fill="rgba(255,255,255,0.05)"/><path d="M4 20h16" stroke="currentColor" stroke-width="1.1" opacity="0.35"/></svg></a>
+    <a href="wallet.html" class="nav-item" title="Wallet" aria-label="Wallet" data-i18n-title="nav.wallet"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2.5" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.1" opacity="0.3"/><circle cx="16.5" cy="14.5" r="1.4" fill="rgba(255,255,255,0.12)" stroke="currentColor" stroke-width="1.15"/></svg></a>
+    <a href="leaderboard.html" class="nav-item" title="Board" aria-label="Board" data-i18n-title="nav.board"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.3 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/></svg></a>
+    <a href="guide.html" class="nav-item" title="Guide" aria-label="Guide" data-i18n-title="nav.guide"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 4h9.5A2.5 2.5 0 0 1 18 6.5V20l-6-2.5L6 20V4z" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M9 9h5M9 12h4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" opacity="0.7"/></svg></a>
+  </nav>
+  <div class="topbar">
   <div class="brand">
     <img src="logo.jpg" alt="">
     <div>
       <h1 class="display" data-i18n="spot.title">Helion Spot</h1>
-      <span data-i18n="spot.subtitle">HEL/USDC · Mock book</span>
+      <span data-i18n="spot.subtitle">HNET/USDC · Mock book</span>
     </div>
   </div>
   <div class="ticker-strip">
@@ -146,24 +175,16 @@ a{color:inherit;text-decoration:none;}
     <div>Ask <span class="mono c-sell" id="askPx">–</span></div>
     <div>Pool <span class="mono" id="oraclePx" style="color:var(--muted)">–</span></div>
   </div>
-  <nav class="nav">
-    <a href="miner.html"><span data-i18n="nav.miner">⛏ Kaivos</span></a>
-    <a href="staking.html"><span data-i18n="nav.staking">🔒 Staking</span></a>
-    <a href="helion-trading.html"><span data-i18n="nav.swap">🔄 Swap</span></a>
-    <a href="spot.html" class="active"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
-    <a href="leaderboard.html"><span data-i18n="nav.board">🏆 Top</span></a>
-  </nav>
   <div class="user"><span id="userLabel">–</span><button onclick="logout()" data-i18n="spot.logout">Logout</button></div>
 </div>
 
-<div class="banner" data-i18n="spot.banner">HEL/USDC · internal order book (mock USDC, testnet)</div>
+<div class="banner" data-i18n="spot.banner">HNET/USDC · internal order book (mock USDC, testnet)</div>
 
 <div class="terminal">
   <!-- LEFT: vertical order book -->
   <div class="panel">
     <div class="panel-h"><b data-i18n="spot.orderBook">Order Book</b><span class="mono" id="spreadLbl">spread –</span></div>
-    <div class="ob-head"><span data-i18n="spot.priceUsdt">Price (USDC)</span><span data-i18n="spot.sizeBtc">Size (HEL)</span><span data-i18n="spot.total">Total</span></div>
+    <div class="ob-head"><span data-i18n="spot.priceUsdt">Price (USDC)</span><span data-i18n="spot.sizeBtc">Size (HNET)</span><span data-i18n="spot.total">Total</span></div>
     <div class="ob">
       <div class="ob-asks" id="asksBox"></div>
       <div class="ob-mid">
@@ -178,7 +199,7 @@ a{color:inherit;text-decoration:none;}
   <div class="panel">
     <div class="center-top">
       <div class="stat"><div class="l"><span data-i18n="spot.usdtAvail">USDC Available</span></div><div class="v" id="balBnb">–</div></div>
-      <div class="stat"><div class="l"><span data-i18n="spot.btcAvail">HEL Available</span></div><div class="v" id="balHel">–</div></div>
+      <div class="stat"><div class="l"><span data-i18n="spot.btcAvail">HNET Available</span></div><div class="v" id="balHel">–</div></div>
       <div class="stat"><div class="l" data-i18n="spot.locked">Locked</div><div class="v" id="balLocked">–</div></div>
       <div class="stat"><div class="l" data-i18n="spot.equity">Equity</div><div class="v" id="balEq">–</div></div>
     </div>
@@ -187,7 +208,7 @@ a{color:inherit;text-decoration:none;}
       <select id="xferAsset">
         <option value="USDC">USDC</option>
         <option value="BNB">tBNB</option>
-        <option value="HEL">HEL</option>
+        <option value="HNET">HNET</option>
       </select>
       <input type="number" id="xferAmt" min="0" step="any" placeholder="0.0">
       <button type="button" class="dep" onclick="spotTransfer('deposit')" data-i18n="spot.deposit">Deposit</button>
@@ -205,7 +226,7 @@ a{color:inherit;text-decoration:none;}
 
   <!-- RIGHT: order ticket -->
   <div class="panel">
-    <div class="panel-h"><b data-i18n="spot.orderTicket">Order Ticket</b><span>HEL/USDC</span></div>
+    <div class="panel-h"><b data-i18n="spot.orderTicket">Order Ticket</b><span>HNET/USDC</span></div>
     <div class="form">
       <div class="side-toggle">
         <button class="buy on" id="btnBuy" onclick="setSide('BUY')" data-i18n="common.buy">Buy</button>
@@ -228,7 +249,7 @@ a{color:inherit;text-decoration:none;}
       </div>
       <div class="field">
         <label><span data-i18n="spot.amount">Amount</span> <span id="availAmt"></span></label>
-        <div class="box"><input type="number" id="qty" placeholder="0.0000" step="0.0001"><span class="u">HEL</span></div>
+        <div class="box"><input type="number" id="qty" placeholder="0.0000" step="0.0001"><span class="u">HNET</span></div>
       </div>
       <div class="pcts">
         <button type="button" onclick="setPct(0.25)">25%</button>
@@ -240,7 +261,7 @@ a{color:inherit;text-decoration:none;}
         <label data-i18n="spot.totalEst">Total (est.)</label>
         <div class="box"><input type="text" id="totalEst" readonly placeholder="–"><span class="u">USDC</span></div>
       </div>
-      <button class="submit buy" id="submitBtn" onclick="submitOrder()" data-i18n="spot.buyBtc">Buy HEL</button>
+      <button class="submit buy" id="submitBtn" onclick="submitOrder()" data-i18n="spot.buyBtc">Buy HNET</button>
       <p class="hint" id="typeHint">Limit: order rests on the book until filled or cancelled.</p>
     </div>
   </div>
@@ -292,7 +313,7 @@ document.getElementById('userLabel').textContent = '@' + (username || '–');
 
 let side = 'BUY';
 let orderType = 'LIMIT';
-let balances = { BNB: 0, HEL: 0, BNB_LOCKED: 0, HEL_LOCKED: 0, USDC: 0, USDC_LOCKED: 0 };
+let balances = { BNB: 0, HNET: 0, BNB_LOCKED: 0, HEL_LOCKED: 0, USDC: 0, USDC_LOCKED: 0 };
 let lastPrice = 0;
 
 function auth() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
@@ -318,7 +339,7 @@ function setSide(s) {
   document.getElementById('btnBuy').classList.toggle('on', s === 'BUY');
   document.getElementById('btnSell').classList.toggle('on', s === 'SELL');
   const btn = document.getElementById('submitBtn');
-  btn.textContent = (s === 'BUY' ? 'Buy HEL' : 'Sell HEL');
+  btn.textContent = (s === 'BUY' ? 'Buy HNET' : 'Sell HNET');
   btn.className = 'submit ' + (s === 'BUY' ? 'buy' : 'sell');
   updateAvailLabels();
   calcTotal();
@@ -343,7 +364,7 @@ function setType(t) {
 
   const hints = {
     LIMIT: 'Limit: rests on the book until filled or cancelled.',
-    MARKET: 'Market: fills the book first, leftover against the Helion HEL/USDC pool.',
+    MARKET: 'Market: fills the book first, leftover against the Helion HNET/USDC pool.',
     STOP_LIMIT: 'Stop Limit: when stop triggers, a limit order is placed.',
     STOP_MARKET: 'Stop Market: when stop triggers, a market order is sent.'
   };
@@ -353,14 +374,14 @@ function setType(t) {
 
 function updateAvailLabels() {
   document.getElementById('availAmt').textContent =
-    side === 'SELL' ? ('Avail ' + fmt(balances.HEL, 4) + ' HEL') : '';
+    side === 'SELL' ? ('Avail ' + fmt(balances.HNET, 4) + ' HNET') : '';
   document.getElementById('availPrice').textContent =
     side === 'BUY' ? ('Avail ' + fmt(balances.USDC != null ? balances.USDC : balances.BNB, 4) + ' USDC') : '';
 }
 
 function setPct(p) {
   if (side === 'SELL') {
-    document.getElementById('qty').value = (balances.HEL * p).toFixed(4);
+    document.getElementById('qty').value = (balances.HNET * p).toFixed(4);
   } else {
     const px = Number(document.getElementById('limitPrice').value) || lastPrice;
     if (px > 0) document.getElementById('qty').value = ((((balances.USDC != null ? balances.USDC : balances.BNB) * p) / px)).toFixed(4);
@@ -476,7 +497,7 @@ async function spotTransfer(kind) {
       (kind === 'deposit'
         ? (typeof t === 'function' ? t('spot.depositOk') : 'Deposited')
         : (typeof t === 'function' ? t('spot.withdrawOk') : 'Withdrawn')) +
-        ' ' + amount + ' ' + (asset === 'BNB' ? 'tBNB' : asset === 'USDC' ? 'USDC' : 'HEL'),
+        ' ' + amount + ' ' + (asset === 'BNB' ? 'tBNB' : asset === 'USDC' ? 'USDC' : 'HNET'),
       true
     );
     document.getElementById('xferAmt').value = '';
@@ -495,9 +516,9 @@ async function refreshAccount() {
     const qAvail = (balances.USDC != null) ? balances.USDC : balances.BNB;
     const qLock = (balances.USDC_LOCKED != null) ? balances.USDC_LOCKED : balances.BNB_LOCKED;
     document.getElementById('balBnb').textContent = fmt(qAvail, 4);
-    document.getElementById('balHel').textContent = fmt(balances.HEL, 4);
+    document.getElementById('balHel').textContent = fmt(balances.HNET, 4);
     document.getElementById('balLocked').textContent =
-      fmt(qLock, 4) + ' USDC / ' + fmt(balances.HEL_LOCKED, 4) + ' HEL';
+      fmt(qLock, 4) + ' USDC / ' + fmt(balances.HEL_LOCKED, 4) + ' HNET';
     document.getElementById('balEq').textContent = fmt(d.equity, 4) + ' USDC';
     updateAvailLabels();
 
@@ -527,7 +548,7 @@ async function refreshAccount() {
 
     document.getElementById('balBody').innerHTML = `
       <tr><td>USDC</td><td>${fmt(balances.BNB,6)}</td><td>${fmt(balances.BNB_LOCKED,6)}</td><td>${fmt((balances.BNB||0)+(balances.BNB_LOCKED||0),6)}</td></tr>
-      <tr><td>HEL</td><td>${fmt(balances.HEL,4)}</td><td>${fmt(balances.HEL_LOCKED,4)}</td><td>${fmt((balances.HEL||0)+(balances.HEL_LOCKED||0),4)}</td></tr>`;
+      <tr><td>HNET</td><td>${fmt(balances.HNET,4)}</td><td>${fmt(balances.HEL_LOCKED,4)}</td><td>${fmt((balances.HNET||0)+(balances.HEL_LOCKED||0),4)}</td></tr>`;
   } catch (e) {
     toast('Account: ' + e.message, false);
   }

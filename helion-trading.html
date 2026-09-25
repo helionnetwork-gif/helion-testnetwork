@@ -30,9 +30,7 @@
   .user-pill{ background: var(--panel); border: 1px solid var(--line); padding: 9px 14px; border-radius: 999px; font-size: 12.5px; display:flex; align-items:center; gap:8px; }
   .user-pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
   .user-pill button{ background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; text-decoration:underline; }
-  .site-nav{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:6px; }
-  .site-nav .nav-item{ flex:1 1 calc(25% - 6px); min-width:0; text-align:center; padding:10px 4px; border-radius:10px; font-size:11px; font-weight:600; font-family:'Chakra Petch',sans-serif; color:var(--muted); text-decoration:none; white-space:normal; line-height:1.25; overflow-wrap:anywhere; }
-  .site-nav .nav-item.active{ background: rgba(242,169,59,0.12); color: var(--gold); }
+  /* nav styles → theme.css */
   .powered-by{ text-align:center; font-size: 11px; color: var(--muted); margin-bottom: 18px; }
   .powered-by b{ color: var(--gold); }
   .pool-stats{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
@@ -83,7 +81,7 @@
   <header>
     <div class="brand">
       <img src="logo.jpg" alt="Helion" class="brand-logo">
-      <div><h1 class="display">Helion Trading</h1><div class="tag">BSC Testnet · HEL / tBNB</div></div>
+      <div><h1 class="display">Helion Trading</h1><div class="tag">BSC Testnet · HNET / tBNB</div></div>
     </div>
     <div class="user-pill">
       <div class="dot"></div>
@@ -92,26 +90,26 @@
     </div>
   </header>
 
-    <nav class="site-nav">
-    <a href="home.html" class="nav-item"><span data-i18n="nav.home">🏠 Home</span></a>
-    <a href="miner.html" class="nav-item"><span data-i18n="nav.miner">⛏ Kaivos</span></a>
-    <a href="staking.html" class="nav-item"><span data-i18n="nav.staking">🔒 Staking</span></a>
-    <a href="helion-trading.html" class="nav-item active"><span data-i18n="nav.swap">🔄 Swap</span></a>
-    <a href="spot.html" class="nav-item"><span data-i18n="nav.spot">📈 Spot</span></a>
-    <a href="wallet.html" class="nav-item"><span data-i18n="nav.wallet">💼 Lompakko</span></a>
-    <a href="leaderboard.html" class="nav-item"><span data-i18n="nav.board">🏆 Top</span></a>
-    <a href="guide.html" class="nav-item"><span data-i18n="nav.guide">📖 Ohjeet</span></a>
+  <nav class="site-nav">
+    <a href="home.html" class="nav-item" title="Home" aria-label="Home" data-i18n-title="nav.home"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5.5v-6h-3v6H5a1 1 0 0 1-1-1v-9.5z" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg></a>
+    <a href="miner.html" class="nav-item" title="Miner" aria-label="Miner" data-i18n-title="nav.miner"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 4h8l1 3H7l1-3z" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M6 7h12v2.5c0 3.5-2.5 6.5-6 7.5-3.5-1-6-4-6-7.5V7z" fill="rgba(255,255,255,0.05)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M12 17v3M9 20h6" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg></a>
+    <a href="staking.html" class="nav-item" title="Staking" aria-label="Staking" data-i18n-title="nav.staking"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35"/><path d="M8 10V8a4 4 0 0 1 8 0v2" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/><circle cx="12" cy="15" r="1.3" fill="currentColor" opacity="0.8"/></svg></a>
+    <a href="helion-trading.html" class="nav-item active" title="Swap" aria-label="Swap" data-i18n-title="nav.swap"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 7h11l-2.5-2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 17H6l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 7v4M6 17v-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/><circle cx="12" cy="12" r="2" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="1.2"/></svg></a>
+    <a href="spot.html" class="nav-item" title="Spot" aria-label="Spot" data-i18n-title="nav.spot"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 16l4.5-5 3.5 3 4-6 4 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16l4.5-5 3.5 3 4-6 4 2V20H4v-4z" fill="rgba(255,255,255,0.05)"/><path d="M4 20h16" stroke="currentColor" stroke-width="1.1" opacity="0.35"/></svg></a>
+    <a href="wallet.html" class="nav-item" title="Wallet" aria-label="Wallet" data-i18n-title="nav.wallet"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2.5" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.1" opacity="0.3"/><circle cx="16.5" cy="14.5" r="1.4" fill="rgba(255,255,255,0.12)" stroke="currentColor" stroke-width="1.15"/></svg></a>
+    <a href="leaderboard.html" class="nav-item" title="Board" aria-label="Board" data-i18n-title="nav.board"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.3 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/></svg></a>
+    <a href="guide.html" class="nav-item" title="Guide" aria-label="Guide" data-i18n-title="nav.guide"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 4h9.5A2.5 2.5 0 0 1 18 6.5V20l-6-2.5L6 20V4z" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M9 9h5M9 12h4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" opacity="0.7"/></svg></a>
   </nav>
 
-  <div class="powered-by"><span data-i18n="swap.powered">Trading via PancakeSwap router · HEL ↔ tBNB only</span></div>
+  <div class="powered-by"><span data-i18n="swap.powered">Trading via PancakeSwap router · HNET ↔ tBNB only</span></div>
   <div class="fee-banner" data-i18n="swap.notice"><strong>Huom:</strong> </div>
 
   <div class="pool-stats">
-    <div class="pool-stat"><div class="label" data-i18n="swap.poolHel">Pool HEL</div><div class="value" id="poolHel">–</div></div>
+    <div class="pool-stat"><div class="label" data-i18n="swap.poolHel">Pool HNET</div><div class="value" id="poolHel">–</div></div>
     <div class="pool-stat"><div class="label" data-i18n="swap.poolBnb">Pool tBNB</div><div class="value" id="poolBnb">–</div></div>
   </div>
   <div class="pool-stats" style="margin-bottom:16px;">
-    <div class="pool-stat"><div class="label" data-i18n="swap.priceHel">HEL hinta</div><div class="value" id="priceHel" style="font-size:13px;">–</div></div>
+    <div class="pool-stat"><div class="label" data-i18n="swap.priceHel">HNET hinta</div><div class="value" id="priceHel" style="font-size:13px;">–</div></div>
     <div class="pool-stat"><div class="label" data-i18n="swap.priceBnb">tBNB hinta</div><div class="value" id="priceBnb" style="font-size:13px;">–</div></div>
   </div>
 
@@ -122,7 +120,7 @@
 
   <div class="card" id="swapPanel">
     <div class="balances-bar">
-      <div class="bal-chip"><b>HEL</b> <span id="balHel">–</span></div>
+      <div class="bal-chip"><b>HNET</b> <span id="balHel">–</span></div>
       <div class="bal-chip"><b>tBNB</b> <span id="balBnb">–</span></div>
     </div>
 
@@ -138,7 +136,7 @@
       <div class="row-top"><span data-i18n="swap.receive">Saat (arvio)</span><span>&nbsp;</span></div>
       <div class="row-input">
         <input type="text" id="toAmount" placeholder="0.0" readonly>
-        <div class="token-badge" id="toTokenBadge"><span class="token-dot hel"></span>HEL</div>
+        <div class="token-badge" id="toTokenBadge"><span class="token-dot hel"></span>HNET</div>
       </div>
     </div>
 
@@ -150,9 +148,9 @@
   </div>
 
   <div class="card hidden" id="liquidityPanel">
-    <div class="lp-input-row"><input type="number" id="lpHelAmount" placeholder="0.0"><span class="unit">HEL</span></div>
+    <div class="lp-input-row"><input type="number" id="lpHelAmount" placeholder="0.0"><span class="unit">HNET</span></div>
     <div class="lp-input-row"><input type="number" id="lpBnbAmount" placeholder="0.0"><span class="unit">TBNB</span></div>
-    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn" data-i18n="swap.addLiq">Lisää likviditeettiä (HEL/tBNB)</button>
+    <button class="btn-block" onclick="addLiquidity()" id="addLiqBtn" data-i18n="swap.addLiq">Lisää likviditeettiä (HNET/tBNB)</button>
     <div style="height:1px; background:var(--line); margin:20px 0;"></div>
     <div class="info-row" style="margin-top:0;"><span>LP-tokenisi</span><span id="lpBalanceInfo">–</span></div>
     <div class="lp-input-row" style="margin-top:10px;"><input type="number" id="lpRemoveAmount" placeholder="0.0"><span class="unit">LP</span></div>
@@ -166,7 +164,7 @@
   const username = localStorage.getItem('helion_username');
   if (!token) { window.location.href = 'index.html'; }
 
-  let direction = 'buy'; // buy = tBNB→HEL, sell = HEL→tBNB
+  let direction = 'buy'; // buy = tBNB→HNET, sell = HNET→tBNB
   let lastPrices = { bnbUsd: 0, helUsd: 0, poolExists: false };
   let userBal = { hel: 0, bnb: 0 };
 
@@ -239,9 +237,9 @@
     const toBadge = document.getElementById('toTokenBadge');
     if (direction === 'buy') {
       fromBadge.innerHTML = '<span class="token-dot pair"></span>TBNB';
-      toBadge.innerHTML = '<span class="token-dot hel"></span>HEL';
+      toBadge.innerHTML = '<span class="token-dot hel"></span>HNET';
     } else {
-      fromBadge.innerHTML = '<span class="token-dot hel"></span>HEL';
+      fromBadge.innerHTML = '<span class="token-dot hel"></span>HNET';
       toBadge.innerHTML = '<span class="token-dot pair"></span>TBNB';
     }
     document.getElementById('fromAmount').value = '';
@@ -249,7 +247,7 @@
     document.getElementById('feeInfo').textContent = '–';
     document.getElementById('feeUsd').textContent = '–';
     document.getElementById('outUsd').textContent = '–';
-    document.getElementById('routeInfo').textContent = direction === 'buy' ? 'TBNB → HEL' : 'HEL → TBNB';
+    document.getElementById('routeInfo').textContent = direction === 'buy' ? 'TBNB → HNET' : 'HNET → TBNB';
   }
   function flipDirection() {
     direction = direction === 'buy' ? 'sell' : 'buy';
@@ -297,7 +295,7 @@
         }
         const feeNum = parseFloat(data.fee) || 0;
         const outNum = parseFloat(data.amountOut) || 0;
-        const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
+        const feeUnit = direction === 'buy' ? ' TBNB' : ' HNET';
         document.getElementById('feeInfo').textContent = feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit;
         const feeUsd = direction === 'buy' ? feeNum * (lastPrices.bnbUsd || 0) : feeNum * (lastPrices.helUsd || 0);
         const outUsd = direction === 'buy' ? outNum * (lastPrices.helUsd || 0) : outNum * (lastPrices.bnbUsd || 0);
@@ -322,9 +320,9 @@
       const minAmountOut = (expectedOut * 0.97).toFixed(18);
       const result = await apiPost('/api/trading/swap', { direction, amount: val, minAmountOut });
       const feeNum = parseFloat(result.fee) || 0;
-      const feeUnit = direction === 'buy' ? ' TBNB' : ' HEL';
+      const feeUnit = direction === 'buy' ? ' TBNB' : ' HNET';
       const feeUsd = direction === 'buy' ? feeNum * (lastPrices.bnbUsd || 0) : feeNum * (lastPrices.helUsd || 0);
-      toast('Swap onnistui! Fee: ' + feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit + ' (' + fmtUsd(feeUsd) + ')', 'success');
+      toast(t('swap.ok') + feeNum.toLocaleString(undefined, { maximumFractionDigits: 6 }) + feeUnit + ' (' + fmtUsd(feeUsd) + ')', 'success');
       document.getElementById('fromAmount').value = '';
       document.getElementById('toAmount').value = '';
       document.getElementById('feeInfo').textContent = '–';
@@ -361,7 +359,7 @@
     btn.disabled = true; btn.textContent = 'Poistetaan…';
     try {
       await apiPost('/api/trading/remove-liquidity', { lpAmount: val });
-      toast('Likviditeetti poistettu!', 'success');
+      toast(t('swap.liqRemoved'), 'success');
       document.getElementById('lpRemoveAmount').value = '';
       await refreshPool(); await refreshLpBalance(); await refreshBalances(); await refreshPrices();
     } catch (e) { toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error'); }
