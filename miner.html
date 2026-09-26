@@ -394,11 +394,14 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
         box.style.display = 'block';
         const loc = (typeof HelionI18n !== 'undefined' && HelionI18n.getLang && HelionI18n.getLang() === 'en') ? 'en-US' : 'fi-FI';
         const tt = (k, fb) => (typeof t === 'function' ? t(k) : fb);
+        const nextDate = em.nextHalvingAt ? new Date(em.nextHalvingAt).toLocaleString(loc) : '–';
+        const genDate = em.genesisAt ? new Date(em.genesisAt).toLocaleString(loc) : '–';
         box.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">' + tt('miner.emissionTitle', 'Hybrid emission') + '</div>' +
           '<div><strong>' + tt('miner.emissionSchedule', 'Schedule') + ':</strong> ' + Number(em.scheduledReward).toLocaleString(loc, {maximumFractionDigits: 2}) + ' ' + tt('miner.emissionCycle', 'HNET / cycle') + '</div>' +
           '<div><strong>' + tt('miner.emissionEpoch', 'Epoch') + ':</strong> #' + em.epoch + ' · ½ / ' + em.halvingIntervalDays + ' ' + tt('miner.emissionDays', 'days') + '</div>' +
-          '<div><strong>' + tt('miner.emissionNext', 'Next drop') + ':</strong> ' + em.daysToHalving + ' ' + tt('miner.emissionDays', 'days') + '</div>' +
-          '<div style="font-size:11px;color:var(--muted);margin-top:8px;">' + tt('miner.emissionNote', '') + '</div>';
+          '<div><strong>' + tt('miner.emissionNext', 'Next drop') + ':</strong> ' + em.daysToHalving + ' ' + tt('miner.emissionDays', 'days') + ' · ' + nextDate + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:6px;">Genesis: ' + genDate + (em.source ? ' · ' + em.source : '') + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:4px;">' + tt('miner.emissionNote', '') + '</div>';
       }
     } catch (e) {
       toast(t('miner.statusFail') + ': ' + e.message, 'error');
