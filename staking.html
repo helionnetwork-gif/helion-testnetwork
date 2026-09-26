@@ -5,259 +5,739 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Helion — Staking</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="theme.css">
+<style>
+  .stats-row{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .stat-card .lbl{ font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .stat-card .val{ font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; color: var(--gold); word-break: break-all; }
+  .stat-card .sub{ font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .section-title{
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 15px;
+    margin: 0 0 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .tier-compare{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .tier-row{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: stretch;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .tier-row:hover{ border-color: rgba(242,169,59,0.35); }
+  .tier-row.selected{
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px rgba(242,169,59,0.25), var(--glow);
+  }
+  .tier-row .name{
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .tier-meta{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .tier-meta b{ color: var(--text); font-weight: 600; }
+  .tier-yield{
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 88px;
+  }
+  .tier-yield .pct{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--success);
+  }
+  .tier-yield .hint{ font-size: 10px; color: var(--muted); }
+
+  .calc-panel{
+    background: linear-gradient(160deg, rgba(242,169,59,0.08), transparent 50%), var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .calc-panel label{
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .calc-panel input[type="number"],
+  .calc-panel input[type="text"]{
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  .calc-panel input:focus{ outline: none; border-color: var(--gold); }
+  .slider-row{ margin: 8px 0 14px; }
+  .slider-row input[type="range"]{
+    width: 100%;
+    accent-color: var(--gold);
+  }
+  .quick-amts{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .chip{
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .chip:hover{ border-color: var(--gold); color: var(--text); }
+
+  .proj-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .proj-cell{
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 10px;
+  }
+  .proj-cell .k{ font-size: 11px; color: var(--muted); }
+  .proj-cell .v{ font-family: 'JetBrains Mono', monospace; font-size: 14px; margin-top: 2px; color: var(--gold); }
+
+  .compare-table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 12px;
+  }
+  .compare-table th{
+    text-align: left;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .compare-table td{
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(38,43,53,0.6);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .compare-table tr.hl td{ color: var(--gold); }
+  .compare-table .tn{ font-family: Inter, sans-serif; color: var(--text); }
+
+  .rules{
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    background: var(--panel);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+  }
+  .rules strong{ color: var(--text); }
+
+  .pos-card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .pos-card.ready{ border-color: rgba(61,214,140,0.4); }
+  .pos-top{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .pos-amt{ font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; }
+  .badge{
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--panel-2);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .badge.ok{ background: rgba(61,214,140,0.15); color: var(--success); }
+  .badge.warn{ background: rgba(242,169,59,0.12); color: var(--gold); }
+  .pos-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .pos-grid b{ color: var(--text); font-weight: 500; }
+  .pos-actions{ display: flex; flex-wrap: wrap; gap: 8px; }
+  .pos-actions .btn{ flex: 1; min-width: 100px; }
+
+  .empty-note{ text-align: center; color: var(--muted); padding: 24px 12px; font-size: 13px; }
+
+  @media (max-width: 480px){
+    .stats-row{ grid-template-columns: 1fr; }
+    .tier-row{ grid-template-columns: 1fr; }
+    .tier-yield{ text-align: left; flex-direction: row; gap: 8px; align-items: baseline; }
+  }
+</style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <a class="brand" href="home.html">
       <img src="logo.jpg" alt="Helion" class="brand-logo" onerror="this.style.display='none'">
-      <div><h1 class="display">Helion Staking</h1><div class="tag">BSC Testnet · Lock HNET</div></div>
+      <div>
+        <h1 class="display" data-i18n="staking.title">Staking</h1>
+        <div class="tag" data-i18n="staking.tag">Lock HNET · daily yield claim</div>
+      </div>
     </a>
     <div class="user-pill">
       <div class="dot"></div>
       <span id="usernameDisplay">–</span>
-      <button type="button" onclick="logout()"><span data-i18n="nav.logout">Kirjaudu ulos</span></button>
+      <button type="button" onclick="logout()"><span data-i18n="nav.logout">Logout</span></button>
     </div>
   </header>
 
   <nav class="site-nav">
     <a href="home.html" class="nav-item" title="Home" aria-label="Home" data-i18n-title="nav.home"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5.5v-6h-3v6H5a1 1 0 0 1-1-1v-9.5z" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/></svg></a>
     <a href="miner.html" class="nav-item" title="Miner" aria-label="Miner" data-i18n-title="nav.miner"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 4h8l1 3H7l1-3z" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M6 7h12v2.5c0 3.5-2.5 6.5-6 7.5-3.5-1-6-4-6-7.5V7z" fill="rgba(255,255,255,0.05)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M12 17v3M9 20h6" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg></a>
-    <a href="staking.html" class="nav-item active" title="Staking" aria-label="Staking" data-i18n-title="nav.staking"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35"/><path d="M8 10V8a4 4 0 0 1 8 0v2" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/><circle cx="12" cy="15" r="1.3" fill="currentColor" opacity="0.8"/></svg></a>
-    <a href="helion-trading.html" class="nav-item" title="Swap" aria-label="Swap" data-i18n-title="nav.swap"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 7h11l-2.5-2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 17H6l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 7v4M6 17v-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/><circle cx="12" cy="12" r="2" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="1.2"/></svg></a>
-    <a href="spot.html" class="nav-item" title="Spot" aria-label="Spot" data-i18n-title="nav.spot"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 16l4.5-5 3.5 3 4-6 4 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16l4.5-5 3.5 3 4-6 4 2V20H4v-4z" fill="rgba(255,255,255,0.05)"/><path d="M4 20h16" stroke="currentColor" stroke-width="1.1" opacity="0.35"/></svg></a>
-    <a href="wallet.html" class="nav-item" title="Wallet" aria-label="Wallet" data-i18n-title="nav.wallet"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2.5" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.1" opacity="0.3"/><circle cx="16.5" cy="14.5" r="1.4" fill="rgba(255,255,255,0.12)" stroke="currentColor" stroke-width="1.15"/></svg></a>
-    <a href="leaderboard.html" class="nav-item" title="Board" aria-label="Board" data-i18n-title="nav.board"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3l2.2 4.6L19 8.2l-3.5 3.4.8 4.9L12 14.3 7.7 16.5l.8-4.9L5 8.2l4.8-.6L12 3z" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/></svg></a>
-    <a href="guide.html" class="nav-item" title="Guide" aria-label="Guide" data-i18n-title="nav.guide"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 4h9.5A2.5 2.5 0 0 1 18 6.5V20l-6-2.5L6 20V4z" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M9 9h5M9 12h4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" opacity="0.7"/></svg></a>
+    <a href="staking.html" class="nav-item active" title="Staking" aria-label="Staking" data-i18n-title="nav.staking"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35"/><path d="M8 10V8a4 4 0 0 1 8 0v2" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg></a>
+    <a href="helion-trading.html" class="nav-item" title="Swap" aria-label="Swap" data-i18n-title="nav.swap"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 7h11l-2.5-2.5M18 17H7l2.5 2.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 7v4M7 17v-4" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg></a>
+    <a href="wallet.html" class="nav-item" title="Wallet" aria-label="Wallet" data-i18n-title="nav.wallet"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2" fill="rgba(255,255,255,0.05)" stroke="currentColor" stroke-width="1.35"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.35"/><circle cx="16.5" cy="14.5" r="1.2" fill="currentColor"/></svg></a>
+    <a href="guide.html" class="nav-item" title="Guide" aria-label="Guide" data-i18n-title="nav.guide"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.35" fill="rgba(255,255,255,0.04)"/><path d="M12 17v-1M12 7.5c1.4 0 2.5.9 2.5 2.2 0 1.2-.8 1.8-1.7 2.2-.7.3-1.3.7-1.3 1.6" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg></a>
   </nav>
 
-<div class="card">
-    <h1 class="display" data-i18n="nav.staking">Staking</h1>
-    <div class="balance-row"><span>HNET</span><strong class="mono" id="walletBalance">–</strong></div>
-    <div class="muted" id="walletUsd" style="text-align:right;margin-bottom:8px;">–</div>
-    <div class="muted mono" id="walletAddress" style="font-size:11px;word-break:break-all;margin-bottom:12px;">–</div>
-    <div class="tiers" id="tiersGrid"></div>
-    <p class="muted" id="selectedTierInfo" style="margin-bottom:10px;"></p>
-    <div class="input-row"><input type="number" id="stakeAmount" placeholder="HNET määrä" data-i18n-placeholder="wallet.amount"></div>
-    <button class="btn-block" id="stakeBtn" onclick="doStake()" data-i18n="staking.stake" disabled>Stake</button>
-  </div>
-  <div class="card">
-    <h2 class="display" data-i18n="staking.positions">Omat staket</h2>
-    <div id="positionsList"></div>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="lbl" data-i18n="staking.walletBal">Wallet</div>
+      <div class="val" id="walletBalance">–</div>
+      <div class="sub" id="walletUsd">–</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl" data-i18n="staking.totalStaked">Staked</div>
+      <div class="val" id="totalStaked">–</div>
+      <div class="sub" id="posCount">–</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl" data-i18n="staking.pendingYield">Claimable</div>
+      <div class="val" id="totalPending">–</div>
+      <div class="sub" data-i18n="staking.dailyHint">Daily claim</div>
+    </div>
   </div>
 
-  <div class="foot">Built for the Future. Powered by Helion.</div>
+  <div class="rules" id="rulesBox">
+    <strong data-i18n="staking.rulesTitle">Rules</strong>
+    <span data-i18n="staking.rulesBody"> · 0% stake fee · first claim after 24h · then once per 24h · principal unlock after lock ends · early exit forfeits remaining yield</span>
+  </div>
+
+  <h2 class="section-title" data-i18n="staking.compareTiers">Compare tiers</h2>
+  <div class="tier-compare" id="tiersGrid">
+    <div class="empty-note" data-i18n="staking.loading">Loading…</div>
+  </div>
+
+  <div class="calc-panel">
+    <h2 class="section-title" style="margin-bottom:10px" data-i18n="staking.calculator">Yield calculator</h2>
+    <label for="stakeAmount" data-i18n="staking.amount">HNET amount</label>
+    <input type="number" id="stakeAmount" min="0" step="any" placeholder="0" inputmode="decimal">
+    <div class="slider-row">
+      <input type="range" id="amountSlider" min="0" max="1000000" step="100" value="0">
+    </div>
+    <div class="quick-amts">
+      <button type="button" class="chip" data-amt="1000">1k</button>
+      <button type="button" class="chip" data-amt="10000">10k</button>
+      <button type="button" class="chip" data-amt="100000">100k</button>
+      <button type="button" class="chip" data-amt="pct25">25%</button>
+      <button type="button" class="chip" data-amt="pct50">50%</button>
+      <button type="button" class="chip" data-amt="max" data-i18n="staking.max">Max</button>
+    </div>
+
+    <div class="proj-grid">
+      <div class="proj-cell">
+        <div class="k" data-i18n="staking.projTotal">Total yield (lock end)</div>
+        <div class="v" id="projTotal">–</div>
+      </div>
+      <div class="proj-cell">
+        <div class="k" data-i18n="staking.projDaily">Avg / day</div>
+        <div class="v" id="projDaily">–</div>
+      </div>
+      <div class="proj-cell">
+        <div class="k" data-i18n="staking.projEnd">Principal + yield</div>
+        <div class="v" id="projEnd">–</div>
+      </div>
+      <div class="proj-cell">
+        <div class="k" data-i18n="staking.selectedTier">Selected tier</div>
+        <div class="v" id="projTier">–</div>
+      </div>
+    </div>
+
+    <table class="compare-table" id="compareTable" aria-label="Tier comparison">
+      <thead>
+        <tr>
+          <th data-i18n="staking.colTier">Tier</th>
+          <th data-i18n="staking.colLock">Lock</th>
+          <th data-i18n="staking.colYield">Yield</th>
+          <th data-i18n="staking.colDaily">/day</th>
+        </tr>
+      </thead>
+      <tbody id="compareBody"></tbody>
+    </table>
+
+    <button type="button" class="btn-block" id="stakeBtn" style="margin-top:14px" onclick="doStake()" data-i18n="staking.stake">Stake</button>
+    <p id="stakeHint" style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center" data-i18n="staking.chooseFirst">Select a tier above first.</p>
+  </div>
+
+  <h2 class="section-title" data-i18n="staking.myPositions">My positions</h2>
+  <div id="positionsList">
+    <div class="empty-note" data-i18n="staking.loading">Loading…</div>
+  </div>
+
+  <p style="font-size:11px;color:var(--muted);margin-top:8px;word-break:break-all" id="walletAddress"></p>
 </div>
-<div id="toastHost"></div>
-<script>
-const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
 
+<div id="toastHost" class="toast-host"></div>
+
+<script>
+(function () {
+  const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || '';
   const token = localStorage.getItem('helion_token');
   const username = localStorage.getItem('helion_username');
-  if (!token || String(token).length < 20) { location.replace('index.html'); }
+  if (!token) location.replace('index.html');
 
-  let selectedTierId = null;
   let tiersCache = [];
+  let selectedTierId = null;
+  let walletHel = 0;
+  let positionsCache = [];
 
-  function tierLabel(name) {
-    const map = { Pika: 'tier.quick', Perus: 'tier.standard', 'Pitkä': 'tier.long', Extra: 'tier.extra' };
-    const key = map[name];
-    return (key && window.t) ? t(key) : name;
+  function tt(key, fb) {
+    if (typeof t === 'function') {
+      const v = t(key);
+      if (v && v !== key) return v;
+    }
+    return fb || key;
   }
-
-
-  function authHeaders() { return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }; }
-
   function logout() {
     localStorage.removeItem('helion_token');
     localStorage.removeItem('helion_username');
-    window.location.href = 'index.html';
+    location.replace('index.html');
   }
-
-  function toast(message, type = 'default') {
+  function authHeaders() {
+    return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
+  }
+  function toast(message, type) {
     const host = document.getElementById('toastHost');
     const el = document.createElement('div');
-    el.className = `toast ${type}`;
+    el.className = 'toast ' + (type || '');
     el.textContent = message;
     host.appendChild(el);
-    setTimeout(() => el.remove(), 4500);
+    setTimeout(function () { el.remove(); }, 4500);
   }
-
+  function fmt(n, d) {
+    d = d == null ? 4 : d;
+    const x = Number(n);
+    if (!isFinite(x)) return '–';
+    return x.toLocaleString(undefined, { maximumFractionDigits: d, minimumFractionDigits: 0 });
+  }
   function fmtDuration(seconds) {
-    const totalSec = Math.max(0, seconds);
-    const d = Math.floor(totalSec / 86400);
-    const h = Math.floor((totalSec % 86400) / 3600);
-    if (d > 0) return `${d}pv ${h}h`;
-    const m = Math.floor((totalSec % 3600) / 60);
-    return `${h}h ${m}min`;
+    const s = Math.max(0, seconds);
+    const d = Math.floor(s / 86400);
+    const h = Math.floor((s % 86400) / 3600);
+    if (d > 0) return d + 'd ' + h + 'h';
+    const m = Math.floor((s % 3600) / 60);
+    return h + 'h ' + m + 'm';
   }
 
   async function apiGet(path) {
     const res = await fetch(BACKEND_URL + path, { headers: authHeaders() });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Virhe');
+    if (!res.ok) throw new Error(data.error || data.errorEn || 'Error');
     return data;
   }
   async function apiPost(path, body) {
-    const res = await fetch(BACKEND_URL + path, { method: 'POST', headers: authHeaders(), body: JSON.stringify(body || {}) });
+    const res = await fetch(BACKEND_URL + path, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(body || {})
+    });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Virhe');
+    if (!res.ok) throw new Error(data.error || data.errorEn || 'Error');
     return data;
   }
 
   async function refreshWallet() {
     try {
       const data = await apiGet('/api/wallet');
-      const helAmt = parseFloat(data.helBalance);
-      document.getElementById('walletBalance').textContent =
-        helAmt.toLocaleString('fi-FI', {maximumFractionDigits: 4}) + ' HNET';
-      document.getElementById('walletAddress').textContent = data.address;
+      walletHel = parseFloat(data.helBalance) || 0;
+      document.getElementById('walletBalance').textContent = fmt(walletHel) + ' HNET';
+      document.getElementById('walletAddress').textContent = data.address || '';
+      const slider = document.getElementById('amountSlider');
+      if (walletHel > 0) {
+        slider.max = String(Math.max(1000, Math.ceil(walletHel)));
+      }
       try {
         const priceRes = await fetch(BACKEND_URL + '/api/prices');
         const prices = await priceRes.json();
-        if (priceRes.ok && prices.poolExists) {
-          const usd = helAmt * prices.helUsd;
-          document.getElementById('walletUsd').textContent = '≈ $' + (usd < 0.01 ? usd.toFixed(6) : usd.toLocaleString('en-US', {maximumFractionDigits: 2}));
-        } else {
-          document.getElementById('walletUsd').textContent = '–';
+        if (priceRes.ok && prices.helUsd != null) {
+          const usd = walletHel * Number(prices.helUsd);
+          document.getElementById('walletUsd').textContent =
+            '≈ $' + (usd < 0.01 ? usd.toFixed(6) : fmt(usd, 2));
         }
       } catch (_) {}
     } catch (e) {
-      toast(t('staking.balanceFail') + ': ' + e.message, 'error');
+      toast(tt('staking.balanceFail', 'Balance failed') + ': ' + e.message, 'error');
     }
+  }
+
+  function rewardPct(tier) {
+    // API may send rewardPct as percent (bps/100) already
+    if (tier.rewardPct != null) return Number(tier.rewardPct);
+    if (tier.rewardBps != null) return Number(tier.rewardBps) / 100;
+    return 0;
+  }
+  function lockDays(tier) {
+    return Number(tier.lockDurationDays) || (Number(tier.lockDuration) / 86400) || 0;
+  }
+  function minStake(tier) {
+    return parseFloat(tier.minStake) || 0;
+  }
+
+  function selectTier(id) {
+    selectedTierId = id;
+    renderTiers();
+    updateCalc();
+    const btn = document.getElementById('stakeBtn');
+    btn.disabled = false;
+    document.getElementById('stakeHint').textContent = '';
+  }
+
+  function renderTiers() {
+    const grid = document.getElementById('tiersGrid');
+    if (!tiersCache.length) {
+      grid.innerHTML = '<div class="empty-note">' + tt('staking.tiersFail', 'No tiers') + '</div>';
+      return;
+    }
+    grid.innerHTML = '';
+    tiersCache.forEach(function (tier) {
+      const days = lockDays(tier);
+      const pct = rewardPct(tier);
+      const min = minStake(tier);
+      const row = document.createElement('div');
+      row.className = 'tier-row' + (selectedTierId === tier.id ? ' selected' : '');
+      row.onclick = function () { selectTier(tier.id); };
+      row.innerHTML =
+        '<div>' +
+          '<div class="name">' + (tier.name || ('Tier ' + tier.id)) +
+            (selectedTierId === tier.id ? ' · ' + tt('staking.selected', 'Selected') : '') +
+          '</div>' +
+          '<div class="tier-meta">' +
+            '<span>' + tt('staking.lock', 'Lock') + ': <b>' + fmt(days, 0) + ' ' + tt('staking.days', 'days') + '</b></span>' +
+            '<span>' + tt('staking.min', 'Min') + ': <b>' + fmt(min, 0) + ' HNET</b></span>' +
+            '<span>' + tt('staking.totalOverLock', 'Over lock') + ': <b>' + fmt(pct, 2) + '%</b></span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="tier-yield">' +
+          '<div class="pct">' + fmt(pct, 2) + '%</div>' +
+          '<div class="hint">' + tt('staking.reward', 'yield') + '</div>' +
+        '</div>';
+      grid.appendChild(row);
+    });
+  }
+
+  function updateCalc() {
+    const amount = parseFloat(document.getElementById('stakeAmount').value) || 0;
+    const body = document.getElementById('compareBody');
+    body.innerHTML = '';
+
+    let bestId = selectedTierId;
+    tiersCache.forEach(function (tier) {
+      const days = lockDays(tier) || 1;
+      const pct = rewardPct(tier) / 100;
+      const totalY = amount * pct;
+      const daily = totalY / days;
+      const tr = document.createElement('tr');
+      if (selectedTierId === tier.id) tr.className = 'hl';
+      tr.innerHTML =
+        '<td class="tn">' + (tier.name || tier.id) + '</td>' +
+        '<td>' + fmt(days, 0) + 'd</td>' +
+        '<td>' + fmt(totalY, 4) + '</td>' +
+        '<td>' + fmt(daily, 4) + '</td>';
+      tr.onclick = function () { selectTier(tier.id); };
+      body.appendChild(tr);
+    });
+
+    const tier = tiersCache.find(function (x) { return x.id === selectedTierId; });
+    if (!tier || amount <= 0) {
+      document.getElementById('projTotal').textContent = '–';
+      document.getElementById('projDaily').textContent = '–';
+      document.getElementById('projEnd').textContent = '–';
+      document.getElementById('projTier').textContent = tier ? (tier.name || ('#' + tier.id)) : '–';
+      return;
+    }
+    const days = lockDays(tier) || 1;
+    const pct = rewardPct(tier) / 100;
+    const totalY = amount * pct;
+    const daily = totalY / days;
+    document.getElementById('projTotal').textContent = fmt(totalY, 4) + ' HNET';
+    document.getElementById('projDaily').textContent = fmt(daily, 4) + ' HNET';
+    document.getElementById('projEnd').textContent = fmt(amount + totalY, 4) + ' HNET';
+    document.getElementById('projTier').textContent = tier.name || ('#' + tier.id);
   }
 
   async function loadTiers() {
     try {
       const res = await fetch(BACKEND_URL + '/api/staking/tiers');
       const data = await res.json();
-      tiersCache = data.tiers.filter(t => t.active);
+      if (!res.ok) throw new Error(data.error || 'tiers');
+      tiersCache = (data.tiers || []).filter(function (t) { return t.active !== false; });
+      if (tiersCache.length && selectedTierId == null) {
+        selectedTierId = tiersCache[0].id;
+      }
       renderTiers();
+      updateCalc();
+      document.getElementById('stakeHint').textContent = '';
     } catch (e) {
-      document.getElementById('tiersGrid').innerHTML = '<div class="empty-note">' + t('staking.tiersFail') + '</div>';
+      document.getElementById('tiersGrid').innerHTML =
+        '<div class="empty-note">' + tt('staking.tiersFail', 'Failed to load tiers') + '</div>';
     }
   }
 
-  function renderTiers() {
-    const grid = document.getElementById('tiersGrid');
-    grid.innerHTML = '';
-    tiersCache.forEach(t => {
+  function renderPositions() {
+    const list = document.getElementById('positionsList');
+    const active = positionsCache.filter(function (p) { return !p.withdrawn; });
+    let totalStaked = 0;
+    let totalPending = 0;
+    active.forEach(function (p) {
+      totalStaked += parseFloat(p.amount) || 0;
+      totalPending += parseFloat(p.pendingClaim) || 0;
+    });
+    document.getElementById('totalStaked').textContent = fmt(totalStaked) + ' HNET';
+    document.getElementById('totalPending').textContent = fmt(totalPending) + ' HNET';
+    document.getElementById('posCount').textContent =
+      active.length + ' ' + tt('staking.positions', 'positions');
+
+    if (!active.length) {
+      list.innerHTML = '<div class="empty-note">' + tt('staking.noActive', 'No active positions') + '</div>';
+      return;
+    }
+    list.innerHTML = '';
+    const now = Math.floor(Date.now() / 1000);
+    active.forEach(function (p) {
+      const unlock = Number(p.unlocksAt) || 0;
+      const left = unlock - now;
+      const ready = !!p.ready || left <= 0;
+      const canClaim = !!p.canClaim;
+      const pending = parseFloat(p.pendingClaim) || 0;
       const card = document.createElement('div');
-      card.className = 'tier-card' + (selectedTierId === t.id ? ' selected' : '');
-      card.onclick = () => selectTier(t.id);
-      card.innerHTML = `
-        <div class="name">${tierLabel(t.name)}</div>
-        <div class="duration">${t.lockDurationDays} ${(window.t&&window.t('staking.days'))||'vrk'}</div>
-        <div class="reward">+${t.rewardPct.toFixed(2)}% ${(window.t&&window.t('staking.reward'))||'tuotto'}</div>
-        <div class="min">Min. ${parseFloat(t.minStake).toLocaleString('fi-FI')} HNET</div>
-      `;
-      grid.appendChild(card);
+      card.className = 'pos-card' + (ready ? ' ready' : '');
+      let badge = ready
+        ? '<span class="badge ok">' + tt('staking.readyTag', 'Ready') + '</span>'
+        : '<span class="badge warn">' + tt('staking.locked', 'Locked') + ' · ' + fmtDuration(left) + '</span>';
+
+      let actions = '';
+      if (canClaim && pending > 0) {
+        actions += '<button type="button" class="btn" data-act="claim" data-i="' + p.index + '">' +
+          tt('staking.claim', 'Claim') + ' ' + fmt(pending, 4) + '</button>';
+      } else if (!ready) {
+        const next = p.nextClaimAt ? Math.max(0, Number(p.nextClaimAt) - now) : 0;
+        actions += '<button type="button" class="btn secondary" disabled>' +
+          (pending > 0
+            ? tt('staking.claimIn', 'Claim in') + ' ' + fmtDuration(next)
+            : tt('staking.accruing', 'Accruing…')) +
+          '</button>';
+      }
+      if (ready) {
+        actions += '<button type="button" class="btn" data-act="wd" data-i="' + p.index + '">' +
+          tt('staking.withdraw', 'Withdraw') + '</button>';
+      } else {
+        actions += '<button type="button" class="btn secondary" data-act="early" data-i="' + p.index + '">' +
+          tt('staking.earlyWithdraw', 'Early exit') + '</button>';
+      }
+
+      card.innerHTML =
+        '<div class="pos-top">' +
+          '<div class="pos-amt">' + fmt(p.amount) + ' HNET</div>' + badge +
+        '</div>' +
+        '<div class="pos-grid">' +
+          '<div>' + tt('staking.reward', 'Yield') + ': <b>' + fmt(p.rewardPct, 2) + '%</b></div>' +
+          '<div>' + tt('staking.pendingYield', 'Claimable') + ': <b>' + fmt(pending, 4) + '</b></div>' +
+          '<div>' + tt('staking.claimed', 'Claimed') + ': <b>' + fmt(p.claimed || 0, 4) + '</b></div>' +
+          '<div>' + tt('staking.unlock', 'Unlock') + ': <b>' +
+            (unlock ? new Date(unlock * 1000).toLocaleString() : '–') + '</b></div>' +
+        '</div>' +
+        '<div class="pos-actions">' + actions + '</div>';
+      list.appendChild(card);
+    });
+
+    list.querySelectorAll('[data-act]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const act = btn.getAttribute('data-act');
+        const i = Number(btn.getAttribute('data-i'));
+        if (act === 'claim') claimReward(i);
+        else if (act === 'wd') doWithdraw(i);
+        else if (act === 'early') doEarly(i);
+      });
     });
   }
 
-  function selectTier(tierId) {
-    selectedTierId = tierId;
-    renderTiers();
-    const tier = tiersCache.find(x => x.id === tierId);
-    const tt = window.t || ((k)=>k);
-    document.getElementById('selectedTierInfo').textContent =
-      `${tt('staking.selected')}: ${tierLabel(tier.name)} · ${tier.lockDurationDays} ${tt('staking.days')} · min ${parseFloat(tier.minStake).toLocaleString()} HNET · ${tt('staking.reward')} ${tier.rewardPct.toFixed(2)}%`;
-    const btn = document.getElementById('stakeBtn');
-    btn.disabled = false;
-    btn.textContent = tt('staking.stake');
+  async function loadPositions() {
+    try {
+      const data = await apiGet('/api/staking/positions');
+      positionsCache = data.positions || [];
+      renderPositions();
+    } catch (e) {
+      document.getElementById('positionsList').innerHTML =
+        '<div class="empty-note">' + tt('staking.positionsFail', 'Failed') + '</div>';
+    }
   }
 
   async function doStake() {
-    if (selectedTierId === null) { toast(t('staking.chooseBtn'), 'error'); return; }
+    if (selectedTierId == null) {
+      toast(tt('staking.chooseFirst', 'Select a tier'), 'error');
+      return;
+    }
     const val = document.getElementById('stakeAmount').value;
-    if (!val || parseFloat(val) <= 0) { toast(t('staking.enterAmount'), 'error'); return; }
-
+    const amount = parseFloat(val);
+    if (!(amount > 0)) {
+      toast(tt('staking.enterAmount', 'Enter amount'), 'error');
+      return;
+    }
+    const tier = tiersCache.find(function (x) { return x.id === selectedTierId; });
+    if (tier && amount < minStake(tier)) {
+      toast(tt('staking.min', 'Min') + ': ' + fmt(minStake(tier)) + ' HNET', 'error');
+      return;
+    }
     const btn = document.getElementById('stakeBtn');
-    btn.disabled = true; btn.textContent = (window.t && t('common.loading')) || '…';
+    btn.disabled = true;
+    btn.textContent = tt('staking.loading', '…');
     try {
-      await apiPost('/api/staking/stake', { tierId: selectedTierId, amount: val });
-      toast((window.t && t('common.success')) || 'OK', 'success');
+      await apiPost('/api/staking/stake', { tierId: selectedTierId, amount: String(val) });
+      toast(tt('staking.stakeOk', 'Staked'), 'success');
       document.getElementById('stakeAmount').value = '';
+      document.getElementById('amountSlider').value = '0';
+      updateCalc();
       await refreshWallet();
       await loadPositions();
     } catch (e) {
-      toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error');
-    } finally {
-      btn.disabled = false; btn.textContent = t('staking.stake');
+      toast(e.message, 'error');
     }
+    btn.disabled = false;
+    btn.textContent = tt('staking.stake', 'Stake');
   }
 
-  async function loadPositions() {
-    const listEl = document.getElementById('positionsList');
+  async function claimReward(index) {
     try {
-      const data = await apiGet('/api/staking/positions');
-      const active = data.positions.filter(p => !p.withdrawn);
-      if (active.length === 0) {
-        listEl.innerHTML = '<div class="empty-note">' + t('staking.noActive') + '</div>';
-        return;
-      }
-      const now = Math.floor(Date.now() / 1000);
-      listEl.innerHTML = '';
-      active.forEach(p => {
-        const remaining = p.unlocksAt - now;
-        const card = document.createElement('div');
-        card.className = 'position-card';
-        card.innerHTML = `
-          <div class="position-top">
-            <div class="position-amount">${parseFloat(p.amount).toLocaleString('fi-FI',{maximumFractionDigits:2})} HNET</div>
-            <div class="position-tag ${p.ready ? 'ready' : 'locked'}">${p.ready ? t('staking.readyTag') : t('staking.locked')}</div>
-          </div>
-          <div style="font-size:11.5px; color:var(--muted); margin-bottom:14px;">
-            ${p.ready ? t('staking.lockEnded') : fmtDuration(remaining) + ' ' + t('staking.left')} · ${t('staking.reward')} ${p.rewardPct.toFixed(2)}%
-          </div>
-          <div class="position-actions">
-            ${p.ready
-              ? `<button class="btn-withdraw" onclick="handleWithdraw(${p.index})">${t("staking.withdraw")}</button>`
-              : `<button class="btn-early" onclick="handleEarlyWithdraw(${p.index})">${t("staking.earlyWithdraw")}</button>`}
-          </div>
-        `;
-        listEl.appendChild(card);
-      });
+      await apiPost('/api/staking/claim-reward', { stakeIndex: index });
+      toast(tt('staking.claimOk', 'Claimed'), 'success');
+      await refreshWallet();
+      await loadPositions();
     } catch (e) {
-      listEl.innerHTML = '<div class="empty-note">' + t('staking.positionsFail') + '</div>';
+      toast(e.message, 'error');
     }
   }
 
-  async function handleWithdraw(index) {
+  async function doWithdraw(index) {
     try {
       await apiPost('/api/staking/withdraw', { stakeIndex: index });
-      toast(t('staking.withdrawOk'), 'success');
+      toast(tt('staking.withdrawOk', 'Withdrawn'), 'success');
       await refreshWallet();
       await loadPositions();
     } catch (e) {
-      toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error');
+      toast(e.message, 'error');
     }
   }
 
-  async function handleEarlyWithdraw(index) {
-    if (!confirm(t('staking.confirmEarly'))) return;
+  async function doEarly(index) {
+    if (!confirm(tt('staking.confirmEarly', 'Forfeit remaining yield?'))) return;
     try {
       await apiPost('/api/staking/early-withdraw', { stakeIndex: index });
-      toast(t('staking.earlyOk'), 'success');
+      toast(tt('staking.earlyOk', 'Principal returned'), 'success');
       await refreshWallet();
       await loadPositions();
     } catch (e) {
-      toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error');
+      toast(e.message, 'error');
     }
   }
+
+  // inputs
+  const amountInput = document.getElementById('stakeAmount');
+  const slider = document.getElementById('amountSlider');
+  amountInput.addEventListener('input', function () {
+    const v = parseFloat(amountInput.value) || 0;
+    if (v <= Number(slider.max)) slider.value = String(Math.round(v));
+    updateCalc();
+  });
+  slider.addEventListener('input', function () {
+    amountInput.value = slider.value;
+    updateCalc();
+  });
+  document.querySelectorAll('.chip[data-amt]').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      const a = chip.getAttribute('data-amt');
+      let v = 0;
+      if (a === 'max') v = walletHel;
+      else if (a === 'pct25') v = walletHel * 0.25;
+      else if (a === 'pct50') v = walletHel * 0.5;
+      else v = parseFloat(a) || 0;
+      amountInput.value = String(Math.floor(v * 1e6) / 1e6);
+      slider.value = String(Math.min(Number(slider.max), Math.round(v)));
+      updateCalc();
+    });
+  });
+
+  window.doStake = doStake;
+  window.logout = logout;
 
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
   loadTiers();
   refreshWallet();
   loadPositions();
+  setInterval(loadPositions, 60000);
+})();
 </script>
 <script src="i18n.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     if (window.HelionI18n) {
       HelionI18n.mountLangSwitch(document.body);
       HelionI18n.applyLang();
