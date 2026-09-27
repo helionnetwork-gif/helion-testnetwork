@@ -611,94 +611,78 @@ td.mono{ color: var(--text); word-break: break-all; }
 [data-lang-only].is-active{display:block;}
 
 
-/* —— Home glass tiles (match site-nav icon language) —— */
-.home-grid{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 4px 0 20px;
-  padding: 0;
+  .home-tile .home-ico-svg{ width: 30px; height: 30px; }
 }
-.home-tile{
+
+
+/* Home menu — same language as site-nav (list, glass, no emoji) */
+.menu-grid.menu-grid-glass{
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 8px;
-  text-decoration: none;
-  color: var(--muted, #8B8F98);
-  -webkit-tap-highlight-color: transparent;
-  border: none;
-  background: transparent;
-  padding: 0;
+  margin: 4px 0 20px;
 }
-.home-tile-glass{
-  width: 100%;
-  aspect-ratio: 1;
-  max-height: 88px;
+.menu-grid.menu-grid-glass a{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--text, #E8EAED);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background .2s, border-color .2s, transform .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.menu-grid.menu-grid-glass a:hover{
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.1);
+}
+.menu-grid.menu-grid-glass a:active{ transform: scale(0.99); }
+.menu-grid.menu-grid-glass a .ico{
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.06),
-    0 8px 24px rgba(0,0,0,0.18);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: background .2s, border-color .2s, transform .15s, box-shadow .2s;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 0;
+  line-height: 0;
 }
-.home-tile .home-ico-svg{
-  width: 28px;
-  height: 28px;
+.menu-grid.menu-grid-glass a .menu-svg{
+  width: 22px;
+  height: 22px;
   opacity: 0.75;
   color: var(--text, #E8EAED);
 }
-.home-tile-label{
-  font-size: 11px;
+.menu-grid.menu-grid-glass a:hover .menu-svg{ opacity: 1; }
+.menu-grid.menu-grid-glass a > span[data-i18n],
+.menu-grid.menu-grid-glass a > span:not(.ico):not(.chev):not(.tag){
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+}
+.menu-grid.menu-grid-glass a .chev{
+  margin-left: auto;
   color: var(--muted, #8B8F98);
-  text-align: center;
-  line-height: 1.2;
+  font-size: 16px;
+  opacity: 0.55;
 }
-.home-tile:hover .home-tile-glass,
-.home-tile:focus-visible .home-tile-glass{
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.12);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.1),
-    0 10px 28px rgba(0,0,0,0.22);
+.menu-grid.menu-grid-glass a .tag{
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin-left: 4px;
 }
-.home-tile:hover .home-ico-svg,
-.home-tile:focus-visible .home-ico-svg{ opacity: 1; }
-.home-tile:hover .home-tile-label{ color: var(--text, #E8EAED); }
-.home-tile:active .home-tile-glass{ transform: scale(0.96); }
-.home-tile.soon{ opacity: 0.45; pointer-events: none; }
-
-.home-wallet{
-  background: rgba(255,255,255,0.03) !important;
-  border: 1px solid rgba(255,255,255,0.06) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.05),
-    0 12px 32px rgba(0,0,0,0.2) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-.home-wallet .lbl{
-  opacity: 0.85;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-@media (max-width: 360px){
-  .home-grid{ gap: 10px; }
-  .home-tile-glass{ border-radius: 14px; max-height: 76px; }
-  .home-tile .home-ico-svg{ width: 24px; height: 24px; }
-  .home-tile-label{ font-size: 10px; }
-}
-@media (min-width: 420px){
-  .home-tile-glass{ max-height: 96px; border-radius: 20px; }
-  .home-tile .home-ico-svg{ width: 30px; height: 30px; }
+.menu-grid.menu-grid-glass a.soon{
+  opacity: 0.5;
 }
