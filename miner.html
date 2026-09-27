@@ -444,7 +444,15 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     startGaugeClock();
   }
 
-  function fmtMineTime renderMineRows(list, host) {
+  function fmtMineTime(ts) {
+    if (ts == null || ts === '') return '–';
+    var d = new Date(typeof ts === 'number' && ts < 1e12 ? ts * 1000 : ts);
+    if (isNaN(d.getTime())) return '–';
+    try { return d.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' }); }
+    catch (e) { return '–'; }
+  }
+
+  function renderMineRows(list, host) {
     if (!host) return;
     if (!list || !list.length) {
       host.innerHTML = '<div class="muted">' + (typeof t === 'function' ? t('miner.histEmpty') : 'No mining events yet') + '</div>';
