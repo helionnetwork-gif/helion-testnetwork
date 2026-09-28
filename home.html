@@ -88,3 +88,130 @@
     </a>
   </nav>
 
+  <div id="toastHost"></div>
+</div>
+
+<script>
+const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
+
+  const token = localStorage.getItem('helion_token');
+  const username = localStorage.getItem('helion_username');
+  if (!token || String(token).length < 20) {
+    location.replace('index.html');
+  }
+
+  function authHeaders() {
+    return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
+  }
+
+  function logout() {
+    localStorage.removeItem('helion_token');
+    localStorage.removeItem('helion_username');
+    window.location.href = 'index.html';
+  }
+
+  function toast(message, isError) {
+    const host = document.getElementById('toastHost');
+    if (!host) return;
+    const el = document.createElement('div');
+    el.className = 'toast' + (isError ? ' error' : '');
+    el.textContent = message;
+    host.appendChild(el);
+    setTimeout(function () { el.remove(); }, 4500);
+  }
+
+  function fmtNum(n, maxFrac) {
+    if (n == null || !isFinite(n)) return '–';
+    try {
+      return n.toLocaleString(undefined, { maximumFractionDigits: maxFrac != null ? maxFrac : 4 });
+    } catch (_) {
+      return String(n);
+    }
+  }
+
+  function fmtUsd(n) {
+    if (n == null || !isFinite(n) || n <= 0) return '–';
+    if (n < 0.01) return '≈ $' + n.toFixed(6);
+    try {
+      return '≈ $' + n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    } catch (_) {
+      return '≈ $' + n.toFixed(2);
+    }
+  }
+
+  async function loadWallet() {
+    try {
+      const res = await fetch(BACKEND_URL + '/api/wallet', { headers: authHeaders() });
+      const data = await res.json().catch(function () { return {}; });
+      if (!res.ok) {
+        toast((data && data.error) || 'Session expired', true);
+        if (res.status === 401 || res.status === 403) logout();
+        return;
+      }
+
+      const helAmt = parseFloat(data.helBalance != null ? data.helBalance : data.hel);
+      const bnbAmt = parseFloat(data.bnbBalance != null ? data.bnbBalance : data.bnb);
+      const hel = isFinite(helAmt) ? helAmt : 0;
+      const bnb = isFinite(bnbAmt) ? bnbAmt : 0;
+
+      const balHel = document.getElementById('balHel');
+      if (balHel) balHel.textContent = fmtNum(hel, 4);
+
+      const balBnb = document.getElementById('balBnb');
+      if (balBnb) balBnb.textContent = fmtNum(bnb, 6) + ' tBNB';
+
+      const addr = data.address || data.walletAddress || '–';
+      const addrEl = document.getElementById('walletAddress');
+      if (addrEl) addrEl.textContent = addr;
+
+      try {
+        const priceRes = await fetch(BACKEND_URL + '/api/prices');
+        const prices = await priceRes.json().catch(function () { return {}; });
+        if (priceRes.ok) {
+          const helUsd = Number(prices.helUsd) || 0;
+          const bnbUsd = Number(prices.bnbUsd) || 0;
+          const poolOk = prices.poolExists !== false && helUsd > 0;
+
+          const priceHel = document.getElementById('priceHel');
+          if (priceHel) priceHel.textContent = poolOk ? fmtUsd(helUsd).replace('≈ ', '') : '–';
+
+          const priceBnb = document.getElementById('priceBnb');
+          if (priceBnb) priceBnb.textContent = bnbUsd > 0 ? fmtUsd(bnbUsd).replace('≈ ', '') : '–';
+
+          const helUsdEl = document.getElementById('helUsd');
+          if (helUsdEl) helUsdEl.textContent = poolOk ? fmtUsd(hel * helUsd) : '–';
+
+          const bnbUsdEl = document.getElementById('bnbUsd');
+          if (bnbUsdEl) bnbUsdEl.textContent = bnbUsd > 0 ? fmtUsd(bnb * bnbUsd) : '–';
+
+          const ch = document.getElementById('helChange24');
+          if (ch && prices.helChange24 != null) {
+            const c = Number(prices.helChange24);
+            if (isFinite(c)) {
+              ch.textContent = (c >= 0 ? '+' : '') + c.toFixed(2) + '%';
+              ch.style.color = c >= 0 ? 'var(--success, #3dd68c)' : 'var(--danger, #f07178)';
+            }
+          }
+        }
+      } catch (_) {
+        /* prices optional */
+      }
+    } catch (e) {
+      toast((e && e.message) || 'Failed to load wallet', true);
+    }
+  }
+
+  document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
+  loadWallet();
+</script>
+<script src="i18n.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.HelionI18n) {
+      HelionI18n.mountLangSwitch(document.body);
+      HelionI18n.applyLang();
+    }
+  });
+</script>
+</body>
+</html>
