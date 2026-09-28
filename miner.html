@@ -147,6 +147,8 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
 
   let miningInterval = null;
   let miningEndsAt = null;
+  let minerPhase = 'idle';
+  let pendingRewardNum = 0;
   let rewardPerCycleNum = 50;
   let rewardPerCycleDisplay = '';
   const MINING_DURATION_MS = 12 * 60 * 60 * 1000;
@@ -308,17 +310,34 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     if (remaining <= 0) {
       if (gaugeTime) gaugeTime.textContent = '00:00:00';
       if (logoWrap) logoWrap.classList.remove('spinning');
-      setSession(reward);
-      if (gaugeStatus) {
-        gaugeStatus.textContent = t('miner.ready');
-        gaugeStatus.className = 'status-badge ready';
+      const pending = pendingRewardNum > 0 ? pendingRewardNum : 0;
+      if (minerPhase === 'claimable' || pending > 0) {
+        setSession(pending || reward);
+        if (gaugeStatus) {
+          gaugeStatus.textContent = t('miner.ready');
+          gaugeStatus.className = 'status-badge ready';
+        }
+        if (actionBtn) {
+          actionBtn.disabled = false;
+          const claimAmt = pending > 0 ? pending : reward;
+          actionBtn.textContent = ('Claim ' + claimAmt.toLocaleString(loc, { maximumFractionDigits: 2 }) + ' HNET').trim();
+          actionBtn.dataset.mode = 'claim';
+        }
+      } else {
+        miningEndsAt = null;
+        minerPhase = 'idle';
+        setSession(0);
+        if (gaugeStatus) {
+          gaugeStatus.textContent = t('miner.inactive');
+          gaugeStatus.className = 'status-badge';
+        }
+        if (actionBtn) {
+          actionBtn.disabled = false;
+          actionBtn.textContent = t('miner.activateBtn');
+          actionBtn.dataset.mode = 'activate';
+        }
       }
-      if (actionBtn) {
-        actionBtn.disabled = false;
-        actionBtn.textContent = ('Claim ' + reward.toLocaleString(loc, { maximumFractionDigits: 2 }) + ' HNET').trim();
-        actionBtn.dataset.mode = 'claim';
-      }
-      clearInterval(miningInterval);
+      if (miningInterval) clearInterval(miningInterval);
       return;
     }
 
@@ -377,8 +396,21 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     try {
       const data = await apiGet('/api/miner/status');
       const endSec = Number(data.miningEndTime);
-      miningEndsAt = (!isFinite(endSec) || endSec <= 0) ? null : endSec * 1000;
-      if (miningEndsAt != null && isNaN(miningEndsAt)) miningEndsAt = null;
+      pendingRewardNum = parseFloat(data.pendingReward) || 0;
+      minerPhase = data.phase || 'idle';
+      if (!data.phase) {
+        const nowMs = Date.now();
+        if (endSec > 0 && endSec * 1000 > nowMs) minerPhase = 'mining';
+        else if (pendingRewardNum > 0) minerPhase = 'claimable';
+        else minerPhase = 'idle';
+      }
+      if (minerPhase === 'mining' && isFinite(endSec) && endSec > 0) {
+        miningEndsAt = endSec * 1000;
+      } else if (minerPhase === 'claimable' && isFinite(endSec) && endSec > 0) {
+        miningEndsAt = endSec * 1000;
+      } else {
+        miningEndsAt = null;
+      }
 
       rewardPerCycleNum = parseFloat(data.rewardPerCycle);
       if (!isFinite(rewardPerCycleNum) && data.emission && data.emission.scheduledReward) {
@@ -500,6 +532,9 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       if (mode === 'claim') {
         await apiPost('/api/miner/claim');
         toast(t('miner.claimOk'), 'success');
+        minerPhase = 'idle';
+        pendingRewardNum = 0;
+        miningEndsAt = null;
       } else {
         await apiPost('/api/miner/activate');
         toast(t('miner.activateOk'), 'success');

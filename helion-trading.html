@@ -74,6 +74,22 @@
 .helion-lang-switch button{border:none;background:transparent;color:var(--muted,#8B8F98);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit;}
 .helion-lang-switch button.active{background:rgba(242,169,59,0.15);color:var(--gold,#F2A93B);}
 
+
+  .chart-card{ margin-bottom:16px; padding:12px 12px 8px; }
+  .chart-toolbar{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:8px; }
+  .chart-toolbar .chart-title{ font-size:12px; font-weight:600; color:var(--muted); margin-right:auto; letter-spacing:0.03em; text-transform:uppercase; }
+  .chart-toolbar button{
+    border:1px solid var(--line); background:transparent; color:var(--muted);
+    border-radius:999px; padding:5px 10px; font-size:11px; font-weight:600;
+    cursor:pointer; font-family:inherit;
+  }
+  .chart-toolbar button.on{ background:rgba(232,185,35,0.12); color:var(--gold); border-color:rgba(232,185,35,0.35); }
+  .chart-meta{ display:flex; gap:12px; flex-wrap:wrap; font-size:11px; color:var(--muted); margin-bottom:6px; min-height:16px; }
+  .chart-meta b{ color:var(--text); font-family:'JetBrains Mono',monospace; font-weight:600; }
+  #tvChart{ width:100%; height:220px; position:relative; }
+  .chart-empty{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:12px; color:var(--muted); pointer-events:none; }
+  @media (min-width:420px){ #tvChart{ height:260px; } }
 </style>
 </head>
 <body>
@@ -111,6 +127,22 @@
   <div class="pool-stats" style="margin-bottom:16px;">
     <div class="pool-stat"><div class="label" data-i18n="swap.priceHel">HNET hinta</div><div class="value" id="priceHel" style="font-size:13px;">–</div></div>
     <div class="pool-stat"><div class="label" data-i18n="swap.priceBnb">tBNB hinta</div><div class="value" id="priceBnb" style="font-size:13px;">–</div></div>
+  </div>
+
+  <div class="card chart-card">
+    <div class="chart-toolbar">
+      <span class="chart-title" data-i18n="swap.chart">Chart</span>
+      <button type="button" class="chart-range on" data-range="1h">1H</button>
+      <button type="button" class="chart-range" data-range="24h">24H</button>
+      <button type="button" class="chart-range" data-range="7d">7D</button>
+      <button type="button" class="chart-range" data-range="30d">30D</button>
+      <button type="button" id="chartFieldBtn" data-field="helUsd" title="Toggle quote">USD</button>
+    </div>
+    <div class="chart-meta">
+      <span>HNET <b id="chartLast">–</b></span>
+      <span id="chartChangeWrap">24h <b id="chartChange">–</b></span>
+    </div>
+    <div id="tvChart"><div class="chart-empty" id="chartEmpty">Loading…</div></div>
   </div>
 
   <div class="tabs">
@@ -158,6 +190,7 @@
   </div>
 </div>
 <div id="toastHost"></div>
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
 <script>
   const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) || 'https://testnetworkserver.onrender.com';
   const token = localStorage.getItem('helion_token');
@@ -202,8 +235,11 @@
   }
   async function apiPost(path, body) {
     const res = await fetch(BACKEND_URL + path, { method: 'POST', headers: authHeaders(), body: JSON.stringify(body || {}) });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Virhe');
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const msg = data.errorEn || data.error || data.message || ('HTTP ' + res.status);
+      throw new Error(msg);
+    }
     return data;
   }
   async function refreshBalances() {
@@ -263,14 +299,22 @@
   async function refreshPool() {
     try {
       const data = await apiGet('/api/trading/pool', false);
-      if (!data.exists) {
-        document.getElementById('poolHel').textContent = 'Ei paria';
-        document.getElementById('poolBnb').textContent = 'Ei paria';
+      if (!data || !data.exists) {
+        document.getElementById('poolHel').textContent = '–';
+        document.getElementById('poolBnb').textContent = '–';
         return;
       }
-      document.getElementById('poolHel').textContent = parseFloat(data.helReserve).toLocaleString('fi-FI', {maximumFractionDigits: 2});
-      document.getElementById('poolBnb').textContent = parseFloat(data.bnbReserve).toLocaleString('fi-FI', {maximumFractionDigits: 4});
-    } catch (e) {}
+      const hel = parseFloat(data.helReserve);
+      const bnb = parseFloat(data.bnbReserve);
+      document.getElementById('poolHel').textContent = isFinite(hel)
+        ? hel.toLocaleString(undefined, {maximumFractionDigits: 2}) : '–';
+      document.getElementById('poolBnb').textContent = isFinite(bnb)
+        ? bnb.toLocaleString(undefined, {maximumFractionDigits: 4}) : '–';
+    } catch (e) {
+      document.getElementById('poolHel').textContent = '–';
+      document.getElementById('poolBnb').textContent = '–';
+      console.warn('[pool]', e.message);
+    }
   }
   let quoteTimer = null;
   function onFromAmountChange() {
@@ -330,7 +374,7 @@
       document.getElementById('outUsd').textContent = '–';
       await refreshPool(); await refreshPrices(); await refreshBalances();
     } catch (e) {
-      toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error');
+      toast((e && e.message) ? e.message : tt('common.error', 'Error'), 'error');
     } finally {
       btn.disabled = false; btn.textContent = 'Swap';
     }
@@ -349,7 +393,7 @@
       document.getElementById('lpHelAmount').value = '';
       document.getElementById('lpBnbAmount').value = '';
       await refreshPool(); await refreshLpBalance(); await refreshBalances(); await refreshPrices();
-    } catch (e) { toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error'); }
+    } catch (e) { toast((e && e.message) ? e.message : tt('common.error', 'Error'), 'error'); }
     finally { btn.disabled = false; btn.textContent = t('swap.addLiq'); }
   }
   async function removeLiquidity() {
@@ -362,7 +406,7 @@
       toast(t('swap.liqRemoved'), 'success');
       document.getElementById('lpRemoveAmount').value = '';
       await refreshPool(); await refreshLpBalance(); await refreshBalances(); await refreshPrices();
-    } catch (e) { toast((typeof t==='function'?t('common.error'):'Error') + ': ' + e.message, 'error'); }
+    } catch (e) { toast((e && e.message) ? e.message : tt('common.error', 'Error'), 'error'); }
     finally { btn.disabled = false; btn.textContent = 'Poista likviditeetti'; }
   }
   async function refreshLpBalance() {
@@ -373,6 +417,189 @@
   }
   document.getElementById('usernameDisplay').textContent = '@' + (username || '–');
   renderDirection();
+
+  /* —— HNET chart (TradingView Lightweight Charts) —— */
+  let chartRange = '24h';
+  let chartField = 'helUsd'; // or helPerBnb
+  let tvChart = null;
+  let tvSeries = null;
+  let chartTimer = null;
+
+  function destroyChart() {
+    if (tvChart) {
+      try { tvChart.remove(); } catch (_) {}
+      tvChart = null;
+      tvSeries = null;
+    }
+  }
+
+  function ensureChart() {
+    const el = document.getElementById('tvChart');
+    if (!el || typeof LightweightCharts === 'undefined') return false;
+    if (tvChart) return true;
+    const empty = document.getElementById('chartEmpty');
+    if (empty) empty.remove();
+    tvChart = LightweightCharts.createChart(el, {
+      width: el.clientWidth,
+      height: el.clientHeight || 220,
+      layout: {
+        background: { color: 'transparent' },
+        textColor: 'rgba(200,205,215,0.75)',
+        fontSize: 11
+      },
+      grid: {
+        vertLines: { color: 'rgba(255,255,255,0.04)' },
+        horzLines: { color: 'rgba(255,255,255,0.04)' }
+      },
+      rightPriceScale: { borderVisible: false },
+      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
+      crosshair: {
+        vertLine: { color: 'rgba(232,185,35,0.35)', labelBackgroundColor: '#E8B923' },
+        horzLine: { color: 'rgba(232,185,35,0.35)', labelBackgroundColor: '#E8B923' }
+      },
+      handleScroll: true,
+      handleScale: true
+    });
+    tvSeries = tvChart.addAreaSeries({
+      lineColor: '#E8B923',
+      topColor: 'rgba(232,185,35,0.28)',
+      bottomColor: 'rgba(232,185,35,0.02)',
+      lineWidth: 2,
+      priceLineVisible: false,
+      lastValueVisible: true
+    });
+    window.addEventListener('resize', function () {
+      if (tvChart && el) tvChart.applyOptions({ width: el.clientWidth });
+    });
+    return true;
+  }
+
+  function intervalForRange(range) {
+    if (range === '1h') return 60_000;
+    if (range === '24h' || range === '1d') return 5 * 60_000;
+    if (range === '7d' || range === '1w') return 30 * 60_000;
+    if (range === '30d' || range === '1M') return 2 * 60 * 60_000;
+    return 5 * 60_000;
+  }
+
+  async function loadChart() {
+    const empty = document.getElementById('chartEmpty');
+    try {
+      if (!ensureChart()) {
+        if (empty) empty.textContent = 'Chart lib failed to load';
+        return;
+      }
+      const intervalMs = intervalForRange(chartRange);
+      const url = BACKEND_URL + '/api/prices/candles?range=' + encodeURIComponent(chartRange) +
+        '&field=' + encodeURIComponent(chartField) + '&intervalMs=' + intervalMs;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'chart');
+
+      const candles = (data.candles || []).filter(function (c) {
+        return c && c.close > 0 && c.time;
+      });
+
+      if (!candles.length) {
+        // fallback line from history points
+        const hRes = await fetch(BACKEND_URL + '/api/prices/history?range=' + encodeURIComponent(chartRange) + '&max=400');
+        const hData = await hRes.json();
+        const pts = (hData.points || []).filter(function (p) {
+          return (chartField === 'helPerBnb' ? p.helPerBnb : p.helUsd) > 0;
+        }).map(function (p) {
+          return {
+            time: Math.floor(p.t / 1000),
+            value: chartField === 'helPerBnb' ? p.helPerBnb : p.helUsd
+          };
+        });
+        if (!pts.length) {
+          if (!document.getElementById('chartEmpty')) {
+            const d = document.createElement('div');
+            d.id = 'chartEmpty';
+            d.className = 'chart-empty';
+            d.textContent = 'No price data yet — swaps will fill the chart';
+            document.getElementById('tvChart').appendChild(d);
+          } else {
+            empty.textContent = 'No price data yet — swaps will fill the chart';
+          }
+          tvSeries.setData([]);
+          return;
+        }
+        // use line data via area series (open=high=low=close)
+        tvSeries.setData(pts.map(function (p) {
+          return { time: p.time, value: p.value };
+        }));
+        const last = pts[pts.length - 1].value;
+        const first = pts[0].value;
+        updateChartMeta(last, first);
+        tvChart.timeScale().fitContent();
+        return;
+      }
+
+      // Area series wants {time, value} — use close
+      tvSeries.setData(candles.map(function (c) {
+        return { time: c.time, value: c.close };
+      }));
+      const last = candles[candles.length - 1].close;
+      const first = candles[0].open;
+      updateChartMeta(last, first);
+      tvChart.timeScale().fitContent();
+      const em = document.getElementById('chartEmpty');
+      if (em) em.remove();
+    } catch (e) {
+      console.warn('[chart]', e);
+      if (empty) empty.textContent = e.message || 'Chart error';
+    }
+  }
+
+  function updateChartMeta(last, first) {
+    const lastEl = document.getElementById('chartLast');
+    const chEl = document.getElementById('chartChange');
+    if (lastEl) {
+      if (chartField === 'helPerBnb') {
+        lastEl.textContent = last > 0 ? (last < 0.0001 ? last.toExponential(3) : last.toPrecision(6)) + ' BNB' : '–';
+      } else {
+        lastEl.textContent = last > 0 ? ('$' + (last < 0.01 ? last.toFixed(6) : last.toFixed(4))) : '–';
+      }
+    }
+    if (chEl && first > 0 && last > 0) {
+      const pct = ((last - first) / first) * 100;
+      chEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+      chEl.style.color = pct >= 0 ? 'var(--success, #3dd68c)' : 'var(--danger, #f07178)';
+    }
+  }
+
+  function bindChartControls() {
+    document.querySelectorAll('.chart-range').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.chart-range').forEach(function (b) { b.classList.remove('on'); });
+        btn.classList.add('on');
+        chartRange = btn.getAttribute('data-range') || '24h';
+        loadChart();
+      });
+    });
+    const fieldBtn = document.getElementById('chartFieldBtn');
+    if (fieldBtn) {
+      fieldBtn.addEventListener('click', function () {
+        if (chartField === 'helUsd') {
+          chartField = 'helPerBnb';
+          fieldBtn.textContent = 'BNB';
+          fieldBtn.setAttribute('data-field', 'helPerBnb');
+        } else {
+          chartField = 'helUsd';
+          fieldBtn.textContent = 'USD';
+          fieldBtn.setAttribute('data-field', 'helUsd');
+        }
+        loadChart();
+      });
+    }
+    loadChart();
+    if (chartTimer) clearInterval(chartTimer);
+    chartTimer = setInterval(loadChart, 60_000);
+  }
+
+
+  bindChartControls();
   refreshPool(); refreshPrices(); refreshBalances();
   setInterval(refreshPrices, 60000);
   setInterval(refreshBalances, 30000);
