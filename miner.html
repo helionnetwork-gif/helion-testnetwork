@@ -310,8 +310,22 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     if (remaining <= 0) {
       if (gaugeTime) gaugeTime.textContent = '00:00:00';
       if (logoWrap) logoWrap.classList.remove('spinning');
+      // Timer ended: treat as claimable until a fresh status says otherwise.
+      // Do NOT flip to "activate" here — that caused "click to mine" while claim was due.
       const pending = pendingRewardNum > 0 ? pendingRewardNum : 0;
-      if (minerPhase === 'claimable' || pending > 0) {
+      if (minerPhase === 'idle' && pending <= 0 && !window.__minerAwaitingStatus) {
+        setSession(0);
+        if (gaugeStatus) {
+          gaugeStatus.textContent = t('miner.inactive');
+          gaugeStatus.className = 'status-badge';
+        }
+        if (actionBtn) {
+          actionBtn.disabled = false;
+          actionBtn.textContent = t('miner.activateBtn');
+          actionBtn.dataset.mode = 'activate';
+        }
+      } else {
+        if (minerPhase === 'mining') minerPhase = 'claimable';
         setSession(pending || reward);
         if (gaugeStatus) {
           gaugeStatus.textContent = t('miner.ready');
@@ -323,21 +337,13 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
           actionBtn.textContent = ('Claim ' + claimAmt.toLocaleString(loc, { maximumFractionDigits: 2 }) + ' HNET').trim();
           actionBtn.dataset.mode = 'claim';
         }
-      } else {
-        miningEndsAt = null;
-        minerPhase = 'idle';
-        setSession(0);
-        if (gaugeStatus) {
-          gaugeStatus.textContent = t('miner.inactive');
-          gaugeStatus.className = 'status-badge';
-        }
-        if (actionBtn) {
-          actionBtn.disabled = false;
-          actionBtn.textContent = t('miner.activateBtn');
-          actionBtn.dataset.mode = 'activate';
+        // Refresh chain status once when local timer hits zero
+        if (!window.__minerStatusRefreshAt || Date.now() - window.__minerStatusRefreshAt > 8000) {
+          window.__minerStatusRefreshAt = Date.now();
+          window.__minerAwaitingStatus = true;
+          loadStatus().finally(function () { window.__minerAwaitingStatus = false; });
         }
       }
-      if (miningInterval) clearInterval(miningInterval);
       return;
     }
 
@@ -358,8 +364,14 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
 
   function startGaugeClock() {
     if (miningInterval) clearInterval(miningInterval);
+    if (window.__minerPollInterval) clearInterval(window.__minerPollInterval);
     updateGauge();
     miningInterval = setInterval(updateGauge, 1000);
+    // Keep phase in sync with chain (local clock drift / missed claim state)
+    window.__minerPollInterval = setInterval(function () {
+      if (document.visibilityState === 'hidden') return;
+      loadStatus();
+    }, 45000);
   }
 
   let lastHelPrice = 0;
@@ -529,6 +541,22 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     btn.disabled = true;
     btn.textContent = mode === 'claim' ? t('miner.claiming') : t('miner.activating');
     try {
+      // Re-check chain before acting (fixes stale "activate" while claim is due)
+      try {
+        const st = await apiGet('/api/miner/status');
+        if (st.phase === 'claimable' || parseFloat(st.pendingReward) > 0) {
+          mode = 'claim';
+        } else if (st.phase === 'mining') {
+          mode = 'wait';
+        } else if (st.phase === 'idle') {
+          mode = 'activate';
+        }
+      } catch (_) {}
+      if (mode === 'wait') {
+        toast(t('miner.wait') || 'Mining in progress…', 'error');
+        await loadStatus();
+        return;
+      }
       if (mode === 'claim') {
         await apiPost('/api/miner/claim');
         toast(t('miner.claimOk'), 'success');
