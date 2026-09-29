@@ -151,6 +151,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
   let pendingRewardNum = 0;
   let rewardPerCycleNum = 50;
   let rewardPerCycleDisplay = '';
+  let actionBusy = false; // claim/activate in flight — keep button locked
   const MINING_DURATION_MS = 12 * 60 * 60 * 1000;
   const GAUGE_CIRCUMFERENCE = 2 * Math.PI * 96;
 
@@ -279,6 +280,23 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
     const loc = (typeof HelionI18n !== 'undefined' && HelionI18n.getLang && HelionI18n.getLang() === 'en') ? 'en-US' : 'fi-FI';
     const reward = Number(rewardPerCycleNum) || 50;
 
+    function setBtn(disabled, text, mode) {
+      if (!actionBtn) return;
+      // Never unlock while claim/activate tx is running
+      if (actionBusy) {
+        actionBtn.disabled = true;
+        if (actionBtn.dataset.mode === 'claim') {
+          actionBtn.textContent = t('miner.claiming') || 'Claiming…';
+        } else if (actionBtn.dataset.mode === 'activate') {
+          actionBtn.textContent = t('miner.activating') || 'Activating…';
+        }
+        return;
+      }
+      actionBtn.disabled = !!disabled;
+      if (text != null) actionBtn.textContent = text;
+      if (mode != null) actionBtn.dataset.mode = mode;
+    }
+
     function setSession(earned) {
       if (sessionEl) {
         sessionEl.textContent = earned.toLocaleString(loc, { maximumFractionDigits: 4, minimumFractionDigits: 2 }) + ' HNET';
@@ -293,11 +311,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
         gaugeStatus.textContent = t('miner.inactive');
         gaugeStatus.className = 'status-badge';
       }
-      if (actionBtn) {
-        actionBtn.disabled = false;
-        actionBtn.textContent = t('miner.activateBtn');
-        actionBtn.dataset.mode = 'activate';
-      }
+      setBtn(false, t('miner.activateBtn'), 'activate');
       return;
     }
 
@@ -319,11 +333,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
           gaugeStatus.textContent = t('miner.inactive');
           gaugeStatus.className = 'status-badge';
         }
-        if (actionBtn) {
-          actionBtn.disabled = false;
-          actionBtn.textContent = t('miner.activateBtn');
-          actionBtn.dataset.mode = 'activate';
-        }
+        setBtn(false, t('miner.activateBtn'), 'activate');
       } else {
         if (minerPhase === 'mining') minerPhase = 'claimable';
         setSession(pending || reward);
@@ -331,12 +341,8 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
           gaugeStatus.textContent = t('miner.ready');
           gaugeStatus.className = 'status-badge ready';
         }
-        if (actionBtn) {
-          actionBtn.disabled = false;
-          const claimAmt = pending > 0 ? pending : reward;
-          actionBtn.textContent = ('Claim ' + claimAmt.toLocaleString(loc, { maximumFractionDigits: 2 }) + ' HNET').trim();
-          actionBtn.dataset.mode = 'claim';
-        }
+        const claimAmt = pending > 0 ? pending : reward;
+        setBtn(false, ('Claim ' + claimAmt.toLocaleString(loc, { maximumFractionDigits: 2 }) + ' HNET').trim(), 'claim');
         // Refresh chain status once when local timer hits zero
         if (!window.__minerStatusRefreshAt || Date.now() - window.__minerStatusRefreshAt > 8000) {
           window.__minerStatusRefreshAt = Date.now();
@@ -354,11 +360,7 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       gaugeStatus.textContent = t('miner.mining') || 'Mining…';
       gaugeStatus.className = 'status-badge active';
     }
-    if (actionBtn) {
-      actionBtn.disabled = true;
-      actionBtn.textContent = t('miner.wait') || 'Mining in progress…';
-      actionBtn.dataset.mode = 'wait';
-    }
+    setBtn(true, t('miner.wait') || 'Mining in progress…', 'wait');
   }
 
 
@@ -535,26 +537,36 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
 
   async function handleAction() {
     const btn = document.getElementById('actionBtn');
-    const mode = btn.dataset.mode;
+    if (!btn || actionBusy) return;
+    let mode = btn.dataset.mode || 'activate';
     if (mode === 'wait') return;
 
+    actionBusy = true;
     btn.disabled = true;
-    btn.textContent = mode === 'claim' ? t('miner.claiming') : t('miner.activating');
+    btn.textContent = mode === 'claim'
+      ? (t('miner.claiming') || 'Claiming…')
+      : (t('miner.activating') || 'Activating…');
     try {
       // Re-check chain before acting (fixes stale "activate" while claim is due)
       try {
         const st = await apiGet('/api/miner/status');
         if (st.phase === 'claimable' || parseFloat(st.pendingReward) > 0) {
           mode = 'claim';
+          btn.dataset.mode = 'claim';
+          btn.textContent = t('miner.claiming') || 'Claiming…';
         } else if (st.phase === 'mining') {
           mode = 'wait';
         } else if (st.phase === 'idle') {
           mode = 'activate';
+          btn.dataset.mode = 'activate';
+          btn.textContent = t('miner.activating') || 'Activating…';
         }
       } catch (_) {}
       if (mode === 'wait') {
         toast(t('miner.wait') || 'Mining in progress…', 'error');
+        actionBusy = false;
         await loadStatus();
+        updateGauge();
         return;
       }
       if (mode === 'claim') {
@@ -572,7 +584,8 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
       await loadMineHistory(3, 'mineList');
     } catch (e) {
       showActionError(e);
-      btn.disabled = false;
+    } finally {
+      actionBusy = false;
       updateGauge();
     }
   }
