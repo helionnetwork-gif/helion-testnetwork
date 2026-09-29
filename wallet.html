@@ -318,10 +318,15 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
         const prices = await priceRes.json();
         if (!priceRes.ok) throw new Error(prices.error || (typeof t==='function'?t('wallet.pricesFail'):'prices failed'));
 
-        document.getElementById('priceBnb').textContent = fmtUsd(prices.bnbUsd);
+        document.getElementById('priceBnb').textContent =
+          prices.bnbUsd > 0 ? fmtUsd(prices.bnbUsd) : '–';
         if (prices.poolExists && prices.helUsd > 0) {
           document.getElementById('priceHel').textContent = fmtUsd(prices.helUsd);
           document.getElementById('helUsd').textContent = '≈ ' + fmtUsd(helAmt * prices.helUsd);
+        } else if (prices.poolExists && prices.helPerBnb > 0) {
+          document.getElementById('priceHel').textContent =
+            Number(prices.helPerBnb).toPrecision(4) + ' BNB';
+          document.getElementById('helUsd').textContent = '–';
         } else {
           document.getElementById('priceHel').textContent = 'Ei poolia / 0 likviditeetti';
           document.getElementById('helUsd').textContent = '–';
@@ -583,13 +588,20 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
 
       const elV = document.getElementById('perfValue');
       const elC = document.getElementById('perfChange');
-      if (perf.valueNow != null) {
-        elV.textContent = '$' + Number(perf.valueNow).toFixed(2);
+      if (perf.valueNow != null && isFinite(Number(perf.valueNow))) {
+        var vn = Number(perf.valueNow);
+        elV.textContent = vn < 0.01 && vn > 0 ? ('$' + vn.toFixed(6)) : ('$' + vn.toFixed(2));
+        if (perf.valueUsdc > 0) {
+          elV.title = 'Crypto only (HNET+tBNB). Mock USDC $' + Number(perf.valueUsdc).toFixed(2) + ' excluded.';
+        }
       }
-      if (perf.changeUsd != null) {
+      if (perf.changeUsd != null && isFinite(Number(perf.changeUsd))) {
         const sign = perf.changeUsd >= 0 ? '+' : '';
-        const pct = perf.changePct != null ? ' (' + sign + Number(perf.changePct).toFixed(2) + '%)' : '';
-        elC.textContent = sign + '$' + Number(perf.changeUsd).toFixed(2) + pct;
+        const pct = perf.changePct != null && isFinite(Number(perf.changePct))
+          ? ' (' + sign + Number(perf.changePct).toFixed(2) + '%)' : '';
+        var cu = Number(perf.changeUsd);
+        var cuStr = Math.abs(cu) < 0.01 && cu !== 0 ? cu.toFixed(6) : cu.toFixed(2);
+        elC.textContent = sign + '$' + cuStr + pct;
         elC.className = 'val ' + (perf.changeUsd >= 0 ? 'up' : 'down');
       } else {
         elC.textContent = '–';

@@ -35,18 +35,89 @@
     <a href="guide.html" class="nav-item" title="Guide" aria-label="Guide" data-i18n-title="nav.guide"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 4h9.5A2.5 2.5 0 0 1 18 6.5V20l-6-2.5L6 20V4z" fill="rgba(255,255,255,0.06)" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/><path d="M9 9h5M9 12h4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" opacity="0.7"/></svg></a>
   </nav>
 
-<div class="card">
-    <h1 class="display" data-i18n="nav.board">Leaderboard</h1>
-    <p class="muted" style="margin-bottom:14px;">Pisteitä louhinnasta, stakeista, swapista ja siirroista.</p>
-    <div class="emission-box">
-      <div class="balance-row"><span>Pisteesi</span><strong class="mono" id="myScore">–</strong></div>
-      <div class="muted" id="myBreakdown" style="margin-top:8px;font-size:12px;"></div>
+</nav>
+
+  <style>
+    .lb-tabs {
+      display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px;
+    }
+    .lb-tabs button {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .lb-tabs button.active {
+      color: var(--text);
+      border-color: rgba(232,185,35,0.45);
+      background: rgba(232,185,35,0.12);
+    }
+    .lb-grid {
+      display: grid; gap: 12px;
+    }
+    @media (min-width: 720px) {
+      .lb-grid.overview { grid-template-columns: 1fr 1fr; }
+    }
+    .lb-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .lb-card h3 {
+      font-size: 13px; font-weight: 700; margin: 0 0 10px;
+      color: var(--muted); letter-spacing: 0.02em; text-transform: uppercase;
+    }
+    .board-list { list-style: none; margin: 0; padding: 0; }
+    .board-list li {
+      display: grid;
+      grid-template-columns: 36px 1fr auto;
+      gap: 8px; align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .board-list li:last-child { border-bottom: none; }
+    .board-list li.me { color: var(--gold, #E8B923); }
+    .board-list .rank { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .board-list .user { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+    .board-list .score { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+    .my-stats {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+      margin-top: 10px; font-size: 12px; color: var(--muted);
+    }
+    .my-stats strong { color: var(--text); display: block; font-size: 14px; }
+  </style>
+
+  <div class="card" style="margin-top:12px;">
+    <div class="label" data-i18n="board.you">Your contribution</div>
+    <div class="mono" id="myScore" style="font-size:22px;font-weight:700;margin-top:4px;">–</div>
+    <div class="my-stats" id="myBreakdown">
+      <div><strong id="stMine">0</strong>Mine cycles</div>
+      <div><strong id="stStake">0</strong>Staked HNET</div>
+      <div><strong id="stTrade">0</strong>Swap volume</div>
+      <div><strong id="stSend">0</strong>Sends</div>
+      <div><strong id="stLiq">0</strong>Liquidity HNET</div>
+      <div><strong id="stScore">0</strong>Total score</div>
     </div>
-    <ol class="board" id="boardList"></ol>
   </div>
 
-  <div class="foot">Built for the Future. Powered by Helion.</div>
-</div>
+  <div class="lb-tabs" role="tablist">
+    <button type="button" class="active" data-cat="all">Overview</button>
+    <button type="button" data-cat="overall">Overall</button>
+    <button type="button" data-cat="stake">Stakers</button>
+    <button type="button" data-cat="liquidity">Liquidity</button>
+    <button type="button" data-cat="trade">Traders</button>
+    <button type="button" data-cat="send">Senders</button>
+    <button type="button" data-cat="mine">Miners</button>
+  </div>
+
+  <div id="boardHost" class="lb-grid overview"></div>
+
 <div id="toastHost"></div>
 <script>
 
@@ -71,32 +142,96 @@
   }
   document.getElementById('usernameDisplay').textContent = username || '–';
 
-  async function load() {
+  const meName = (username || '').toLowerCase();
+  let currentCat = 'all';
+  const LABELS = {
+    overall: 'Overall score',
+    stake: 'Top stakers',
+    liquidity: 'Top liquidity',
+    trade: 'Top traders',
+    send: 'Top senders',
+    mine: 'Top miners'
+  };
+
+  function fmtNum(n) {
+    const x = Number(n) || 0;
+    if (x >= 1e6) return (x / 1e6).toFixed(2) + 'M';
+    if (x >= 1e3) return (x / 1e3).toFixed(1) + 'K';
+    return x.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+
+  function renderList(rows) {
+    if (!rows || !rows.length) {
+      return '<ul class="board-list"><li><span class="rank">–</span><span class="user">No data yet</span><span class="score"></span></li></ul>';
+    }
+    return '<ul class="board-list">' + rows.map(function (row, i) {
+      const me = (row.username || '').toLowerCase() === meName ? ' me' : '';
+      const disp = row.display != null ? row.display : Number(row.score || 0).toFixed(1);
+      return '<li class="' + me + '"><span class="rank">#' + (i + 1) + '</span><span class="user">@' +
+        row.username + '</span><span class="score">' + disp + '</span></li>';
+    }).join('') + '</ul>';
+  }
+
+  function renderBoards(boards) {
+    const host = document.getElementById('boardHost');
+    host.className = 'lb-grid overview';
+    const order = ['overall', 'stake', 'liquidity', 'trade', 'send', 'mine'];
+    host.innerHTML = order.map(function (id) {
+      const b = boards[id] || { label: LABELS[id], rows: [] };
+      return '<div class="lb-card"><h3>' + (b.label || LABELS[id] || id) + '</h3>' +
+        renderList(b.rows) + '</div>';
+    }).join('');
+  }
+
+  function renderSingle(label, rows) {
+    const host = document.getElementById('boardHost');
+    host.className = 'lb-grid';
+    host.innerHTML = '<div class="lb-card"><h3>' + label + '</h3>' + renderList(rows) + '</div>';
+  }
+
+  async function loadMe() {
     try {
       const meRes = await fetch(BACKEND_URL + '/api/contribution', { headers: authHeaders() });
       const me = await meRes.json();
-      if (meRes.ok) {
-        document.getElementById('myScore').textContent = (me.score != null ? Number(me.score).toFixed(1) : '–');
-        document.getElementById('myBreakdown').textContent =
-          '⛏ ' + (me.mineCount || 0) + ' · 🔒 ' + (me.stakeVolume || 0) + ' HNET · 🔄 ' + (me.tradeCount || 0) + ' · 📤 ' + (me.sendCount || 0);
-      }
+      if (!meRes.ok) return;
+      document.getElementById('myScore').textContent = me.score != null ? Number(me.score).toFixed(1) : '–';
+      document.getElementById('stMine').textContent = me.mineCount || 0;
+      document.getElementById('stStake').textContent = fmtNum(me.stakeVolume);
+      document.getElementById('stTrade').textContent = fmtNum(me.tradeVolume) + ' (' + (me.tradeCount || 0) + ')';
+      document.getElementById('stSend').textContent = (me.sendCount || 0) + ' · ' + fmtNum(me.sendVolume);
+      document.getElementById('stLiq').textContent = fmtNum(me.liquidityVolume);
+      document.getElementById('stScore').textContent = me.score != null ? Number(me.score).toFixed(1) : '–';
     } catch (e) {}
+  }
+
+  async function load() {
+    await loadMe();
     try {
-      const res = await fetch(BACKEND_URL + '/api/leaderboard?limit=20');
-      const data = await res.json();
-      const list = document.getElementById('boardList');
-      list.innerHTML = '';
-      const meName = (username || '').toLowerCase();
-      (data.leaderboard || []).forEach((row, i) => {
-        const li = document.createElement('li');
-        if ((row.username || '').toLowerCase() === meName) li.className = 'me';
-        li.innerHTML = '<span class="rank">#' + (i + 1) + '</span><span class="user">@' + row.username + '</span><span class="score mono">' + Number(row.score || 0).toFixed(1) + '</span>';
-        list.appendChild(li);
-      });
+      if (currentCat === 'all') {
+        const res = await fetch(BACKEND_URL + '/api/leaderboard?category=all&limit=8');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        renderBoards(data.boards || {});
+      } else {
+        const res = await fetch(BACKEND_URL + '/api/leaderboard?category=' + encodeURIComponent(currentCat) + '&limit=25');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        renderSingle(data.label || LABELS[currentCat] || currentCat, data.leaderboard || []);
+      }
     } catch (e) {
       toast('Leaderboard failed: ' + e.message, 'error');
     }
   }
+
+  document.querySelectorAll('.lb-tabs button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.lb-tabs button').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentCat = btn.getAttribute('data-cat') || 'all';
+      load();
+    });
+  });
+
   load();
 
 </script>

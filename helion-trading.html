@@ -258,7 +258,15 @@
       if (!res.ok) return;
       lastPrices = p;
       document.getElementById('priceBnb').textContent = fmtUsd(p.bnbUsd);
-      document.getElementById('priceHel').textContent = (p.poolExists && p.helUsd > 0) ? fmtUsd(p.helUsd) : (typeof t==='function'?t('swap.noPool'):'No pool');
+      if (p.poolExists && p.helUsd > 0) {
+        document.getElementById('priceHel').textContent = fmtUsd(p.helUsd);
+      } else if (p.poolExists && p.helPerBnb > 0) {
+        document.getElementById('priceHel').textContent =
+          Number(p.helPerBnb).toPrecision(4) + ' BNB';
+      } else {
+        document.getElementById('priceHel').textContent =
+          (typeof t === 'function' ? t('swap.noPool') : 'No pool');
+      }
     } catch (_) {}
   }
   function switchTab(tab) {
