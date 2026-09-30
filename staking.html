@@ -4,6 +4,14 @@
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0A0C10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Helion">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Helion — Staking</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -527,18 +535,22 @@
   async function loadTiers() {
     try {
       const res = await fetch(BACKEND_URL + '/api/staking/tiers');
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'tiers');
+      const data = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(data.errorEn || data.error || ('HTTP ' + res.status));
       tiersCache = (data.tiers || []).filter(function (t) { return t.active !== false; });
-      if (tiersCache.length && selectedTierId == null) {
-        selectedTierId = tiersCache[0].id;
+      if (!tiersCache.length) {
+        document.getElementById('tiersGrid').innerHTML =
+          '<div class="empty-note">' + tt('staking.noTiers', 'No active tiers on contract') + '</div>';
+        return;
       }
+      if (selectedTierId == null) selectedTierId = tiersCache[0].id;
       renderTiers();
       updateCalc();
       document.getElementById('stakeHint').textContent = '';
     } catch (e) {
       document.getElementById('tiersGrid').innerHTML =
-        '<div class="empty-note">' + tt('staking.tiersFail', 'Failed to load tiers') + '</div>';
+        '<div class="empty-note">' + tt('staking.tiersFail', 'Failed to load tiers') +
+        '<br><span style="font-size:11px;opacity:.8">' + (e.message || '') + '</span></div>';
     }
   }
 

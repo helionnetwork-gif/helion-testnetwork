@@ -4,6 +4,14 @@
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0A0C10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Helion">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Helion</title>
 <link rel="stylesheet" href="theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -171,10 +179,15 @@ const BACKEND_URL = (window.HELION_CONFIG && window.HELION_CONFIG.BACKEND_URL) |
         if (priceRes.ok) {
           const helUsd = Number(prices.helUsd) || 0;
           const bnbUsd = Number(prices.bnbUsd) || 0;
-          const poolOk = prices.poolExists !== false && helUsd > 0;
+          const helPerBnb = Number(prices.helPerBnb) || 0;
+          const poolOk = prices.poolExists === true && (helUsd > 0 || helPerBnb > 0);
 
           const priceHel = document.getElementById('priceHel');
-          if (priceHel) priceHel.textContent = poolOk ? fmtUsd(helUsd).replace('≈ ', '') : '–';
+          if (priceHel) {
+            if (helUsd > 0) priceHel.textContent = fmtUsd(helUsd).replace('≈ ', '');
+            else if (helPerBnb > 0) priceHel.textContent = helPerBnb.toPrecision(4) + ' BNB';
+            else priceHel.textContent = '–';
+          }
 
           const priceBnb = document.getElementById('priceBnb');
           if (priceBnb) priceBnb.textContent = bnbUsd > 0 ? fmtUsd(bnbUsd).replace('≈ ', '') : '–';

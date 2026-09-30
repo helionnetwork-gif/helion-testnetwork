@@ -4,6 +4,14 @@
 <script src="config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0A0C10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Helion">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Helion Trading</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="theme.css">
@@ -172,7 +180,7 @@
       </div>
     </div>
 
-    <div class="info-row"><span data-i18n="swap.fee">Platform-fee (1%)</span><span id="feeInfo">–</span></div>
+    <div class="info-row"><span data-i18n="swap.fee">Platform-fee (1%)</span><span id="feeInfo">–</span></div><div class="muted" style="font-size:12px;margin-top:4px">Rate: <span id="rateInfo">–</span></div>
     <div class="info-row"><span data-i18n="swap.feeUsd">Fee USD</span><span id="feeUsd">–</span></div>
     <div class="info-row"><span data-i18n="swap.outUsd">Saat arviolta (USD)</span><span id="outUsd">–</span></div>
     <div class="info-row"><span data-i18n="swap.route">Reitti</span><span id="routeInfo">–</span></div>
@@ -258,11 +266,13 @@
       if (!res.ok) return;
       lastPrices = p;
       document.getElementById('priceBnb').textContent = fmtUsd(p.bnbUsd);
-      if (p.poolExists && p.helUsd > 0) {
-        document.getElementById('priceHel').textContent = fmtUsd(p.helUsd);
-      } else if (p.poolExists && p.helPerBnb > 0) {
-        document.getElementById('priceHel').textContent =
-          Number(p.helPerBnb).toPrecision(4) + ' BNB';
+      if (p.poolExists && (p.helUsd > 0 || p.helPerBnb > 0)) {
+        const mid = Number(p.helPerBnb) || 0; // BNB per 1 HNET (pool mid)
+        const usd = Number(p.helUsd) || 0;
+        const parts = [];
+        if (usd > 0) parts.push(fmtUsd(usd));
+        if (mid > 0) parts.push(mid.toPrecision(4) + ' tBNB');
+        document.getElementById('priceHel').textContent = parts.join(' · ') || '–';
       } else {
         document.getElementById('priceHel').textContent =
           (typeof t === 'function' ? t('swap.noPool') : 'No pool');
@@ -346,13 +356,29 @@
           ri.textContent = (v === 'helion' ? 'Helion pool' : v === 'pancake' ? 'Pancake (varalla)' : v) + (alt ? ' | ' + alt : '');
         }
         const feeNum = parseFloat(data.fee) || 0;
-        const outNum = parseFloat(data.amountOut) || 0;
+        const outNum = parseFloat(data.amountOut || data.amountOutFmt) || 0;
+        const inNum = parseFloat(val) || 0;
         const feeUnit = direction === 'buy' ? ' TBNB' : ' HNET';
-        document.getElementById('feeInfo').textContent = feeNum.toLocaleString('fi-FI', { maximumFractionDigits: 6 }) + feeUnit;
+        document.getElementById('feeInfo').textContent = feeNum.toLocaleString(undefined, { maximumFractionDigits: 6 }) + feeUnit;
         const feeUsd = direction === 'buy' ? feeNum * (lastPrices.bnbUsd || 0) : feeNum * (lastPrices.helUsd || 0);
         const outUsd = direction === 'buy' ? outNum * (lastPrices.helUsd || 0) : outNum * (lastPrices.bnbUsd || 0);
-        document.getElementById('feeUsd').textContent = fmtUsd(feeUsd);
-        document.getElementById('outUsd').textContent = fmtUsd(outUsd);
+        const feeUsdEl = document.getElementById('feeUsd');
+        const outUsdEl = document.getElementById('outUsd');
+        if (feeUsdEl) feeUsdEl.textContent = fmtUsd(feeUsd);
+        if (outUsdEl) outUsdEl.textContent = fmtUsd(outUsd);
+        // Effective execution rate (after platform fee, before/with pool impact)
+        const rateEl = document.getElementById('rateInfo');
+        if (rateEl && inNum > 0 && outNum > 0) {
+          if (direction === 'buy') {
+            const hnetPerBnb = outNum / inNum;
+            rateEl.textContent = '1 tBNB ≈ ' + hnetPerBnb.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' HNET';
+          } else {
+            const bnbPerHnet = outNum / inNum;
+            rateEl.textContent = '1 HNET ≈ ' + bnbPerHnet.toPrecision(6) + ' tBNB';
+          }
+        } else if (rateEl) {
+          rateEl.textContent = '–';
+        }
       } catch (e) {
         document.getElementById('toAmount').value = '';
         document.getElementById('feeInfo').textContent = t('swap.noLiq');
