@@ -106,7 +106,7 @@
     <div class="mono" id="myScore" style="font-size:22px;font-weight:700;margin-top:4px;">–</div>
     <div class="my-stats" id="myBreakdown">
       <div><strong id="stMine">0</strong>Mine cycles</div>
-      <div><strong id="stStake">0</strong>Staked HNET</div>
+      <div><strong id="stStake">0</strong>Staked now (lifetime vol)</div>
       <div><strong id="stTrade">0</strong>Swap volume</div>
       <div><strong id="stSend">0</strong>Sends</div>
       <div><strong id="stLiq">0</strong>Liquidity HNET</div>
@@ -204,7 +204,12 @@
       if (!meRes.ok) return;
       document.getElementById('myScore').textContent = me.score != null ? Number(me.score).toFixed(1) : '–';
       document.getElementById('stMine').textContent = me.mineCount || 0;
-      document.getElementById('stStake').textContent = fmtNum(me.stakeVolume);
+      // Prefer on-chain current stake; show lifetime volume in score context
+      const cur = Number(me.currentStaked);
+      const life = Number(me.stakeVolume) || 0;
+      document.getElementById('stStake').textContent =
+        (Number.isFinite(cur) ? fmtNum(cur) : fmtNum(life)) +
+        (life > 0 && Number.isFinite(cur) ? ' (vol ' + fmtNum(life) + ')' : '');
       document.getElementById('stTrade').textContent = fmtNum(me.tradeVolume) + ' (' + (me.tradeCount || 0) + ')';
       document.getElementById('stSend').textContent = (me.sendCount || 0) + ' · ' + fmtNum(me.sendVolume);
       document.getElementById('stLiq').textContent = fmtNum(me.liquidityVolume);
